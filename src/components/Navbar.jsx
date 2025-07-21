@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 const Navbar = () => {
@@ -6,13 +6,13 @@ const Navbar = () => {
   const location = useLocation()
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Sermons', href: '/sermons' },
-    { name: 'Events', href: '/events' },
-    { name: 'Ministries', href: '/ministries' },
-    { name: 'Contact', href: '/contact' },
-    { name: 'Give', href: '/giving' },
+    { name: 'Home', href: '/', icon: '🏠' },
+    { name: 'About', href: '/about', icon: 'ℹ️' },
+    { name: 'Sermons', href: '/sermons', icon: '🎤' },
+    { name: 'Events', href: '/events', icon: '📅' },
+    { name: 'Ministries', href: '/ministries', icon: '🤝' },
+    { name: 'Contact', href: '/contact', icon: '📞' },
+    { name: 'Give', href: '/giving', icon: '💝' },
   ]
 
   const isActive = (path) => location.pathname === path
@@ -137,8 +137,13 @@ const Navbar = () => {
     backgroundColor: 'white',
     boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
     borderTop: '1px solid rgba(0, 0, 0, 0.05)',
-    display: isOpen ? 'block' : 'none',
-    zIndex: 50
+    transform: isOpen ? 'translateY(0)' : 'translateY(-10px)',
+    opacity: isOpen ? 1 : 0,
+    visibility: isOpen ? 'visible' : 'hidden',
+    transition: 'all 0.3s ease',
+    zIndex: 50,
+    maxHeight: isOpen ? '400px' : '0',
+    overflow: 'hidden'
   }
 
   const mobileMenuContainerStyle = {
@@ -148,13 +153,17 @@ const Navbar = () => {
   }
 
   const mobileLinkStyle = {
-    display: 'block',
-    padding: '16px 20px',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '18px 24px',
     textDecoration: 'none',
     fontWeight: '600',
     fontSize: '16px',
     borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-    transition: 'all 0.3s ease'
+    transition: 'all 0.3s ease',
+    minHeight: '60px',
+    position: 'relative',
+    gap: '12px'
   }
 
   const mobileGiveButtonStyle = {
@@ -172,8 +181,22 @@ const Navbar = () => {
     transition: 'all 0.3s ease'
   }
 
-  // Check if we're on mobile
-  const isMobile = window.innerWidth < 768
+  // Enhanced mobile detection with resize listener
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768)
+  const [isTablet, setIsTablet] = React.useState(window.innerWidth >= 768 && window.innerWidth < 1024)
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024)
+      if (window.innerWidth >= 768) {
+        setIsOpen(false) // Close mobile menu on desktop
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   return (
     <nav style={navStyle}>
@@ -270,30 +293,46 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <div style={mobileMenuStyle}>
         <div style={mobileMenuContainerStyle}>
-          {navigation.slice(0, -1).map((item) => (
+          {navigation.slice(0, -1).map((item, index) => (
             <Link
               key={item.name}
               to={item.href}
               style={{
                 ...mobileLinkStyle,
                 color: isActive(item.href) ? '#2d5a27' : '#4b5563',
-                backgroundColor: isActive(item.href) ? 'rgba(45, 90, 39, 0.05)' : 'transparent'
+                backgroundColor: isActive(item.href) ? 'rgba(45, 90, 39, 0.05)' : 'transparent',
+                animationDelay: `${index * 50}ms`
               }}
               onClick={() => setIsOpen(false)}
-              onMouseEnter={(e) => {
-                if (!isActive(item.href)) {
-                  e.target.style.backgroundColor = 'rgba(45, 90, 39, 0.05)'
-                  e.target.style.color = '#2d5a27'
-                }
+              onTouchStart={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(45, 90, 39, 0.1)'
               }}
-              onMouseLeave={(e) => {
-                if (!isActive(item.href)) {
-                  e.target.style.backgroundColor = 'transparent'
-                  e.target.style.color = '#4b5563'
-                }
+              onTouchEnd={(e) => {
+                setTimeout(() => {
+                  if (!isActive(item.href)) {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }
+                }, 150)
               }}
             >
-              {item.name}
+              <span style={{
+                fontSize: '1.25rem',
+                width: '24px',
+                textAlign: 'center',
+                flexShrink: 0
+              }}>
+                {item.icon}
+              </span>
+              <span style={{ flex: 1 }}>{item.name}</span>
+              {isActive(item.href) && (
+                <span style={{
+                  width: '4px',
+                  height: '4px',
+                  backgroundColor: '#2d5a27',
+                  borderRadius: '50%',
+                  flexShrink: 0
+                }}></span>
+              )}
             </Link>
           ))}
           <Link

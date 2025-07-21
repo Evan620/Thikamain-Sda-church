@@ -2,9 +2,33 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 const Home = () => {
-  // Check if we're on mobile
-  const isMobile = window.innerWidth < 768
-  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+  // Enhanced mobile detection with state management
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768)
+  const [isTablet, setIsTablet] = React.useState(window.innerWidth >= 768 && window.innerWidth < 1024)
+  const [isLoading, setIsLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024)
+    }
+
+    const handleLoad = () => {
+      setIsLoading(false)
+    }
+
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('load', handleLoad)
+
+    // Set loading to false after a short delay if load event doesn't fire
+    const timer = setTimeout(() => setIsLoading(false), 1000)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('load', handleLoad)
+      clearTimeout(timer)
+    }
+  }, [])
 
   const heroStyle = {
     background: 'linear-gradient(135deg, #2d5a27 0%, #1c3a1c 100%)',
@@ -178,29 +202,57 @@ const Home = () => {
                 to="/about"
                 style={primaryButtonStyle}
                 onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-3px)'
-                  e.target.style.boxShadow = '0 12px 40px rgba(0,0,0,0.3)'
+                  if (!isMobile) {
+                    e.target.style.transform = 'translateY(-3px)'
+                    e.target.style.boxShadow = '0 12px 40px rgba(0,0,0,0.3)'
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)'
-                  e.target.style.boxShadow = '0 8px 30px rgba(0,0,0,0.2)'
+                  if (!isMobile) {
+                    e.target.style.transform = 'translateY(0)'
+                    e.target.style.boxShadow = '0 8px 30px rgba(0,0,0,0.2)'
+                  }
+                }}
+                onTouchStart={(e) => {
+                  e.target.style.transform = 'scale(0.98)'
+                  e.target.style.opacity = '0.9'
+                }}
+                onTouchEnd={(e) => {
+                  setTimeout(() => {
+                    e.target.style.transform = 'scale(1)'
+                    e.target.style.opacity = '1'
+                  }, 150)
                 }}
               >
-                Plan Your Visit
+                {isMobile ? 'Plan Visit' : 'Plan Your Visit'}
               </Link>
               <Link
                 to="/sermons"
                 style={outlineButtonStyle}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'
-                  e.target.style.transform = 'translateY(-3px)'
+                  if (!isMobile) {
+                    e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'
+                    e.target.style.transform = 'translateY(-3px)'
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent'
-                  e.target.style.transform = 'translateY(0)'
+                  if (!isMobile) {
+                    e.target.style.backgroundColor = 'transparent'
+                    e.target.style.transform = 'translateY(0)'
+                  }
+                }}
+                onTouchStart={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255,255,255,0.2)'
+                  e.target.style.transform = 'scale(0.98)'
+                }}
+                onTouchEnd={(e) => {
+                  setTimeout(() => {
+                    e.target.style.backgroundColor = 'transparent'
+                    e.target.style.transform = 'scale(1)'
+                  }, 150)
                 }}
               >
-                Watch Sermons
+                {isMobile ? 'Sermons' : 'Watch Sermons'}
               </Link>
               <Link
                 to="/giving"
@@ -743,7 +795,7 @@ const Home = () => {
                   borderRadius: '10px'
                 }}>
                   <span style={{ fontWeight: '600', color: '#f59e0b' }}>Address:</span>
-                  <span style={{ fontWeight: '600' }}>Thika Town, Kenya</span>
+                  <span style={{ fontWeight: '600' }}>Makongeni, Thika</span>
                 </div>
                 <div style={{
                   display: 'flex',
@@ -778,6 +830,119 @@ const Home = () => {
                   <span style={{ fontWeight: '600', color: '#f59e0b' }}>Transport:</span>
                   <span style={{ fontWeight: '600' }}>Public nearby</span>
                 </div>
+              </div>
+
+              {/* Map Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                marginTop: '1.5rem',
+                flexDirection: isMobile ? 'column' : 'row'
+              }}>
+                <a
+                  href="https://www.google.com/maps/place/SDA+Thika+Main+Church+Kenya/@-1.053758,37.1108582,17z/data=!3m1!4b1!4m6!3m5!1s0x182f4fbb681042a9:0x39773ad0d5f57cee!8m2!3d-1.053758!4d37.1108582!16s%2Fg%2F11txs_8b0p"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mobile-btn"
+                  style={{
+                    backgroundColor: '#f59e0b',
+                    color: 'white',
+                    padding: isMobile ? '14px 16px' : '10px 16px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    fontWeight: '600',
+                    fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.3s ease',
+                    flex: 1,
+                    justifyContent: 'center',
+                    minHeight: isMobile ? '44px' : 'auto'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#d97706'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#f59e0b'
+                      e.target.style.transform = 'translateY(0)'
+                    }
+                  }}
+                  onTouchStart={(e) => {
+                    e.target.style.backgroundColor = '#d97706'
+                    e.target.style.transform = 'scale(0.98)'
+                  }}
+                  onTouchEnd={(e) => {
+                    setTimeout(() => {
+                      e.target.style.backgroundColor = '#f59e0b'
+                      e.target.style.transform = 'scale(1)'
+                    }, 150)
+                  }}
+                >
+                  <svg style={{ width: '0.9rem', height: '0.9rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {isMobile ? 'View Map' : 'View on Maps'}
+                </a>
+                <a
+                  href="https://www.google.com/maps/dir//SDA+Thika+Main+Church+Kenya/@-1.053758,37.1108582,17z"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mobile-btn"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#f59e0b',
+                    border: '2px solid #f59e0b',
+                    padding: isMobile ? '12px 16px' : '8px 16px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    fontWeight: '600',
+                    fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.3s ease',
+                    flex: 1,
+                    justifyContent: 'center',
+                    minHeight: isMobile ? '44px' : 'auto'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#f59e0b'
+                      e.target.style.color = 'white'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = '#f59e0b'
+                      e.target.style.transform = 'translateY(0)'
+                    }
+                  }}
+                  onTouchStart={(e) => {
+                    e.target.style.backgroundColor = '#f59e0b'
+                    e.target.style.color = 'white'
+                    e.target.style.transform = 'scale(0.98)'
+                  }}
+                  onTouchEnd={(e) => {
+                    setTimeout(() => {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = '#f59e0b'
+                      e.target.style.transform = 'scale(1)'
+                    }, 150)
+                  }}
+                >
+                  <svg style={{ width: '0.9rem', height: '0.9rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  Directions
+                </a>
               </div>
             </div>
 

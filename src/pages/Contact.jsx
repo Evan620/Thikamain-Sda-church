@@ -189,7 +189,7 @@ const Contact = () => {
                     </svg>
                   ),
                   title: "Address",
-                  content: "Thika Town, Kiambu County, Kenya",
+                  content: "Makongeni, Thika, Kiambu County, Kenya",
                   subtitle: "Visit us anytime during service hours",
                   color: "#2d5a27"
                 },
@@ -701,7 +701,7 @@ const Contact = () => {
               color: '#6b7280',
               fontSize: '1.1rem'
             }}>
-              We're located in the heart of Thika and would love to welcome you
+              We're located in Makongeni, Thika and would love to welcome you
             </p>
           </div>
 
@@ -711,78 +711,224 @@ const Contact = () => {
             gap: '2rem',
             alignItems: 'center'
           }}>
-            {/* Map Placeholder */}
+            {/* Google Maps Integration */}
             <div style={{
               background: 'white',
               borderRadius: '20px',
-              padding: '2rem',
+              padding: '1.5rem',
               boxShadow: '0 8px 25px rgba(0, 0, 0, 0.08)',
               border: '1px solid rgba(45, 90, 39, 0.1)',
               position: 'relative',
-              minHeight: '300px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column'
+              overflow: 'hidden'
             }}>
+              {/* Map Header */}
               <div style={{
-                width: '80px',
-                height: '80px',
-                backgroundColor: 'rgba(45, 90, 39, 0.1)',
-                borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '1rem'
+                gap: '1rem',
+                marginBottom: '1.5rem',
+                paddingBottom: '1rem',
+                borderBottom: '1px solid rgba(45, 90, 39, 0.1)'
               }}>
-                <svg style={{ width: '2.5rem', height: '2.5rem', color: '#2d5a27' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(135deg, #2d5a27 0%, #1c3a1c 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '1.5rem',
+                  boxShadow: '0 4px 12px rgba(45, 90, 39, 0.3)'
+                }}>
+                  📍
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.3rem',
+                    fontWeight: '700',
+                    color: '#2d5a27',
+                    margin: '0 0 0.25rem 0'
+                  }}>
+                    Find Our Church
+                  </h3>
+                  <p style={{
+                    color: '#6b7280',
+                    margin: 0,
+                    fontSize: '0.9rem'
+                  }}>
+                    SDA Thika Main Church, Makongeni, Thika
+                  </p>
+                </div>
               </div>
-              <h3 style={{
-                fontSize: '1.2rem',
-                fontWeight: '600',
-                color: '#2d5a27',
-                marginBottom: '0.5rem'
+
+              {/* Google Maps Embed */}
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                height: isMobile ? '280px' : '350px',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                border: '1px solid rgba(45, 90, 39, 0.1)',
+                marginBottom: '1.5rem'
               }}>
-                Interactive Map
-              </h3>
-              <p style={{
-                color: '#6b7280',
-                textAlign: 'center',
-                marginBottom: '1rem'
-              }}>
-                Click below to view our location on Google Maps
-              </p>
-              <button style={{
-                backgroundColor: '#2d5a27',
-                color: 'white',
-                fontWeight: '600',
-                padding: '12px 24px',
-                borderRadius: '10px',
-                border: 'none',
-                fontSize: '0.9rem',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0123456789!2d37.1108582!3d-1.053758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f4fbb681042a9%3A0x39773ad0d5f57cee!2sSDA%20Thika%20Main%20Church%20Kenya!5e0!3m2!1sen!2ske!4v1234567890123!5m2!1sen!2ske"
+                  width="100%"
+                  height="100%"
+                  style={{
+                    border: 0,
+                    borderRadius: '12px'
+                  }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="SDA Thika Main Church Location"
+                ></iframe>
+              </div>
+
+              {/* Map Actions */}
+              <div style={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)'
-                e.target.style.boxShadow = '0 8px 25px rgba(45, 90, 39, 0.3)'
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)'
-                e.target.style.boxShadow = 'none'
-              }}
-              >
-                <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                Open in Google Maps
-              </button>
+                gap: '0.75rem',
+                flexWrap: 'wrap',
+                flexDirection: isMobile ? 'column' : 'row'
+              }}>
+                <a
+                  href="https://www.google.com/maps/place/SDA+Thika+Main+Church+Kenya/@-1.053758,37.1108582,17z/data=!3m1!4b1!4m6!3m5!1s0x182f4fbb681042a9:0x39773ad0d5f57cee!8m2!3d-1.053758!4d37.1108582!16s%2Fg%2F11txs_8b0p"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mobile-btn"
+                  style={{
+                    backgroundColor: '#2d5a27',
+                    color: 'white',
+                    padding: isMobile ? '14px 16px' : '10px 16px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    fontWeight: '600',
+                    fontSize: '0.9rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.3s ease',
+                    flex: 1,
+                    justifyContent: 'center',
+                    minWidth: isMobile ? 'auto' : '140px',
+                    minHeight: isMobile ? '48px' : 'auto'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#1c3a1c'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#2d5a27'
+                      e.target.style.transform = 'translateY(0)'
+                    }
+                  }}
+                  onTouchStart={(e) => {
+                    e.target.style.backgroundColor = '#1c3a1c'
+                    e.target.style.transform = 'scale(0.98)'
+                  }}
+                  onTouchEnd={(e) => {
+                    setTimeout(() => {
+                      e.target.style.backgroundColor = '#2d5a27'
+                      e.target.style.transform = 'scale(1)'
+                    }, 150)
+                  }}
+                >
+                  <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {isMobile ? 'View on Maps' : 'View on Google Maps'}
+                </a>
+                <a
+                  href="https://www.google.com/maps/dir//SDA+Thika+Main+Church+Kenya/@-1.053758,37.1108582,17z"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mobile-btn"
+                  style={{
+                    backgroundColor: '#f59e0b',
+                    color: 'white',
+                    padding: isMobile ? '14px 16px' : '10px 16px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    fontWeight: '600',
+                    fontSize: '0.9rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.3s ease',
+                    flex: 1,
+                    justifyContent: 'center',
+                    minWidth: isMobile ? 'auto' : '120px',
+                    minHeight: isMobile ? '48px' : 'auto'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#d97706'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#f59e0b'
+                      e.target.style.transform = 'translateY(0)'
+                    }
+                  }}
+                  onTouchStart={(e) => {
+                    e.target.style.backgroundColor = '#d97706'
+                    e.target.style.transform = 'scale(0.98)'
+                  }}
+                  onTouchEnd={(e) => {
+                    setTimeout(() => {
+                      e.target.style.backgroundColor = '#f59e0b'
+                      e.target.style.transform = 'scale(1)'
+                    }, 150)
+                  }}
+                >
+                  <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  Get Directions
+                </a>
+              </div>
+
+              {/* Location Details */}
+              <div style={{
+                marginTop: '1.5rem',
+                padding: '1rem',
+                backgroundColor: 'rgba(45, 90, 39, 0.05)',
+                borderRadius: '10px',
+                border: '1px solid rgba(45, 90, 39, 0.1)'
+              }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(150px, 1fr))',
+                  gap: '1rem',
+                  fontSize: '0.85rem'
+                }}>
+                  <div>
+                    <strong style={{ color: '#2d5a27' }}>📍 Address:</strong>
+                    <br />
+                    <span style={{ color: '#6b7280' }}>Makongeni, Thika, Kenya</span>
+                  </div>
+                  <div>
+                    <strong style={{ color: '#2d5a27' }}>🕐 Coordinates:</strong>
+                    <br />
+                    <span style={{ color: '#6b7280' }}>-1.053758, 37.1108582</span>
+                  </div>
+                  <div>
+                    <strong style={{ color: '#2d5a27' }}>🚗 Parking:</strong>
+                    <br />
+                    <span style={{ color: '#6b7280' }}>Available on-site</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Directions and Transportation */}
@@ -822,7 +968,7 @@ const Contact = () => {
                     ),
                     title: "By Car",
                     description: "Free parking available on church grounds",
-                    details: "Main entrance on Thika Road"
+                    details: "Located in Makongeni area, Thika"
                   },
                   {
                     icon: (
@@ -831,8 +977,8 @@ const Contact = () => {
                       </svg>
                     ),
                     title: "Public Transport",
-                    description: "Multiple matatu routes serve the area",
-                    details: "Alight at Thika Main Stage"
+                    description: "Multiple matatu routes serve Makongeni",
+                    details: "Alight at Makongeni or Thika Main Stage"
                   },
                   {
                     icon: (
