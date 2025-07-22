@@ -32,6 +32,9 @@
 - **Men's Ministry:** Benard Mogere
 - **Music Ministry:** Paul Odongo
 - **Health Ministry:** Elizabeth Sapato
+- **Prayer Ministry:** Rael Karim
+- **Community Outreach:** Elder Abraham Sayah
+- **Family Life Ministry:** Elder Reuben Lusasi
 
 ### 📱 SOCIAL MEDIA
 **✅ COMPLETE:**
@@ -40,6 +43,10 @@
 ### 📖 MISSION & VISION
 **✅ COMPLETE:**
 - Mission, Vision, and Values already provided in current website
+
+### 👥 MEMBERSHIP
+**✅ COMPLETE:**
+- **Current Active Members:** 299 (including 11 newly baptized members)
 
 ---
 

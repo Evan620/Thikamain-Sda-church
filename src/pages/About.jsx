@@ -617,7 +617,7 @@ const About = () => {
                       color: '#2d5a27',
                       marginBottom: '0.5rem',
                       lineHeight: '1'
-                    }}>800+</div>
+                    }}>299</div>
                     <p style={{
                       color: '#6b7280',
                       fontWeight: '600',
