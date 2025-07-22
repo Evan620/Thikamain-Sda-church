@@ -296,12 +296,7 @@ const Home = () => {
         }}>
           <div style={{
             maxWidth: '1000px',
-            margin: '0 auto',
-            background: 'rgba(0, 0, 0, 0.3)',
-            borderRadius: '20px',
-            padding: isMobile ? '2rem 1.5rem' : '3rem 2rem',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
+            margin: '0 auto'
           }}>
             {/* Welcome Badge */}
             <div style={{ marginBottom: '2rem' }}>
