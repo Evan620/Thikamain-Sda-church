@@ -1,11 +1,23 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
+// Church images for hero background (from public folder)
+const image1 = '/assets/image1.png'
+const image2 = '/assets/image2.png'
+const image3 = '/assets/image3.png'
+const image4 = '/assets/image4.png'
+const image5 = '/assets/image5.png'
+
 const Home = () => {
   // Enhanced mobile detection with state management
   const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768)
   const [isTablet, setIsTablet] = React.useState(window.innerWidth >= 768 && window.innerWidth < 1024)
   const [isLoading, setIsLoading] = React.useState(true)
+
+  // Hero background image carousel state
+  const [currentImageIndex, setCurrentImageIndex] = React.useState(0)
+  const [imagesLoaded, setImagesLoaded] = React.useState(false)
+  const heroImages = [image1, image2, image3, image4, image5]
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -29,6 +41,44 @@ const Home = () => {
       clearTimeout(timer)
     }
   }, [])
+
+  // Preload hero images for smooth transitions
+  React.useEffect(() => {
+    const preloadImages = async () => {
+      const imagePromises = heroImages.map((src) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image()
+          img.onload = resolve
+          img.onerror = reject
+          img.src = src
+        })
+      })
+
+      try {
+        await Promise.all(imagePromises)
+        console.log('All church images loaded successfully!')
+        setImagesLoaded(true)
+      } catch (error) {
+        console.log('Some images failed to load, but continuing...', error)
+        setImagesLoaded(true)
+      }
+    }
+
+    preloadImages()
+  }, [heroImages])
+
+  // Hero background image carousel effect
+  React.useEffect(() => {
+    if (!imagesLoaded) return
+
+    const imageInterval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        (prevIndex + 1) % heroImages.length
+      )
+    }, 5000) // Change image every 5 seconds
+
+    return () => clearInterval(imageInterval)
+  }, [heroImages.length, imagesLoaded])
 
   const heroStyle = {
     background: 'linear-gradient(135deg, #2d5a27 0%, #1c3a1c 100%)',
@@ -122,30 +172,137 @@ const Home = () => {
     <div>
       {/* Hero Section */}
       <section style={heroStyle}>
-        {/* Enhanced Background Elements */}
+        {/* Church Images Background Carousel */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-          opacity: 0.4
-        }}></div>
+          overflow: 'hidden'
+        }}>
+          {/* Loading state */}
+          {!imagesLoaded && (
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'linear-gradient(135deg, #2d5a27 0%, #1c3a1c 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                border: '3px solid rgba(245, 158, 11, 0.3)',
+                borderTop: '3px solid #f59e0b',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}></div>
+            </div>
+          )}
 
-        {/* Gradient Overlay */}
+          {/* Image carousel */}
+          {imagesLoaded && heroImages.map((image, index) => (
+            <div
+              key={index}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url(${image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundColor: '#2d5a27', // Fallback color if image fails to load
+                opacity: index === currentImageIndex ? 1 : 0,
+                transition: 'all 2.5s ease-in-out',
+                transform: index === currentImageIndex ? 'scale(1.05)' : 'scale(1)',
+                filter: 'brightness(0.8) contrast(1.1) saturate(1.1)',
+                zIndex: 1
+              }}
+            />
+          ))}
+        </div>
+
+
+
+        {/* Subtle Pattern Overlay */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'radial-gradient(ellipse at center, rgba(45, 90, 39, 0.1) 0%, rgba(28, 58, 28, 0.3) 100%)',
-          zIndex: 1
+          background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.02"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+          zIndex: 3
         }}></div>
 
-        <div style={containerStyle}>
-          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        {/* Image Carousel Indicators */}
+        {imagesLoaded && (
+          <div style={{
+            position: 'absolute',
+            bottom: '2rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '0.75rem',
+            zIndex: 5,
+            opacity: imagesLoaded ? 1 : 0,
+            transition: 'opacity 1s ease-in-out'
+          }}>
+            {heroImages.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentImageIndex(index)}
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  border: '2px solid rgba(255, 255, 255, 0.5)',
+                  backgroundColor: index === currentImageIndex ? 'rgba(245, 158, 11, 0.9)' : 'rgba(255, 255, 255, 0.3)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxShadow: index === currentImageIndex ? '0 0 10px rgba(245, 158, 11, 0.5)' : 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (index !== currentImageIndex) {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.6)'
+                    e.target.style.transform = 'scale(1.2)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (index !== currentImageIndex) {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
+                    e.target.style.transform = 'scale(1)'
+                  }
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        <div style={{
+          ...containerStyle,
+          position: 'relative',
+          zIndex: 4
+        }}>
+          <div style={{
+            maxWidth: '1000px',
+            margin: '0 auto',
+            background: 'rgba(0, 0, 0, 0.3)',
+            borderRadius: '20px',
+            padding: isMobile ? '2rem 1.5rem' : '3rem 2rem',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
             {/* Welcome Badge */}
             <div style={{ marginBottom: '2rem' }}>
               <span style={{
@@ -166,10 +323,13 @@ const Home = () => {
             </div>
 
             {/* Main Title */}
-            <h1 style={titleStyle}>
+            <h1 style={{
+              ...titleStyle,
+              textShadow: '0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3)'
+            }}>
               THIKA MAIN <span style={{
                 color: '#fbbf24',
-                textShadow: '0 0 30px rgba(251, 191, 36, 0.3)'
+                textShadow: '0 0 30px rgba(251, 191, 36, 0.5), 0 4px 8px rgba(0, 0, 0, 0.5)'
               }}>SDA</span> CHURCH
             </h1>
 
@@ -180,7 +340,7 @@ const Home = () => {
                 fontSize: '1.5rem',
                 fontWeight: '300',
                 marginBottom: '1.5rem',
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.3)'
               }}>
                 "For I know the plans I have for you," declares the Lord, "plans to prosper you and not to harm you, to give you hope and a future."
               </blockquote>
@@ -190,7 +350,7 @@ const Home = () => {
                 fontSize: '1.3rem',
                 textTransform: 'uppercase',
                 letterSpacing: '2px',
-                textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'
+                textShadow: '0 0 20px rgba(251, 191, 36, 0.5), 0 2px 4px rgba(0, 0, 0, 0.5)'
               }}>
                 — Jeremiah 29:11
               </cite>
@@ -1574,6 +1734,14 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
