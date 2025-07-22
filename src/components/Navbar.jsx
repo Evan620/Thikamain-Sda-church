@@ -32,13 +32,13 @@ const Navbar = () => {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: '90px',
+    height: '95px',
     padding: '0 1rem'
   }
 
   const mobileContainerStyle = {
     ...containerStyle,
-    height: '70px',
+    height: '75px',
     padding: '0 1rem'
   }
 
@@ -201,11 +201,49 @@ const Navbar = () => {
   return (
     <nav style={navStyle}>
       <div style={isMobile ? mobileContainerStyle : containerStyle}>
-        <Link to="/" style={logoStyle}>
-          <div style={isMobile ? mobileLogoIconStyle : logoIconStyle}>T</div>
-          <div>
-            <div style={isMobile ? mobileLogoTextStyle : logoTextStyle}>Thika Main SDA</div>
-            <div style={isMobile ? mobileLogoSubtextStyle : logoSubtextStyle}>Church</div>
+        <Link to="/" style={{
+          ...logoStyle,
+          alignItems: 'center',
+          gap: isMobile ? '0.75rem' : '1rem'
+        }}>
+          <img
+            src="/assets/seventhdayadventistchurch.png"
+            alt="Seventh-day Adventist Church Logo"
+            style={{
+              width: isMobile ? '50px' : '65px',
+              height: isMobile ? '50px' : '65px',
+              objectFit: 'contain',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.95)',
+              padding: '6px',
+              boxShadow: '0 2px 8px rgba(45, 90, 39, 0.15)',
+              border: '1px solid rgba(45, 90, 39, 0.1)'
+            }}
+          />
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}>
+            <div style={{
+              fontSize: isMobile ? '15px' : '17px',
+              fontWeight: '700',
+              color: '#2d5a27',
+              letterSpacing: '-0.2px',
+              lineHeight: '1.2',
+              marginBottom: '1px'
+            }}>
+              Thika Main SDA
+            </div>
+            <div style={{
+              fontSize: isMobile ? '10px' : '11px',
+              color: '#6b7280',
+              fontWeight: '600',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase'
+            }}>
+              Church
+            </div>
           </div>
         </Link>
 

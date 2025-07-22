@@ -822,7 +822,7 @@ const Giving = () => {
                     {
                       name: 'Bank Transfer',
                       description: 'Direct bank transfer',
-                      details: 'Account: Thika Main SDA Church | Bank: KCB',
+                      details: 'Equity Bank | Account: 1710276436520',
                       icon: '🏦',
                       color: '#7c3aed',
                       bgColor: 'rgba(124, 58, 237, 0.1)'
@@ -1048,6 +1048,102 @@ const Giving = () => {
                     margin: 0
                   }}>
                     💚 Thank you for your generous giving! You will receive an M-PESA confirmation message.
+                  </p>
+                </div>
+              </div>
+
+              {/* Bank Transfer Instructions */}
+              <div style={{
+                marginTop: '2rem',
+                padding: '1.5rem',
+                backgroundColor: 'rgba(124, 58, 237, 0.05)',
+                borderRadius: '12px',
+                border: '1px solid rgba(124, 58, 237, 0.1)'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '1rem'
+                }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    backgroundColor: '#7c3aed',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1rem'
+                  }}>
+                    🏦
+                  </div>
+                  <h4 style={{
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
+                    color: '#7c3aed',
+                    margin: 0
+                  }}>
+                    Bank Transfer Details
+                  </h4>
+                </div>
+
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '1rem',
+                  marginBottom: '1.5rem'
+                }}>
+                  {[
+                    { label: 'Bank Name', value: 'Equity Bank' },
+                    { label: 'Account Name', value: 'Seventh Day Adventist Thika Main' },
+                    { label: 'Account Number', value: '1710276436520' },
+                    { label: 'Branch', value: 'Makongeni Thika' }
+                  ].map((detail, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        padding: '1rem',
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(124, 58, 237, 0.1)',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <div style={{
+                        fontSize: '0.8rem',
+                        fontWeight: '600',
+                        color: '#7c3aed',
+                        marginBottom: '0.5rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {detail.label}
+                      </div>
+                      <div style={{
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        color: '#374151'
+                      }}>
+                        {detail.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{
+                  padding: '0.75rem',
+                  backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <p style={{
+                    fontSize: '0.85rem',
+                    color: '#7c3aed',
+                    fontWeight: '600',
+                    margin: 0
+                  }}>
+                    💜 Please include your name and "Church Offering" in the transfer reference for proper record keeping.
                   </p>
                 </div>
               </div>

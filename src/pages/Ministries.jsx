@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 
 const Ministries = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedMinistry, setSelectedMinistry] = useState(null)
+  const [showVolunteerForm, setShowVolunteerForm] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
 
   // Check if we're on mobile
   const isMobile = window.innerWidth < 768
@@ -16,12 +19,54 @@ const Ministries = () => {
       description: "Empowering young people aged 13-25 to grow in faith, build lasting friendships, and serve their community through dynamic programs and activities.",
       leader: "Deacon James Kiprotich",
       contact: "youth@thikasda.org",
+      phone: "+254 712 345 678",
       meetingTime: "Fridays 6:00 PM",
       location: "Youth Hall",
       activities: ["Bible Study", "Community Service", "Sports", "Music"],
       icon: "👥",
       color: "#2d5a27",
-      image: "/api/placeholder/400/250"
+      image: "/api/placeholder/400/250",
+      detailedDescription: "Our Youth Ministry is dedicated to nurturing the spiritual, emotional, and social development of young people. We provide a safe space where youth can explore their faith, ask questions, and grow in their relationship with Jesus Christ. Through various programs including weekly Bible studies, community service projects, sports activities, and music ministry, we aim to develop well-rounded Christian leaders for tomorrow.",
+      mission: "To empower young people to live purposeful lives centered on Christ and to equip them for leadership in the church and community.",
+      volunteerOpportunities: [
+        {
+          title: "Youth Leader Assistant",
+          description: "Help facilitate youth programs and mentor young people",
+          requirements: ["Heart for youth ministry", "Regular church attendance", "Background check"],
+          timeCommitment: "4-6 hours per week"
+        },
+        {
+          title: "Music Coordinator",
+          description: "Lead youth worship team and organize musical activities",
+          requirements: ["Musical skills", "Leadership experience", "Passion for worship"],
+          timeCommitment: "3-4 hours per week"
+        },
+        {
+          title: "Event Organizer",
+          description: "Plan and coordinate youth events and outreach activities",
+          requirements: ["Event planning experience", "Creative thinking", "Team player"],
+          timeCommitment: "2-3 hours per week"
+        }
+      ],
+      resources: [
+        { name: "Youth Bible Study Guide", type: "PDF", size: "2.3 MB" },
+        { name: "Activity Planning Template", type: "DOC", size: "1.1 MB" },
+        { name: "Youth Ministry Handbook", type: "PDF", size: "5.2 MB" },
+        { name: "Community Service Ideas", type: "PDF", size: "800 KB" }
+      ],
+      photoGallery: [
+        { url: "/api/placeholder/300/200", caption: "Youth Bible Study Session" },
+        { url: "/api/placeholder/300/200", caption: "Community Service Project" },
+        { url: "/api/placeholder/300/200", caption: "Youth Sports Day" },
+        { url: "/api/placeholder/300/200", caption: "Music Ministry Practice" },
+        { url: "/api/placeholder/300/200", caption: "Youth Retreat 2024" },
+        { url: "/api/placeholder/300/200", caption: "Baptism Celebration" }
+      ],
+      schedule: [
+        { day: "Friday", time: "6:00 PM - 8:00 PM", activity: "Youth Bible Study & Fellowship", location: "Youth Hall" },
+        { day: "Saturday", time: "2:00 PM - 4:00 PM", activity: "Community Service (Monthly)", location: "Various Locations" },
+        { day: "Sunday", time: "4:00 PM - 6:00 PM", activity: "Youth Choir Practice", location: "Main Sanctuary" }
+      ]
     },
     {
       id: 2,
@@ -30,12 +75,54 @@ const Ministries = () => {
       description: "Nurturing children ages 3-12 in their relationship with Jesus Christ through engaging lessons, activities, and loving care.",
       leader: "Elder Mary Njeri",
       contact: "children@thikasda.org",
+      phone: "+254 723 456 789",
       meetingTime: "Saturdays 9:00 AM",
       location: "Children's Wing",
       activities: ["Sabbath School", "Vacation Bible School", "Children's Choir", "Crafts"],
       icon: "👶",
       color: "#f59e0b",
-      image: "/api/placeholder/400/250"
+      image: "/api/placeholder/400/250",
+      detailedDescription: "Our Children's Ministry creates a loving, safe environment where children can learn about God's love through age-appropriate activities, stories, and hands-on experiences. We believe in nurturing each child's unique gifts and helping them develop a personal relationship with Jesus Christ that will last a lifetime.",
+      mission: "To introduce children to Jesus Christ and help them grow in faith through engaging, age-appropriate programs that build strong spiritual foundations.",
+      volunteerOpportunities: [
+        {
+          title: "Sabbath School Teacher",
+          description: "Teach weekly Sabbath School classes for children",
+          requirements: ["Love for children", "Teaching experience preferred", "Background check required"],
+          timeCommitment: "2-3 hours per week"
+        },
+        {
+          title: "Children's Choir Director",
+          description: "Lead children's choir and teach music fundamentals",
+          requirements: ["Musical background", "Experience with children", "Patience and creativity"],
+          timeCommitment: "2 hours per week"
+        },
+        {
+          title: "Craft Coordinator",
+          description: "Plan and lead craft activities that reinforce Bible lessons",
+          requirements: ["Creative skills", "Craft experience", "Heart for children"],
+          timeCommitment: "1-2 hours per week"
+        }
+      ],
+      resources: [
+        { name: "Children's Sabbath School Lessons", type: "PDF", size: "3.1 MB" },
+        { name: "Bible Story Activity Book", type: "PDF", size: "4.5 MB" },
+        { name: "Craft Ideas for Bible Lessons", type: "PDF", size: "2.8 MB" },
+        { name: "Children's Songs Collection", type: "PDF", size: "1.9 MB" }
+      ],
+      photoGallery: [
+        { url: "/api/placeholder/300/200", caption: "Sabbath School Class" },
+        { url: "/api/placeholder/300/200", caption: "Vacation Bible School" },
+        { url: "/api/placeholder/300/200", caption: "Children's Choir Performance" },
+        { url: "/api/placeholder/300/200", caption: "Bible Craft Activity" },
+        { url: "/api/placeholder/300/200", caption: "Children's Day Celebration" },
+        { url: "/api/placeholder/300/200", caption: "Story Time Session" }
+      ],
+      schedule: [
+        { day: "Saturday", time: "9:00 AM - 10:30 AM", activity: "Sabbath School", location: "Children's Wing" },
+        { day: "Saturday", time: "11:00 AM - 12:00 PM", activity: "Children's Church", location: "Children's Wing" },
+        { day: "Wednesday", time: "4:00 PM - 5:00 PM", activity: "Children's Choir Practice", location: "Music Room" }
+      ]
     },
     {
       id: 3,
@@ -44,12 +131,54 @@ const Ministries = () => {
       description: "Supporting and encouraging women in their spiritual journey through fellowship, study, and service opportunities.",
       leader: "Elder Grace Wanjiku",
       contact: "women@thikasda.org",
+      phone: "+254 734 567 890",
       meetingTime: "Second Sunday 2:00 PM",
       location: "Fellowship Hall",
       activities: ["Bible Study", "Prayer Groups", "Community Service", "Retreats"],
       icon: "👩",
       color: "#2d5a27",
-      image: "/api/placeholder/400/250"
+      image: "/api/placeholder/400/250",
+      detailedDescription: "Our Women's Ministry provides a supportive community where women of all ages can grow spiritually, build meaningful relationships, and discover their unique purpose in God's kingdom. Through Bible studies, prayer groups, and service projects, we encourage one another in faith and life.",
+      mission: "To empower women to live out their faith boldly, support one another through life's challenges, and serve God and community with passion and purpose.",
+      volunteerOpportunities: [
+        {
+          title: "Bible Study Leader",
+          description: "Facilitate weekly women's Bible study groups",
+          requirements: ["Strong biblical knowledge", "Leadership skills", "Heart for women's ministry"],
+          timeCommitment: "3-4 hours per week"
+        },
+        {
+          title: "Prayer Coordinator",
+          description: "Organize prayer groups and coordinate prayer requests",
+          requirements: ["Strong prayer life", "Organizational skills", "Compassionate heart"],
+          timeCommitment: "2-3 hours per week"
+        },
+        {
+          title: "Retreat Organizer",
+          description: "Plan and coordinate women's retreats and special events",
+          requirements: ["Event planning experience", "Attention to detail", "Team leadership"],
+          timeCommitment: "4-6 hours per month"
+        }
+      ],
+      resources: [
+        { name: "Women's Bible Study Guide", type: "PDF", size: "2.7 MB" },
+        { name: "Prayer Journal Template", type: "PDF", size: "1.5 MB" },
+        { name: "Retreat Planning Guide", type: "DOC", size: "2.1 MB" },
+        { name: "Women's Ministry Handbook", type: "PDF", size: "3.8 MB" }
+      ],
+      photoGallery: [
+        { url: "/api/placeholder/300/200", caption: "Women's Bible Study" },
+        { url: "/api/placeholder/300/200", caption: "Prayer Group Meeting" },
+        { url: "/api/placeholder/300/200", caption: "Annual Women's Retreat" },
+        { url: "/api/placeholder/300/200", caption: "Community Service Project" },
+        { url: "/api/placeholder/300/200", caption: "Mother's Day Celebration" },
+        { url: "/api/placeholder/300/200", caption: "Fellowship Dinner" }
+      ],
+      schedule: [
+        { day: "Sunday", time: "2:00 PM - 4:00 PM", activity: "Monthly Women's Meeting (2nd Sunday)", location: "Fellowship Hall" },
+        { day: "Wednesday", time: "7:00 PM - 8:30 PM", activity: "Bible Study Group", location: "Conference Room" },
+        { day: "Saturday", time: "6:00 AM - 7:00 AM", activity: "Prayer Group", location: "Prayer Room" }
+      ]
     },
     {
       id: 4,

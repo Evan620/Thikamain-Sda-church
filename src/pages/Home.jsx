@@ -942,15 +942,27 @@ const Home = () => {
                 color: '#6b7280'
               }}>
                 <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
                   padding: '0.75rem 1rem',
                   backgroundColor: 'rgba(245, 158, 11, 0.05)',
                   borderRadius: '10px'
                 }}>
-                  <span style={{ fontWeight: '600', color: '#f59e0b' }}>Address:</span>
-                  <span style={{ fontWeight: '600' }}>Makongeni, Thika</span>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.25rem'
+                  }}>
+                    <span style={{ fontWeight: '600', color: '#f59e0b' }}>Address:</span>
+                    <span style={{ fontWeight: '600' }}>Makongeni, Thika</span>
+                  </div>
+                  <div style={{
+                    textAlign: 'right',
+                    fontSize: '0.8rem',
+                    color: '#6b7280',
+                    fontWeight: '500'
+                  }}>
+                    P.O BOX 3478-01002 Madaraka Thika
+                  </div>
                 </div>
                 <div style={{
                   display: 'flex',

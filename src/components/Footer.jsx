@@ -10,19 +10,20 @@ const Footer = () => {
           {/* Church Info */}
           <div className="footer-section">
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-              <div style={{
-                width: '3rem',
-                height: '3rem',
-                background: 'linear-gradient(135deg, #2d5a27, #f59e0b)',
-                borderRadius: '0.75rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: '1rem',
-                boxShadow: '0 4px 12px rgba(45, 90, 39, 0.3)'
-              }}>
-                <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }}>T</span>
-              </div>
+              <img
+                src="/assets/seventhdayadventistchurch.png"
+                alt="Seventh-day Adventist Church Logo"
+                style={{
+                  width: '3rem',
+                  height: '3rem',
+                  objectFit: 'contain',
+                  marginRight: '1rem',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  borderRadius: '0.75rem',
+                  padding: '0.25rem',
+                  boxShadow: '0 4px 12px rgba(45, 90, 39, 0.3)'
+                }}
+              />
               <div>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white', margin: 0 }}>
                   Thika Main SDA
@@ -42,7 +43,12 @@ const Footer = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>Thika Town, Kiambu County, Kenya</span>
+                <div>
+                  <div>Makongeni, Thika, Kiambu County, Kenya</div>
+                  <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '0.25rem' }}>
+                    P.O BOX 3478-01002 Madaraka Thika
+                  </div>
+                </div>
               </div>
 
               <div className="footer-contact-item">

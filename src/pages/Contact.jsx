@@ -190,7 +190,7 @@ const Contact = () => {
                   ),
                   title: "Address",
                   content: "Makongeni, Thika, Kiambu County, Kenya",
-                  subtitle: "Visit us anytime during service hours",
+                  subtitle: "P.O BOX 3478-01002 Madaraka Thika",
                   color: "#2d5a27"
                 },
                 {
@@ -916,6 +916,8 @@ const Contact = () => {
                     <strong style={{ color: '#2d5a27' }}>📍 Address:</strong>
                     <br />
                     <span style={{ color: '#6b7280' }}>Makongeni, Thika, Kenya</span>
+                    <br />
+                    <span style={{ color: '#6b7280', fontSize: '0.85rem' }}>P.O BOX 3478-01002 Madaraka Thika</span>
                   </div>
                   <div>
                     <strong style={{ color: '#2d5a27' }}>🕐 Coordinates:</strong>
