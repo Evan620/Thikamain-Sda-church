@@ -373,7 +373,7 @@ const About = () => {
                         color: '#6b7280',
                         lineHeight: '1.6'
                       }}>
-                        Thika Main SDA Church was established by a small group of dedicated believers who
+                        Thika Main SDA Church was established in 2010 by a small group of dedicated believers who
                         felt called to share the Adventist message in the growing town of Thika. Starting
                         with just 15 members, they met in a simple structure that would become the foundation
                         of our current church.
@@ -433,7 +433,7 @@ const About = () => {
                       }}>
                         As Thika developed into a major commercial center, our church grew significantly.
                         We expanded our facilities, established multiple ministries, and became a mother
-                        church, planting several daughter churches throughout the region.
+                        church, successfully planting 10 daughter churches throughout the region over our 15 years of service.
                       </p>
                     </div>
                   </div>
@@ -649,7 +649,7 @@ const About = () => {
                       color: '#f59e0b',
                       marginBottom: '0.5rem',
                       lineHeight: '1'
-                    }}>60+</div>
+                    }}>15</div>
                     <p style={{
                       color: '#6b7280',
                       fontWeight: '600',
@@ -713,7 +713,7 @@ const About = () => {
                       color: '#f59e0b',
                       marginBottom: '0.5rem',
                       lineHeight: '1'
-                    }}>5</div>
+                    }}>10</div>
                     <p style={{
                       color: '#6b7280',
                       fontWeight: '600',
@@ -1068,6 +1068,14 @@ const About = () => {
                 education: "Church Administration",
                 specialties: ["Church Administration", "Facilities Management", "Stewardship"],
                 color: '#2d5a27'
+              },
+              {
+                name: "Edwina Odongo",
+                position: "Head Deaconess",
+                description: "Leading our deaconess board with grace and compassion, Deaconess Edwina coordinates women's service ministries and pastoral care.",
+                education: "Church Ministry",
+                specialties: ["Women's Ministry", "Pastoral Care", "Community Service"],
+                color: '#f59e0b'
               },
               {
                 name: "Sister Effie Muthoni",

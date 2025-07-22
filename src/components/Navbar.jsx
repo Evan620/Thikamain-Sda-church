@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [ministriesDropdownOpen, setMinistriesDropdownOpen] = useState(false)
+  const [dropdownTimeout, setDropdownTimeout] = useState(null)
   const location = useLocation()
 
   const navigation = [
@@ -10,12 +12,49 @@ const Navbar = () => {
     { name: 'About', href: '/about', icon: 'ℹ️' },
     { name: 'Sermons', href: '/sermons', icon: '🎤' },
     { name: 'Events', href: '/events', icon: '📅' },
-    { name: 'Ministries', href: '/ministries', icon: '🤝' },
+    {
+      name: 'Ministries',
+      href: '/ministries',
+      icon: '🤝',
+      hasDropdown: true,
+      dropdownItems: [
+        { name: 'Ministries', href: '/ministries', icon: '🤝' },
+        { name: 'Departments', href: '/departments', icon: '🏢' }
+      ]
+    },
     { name: 'Contact', href: '/contact', icon: '📞' },
     { name: 'Give', href: '/giving', icon: '💝' },
   ]
 
   const isActive = (path) => location.pathname === path
+  const isMinistryDropdownActive = () => location.pathname === '/ministries' || location.pathname === '/departments'
+
+  // Dynamic button text based on current page
+  const getDynamicButtonText = () => {
+    if (location.pathname === '/departments') return 'Departments'
+    return 'Ministries'
+  }
+
+  const getDynamicButtonIcon = () => {
+    if (location.pathname === '/departments') return '🏢'
+    return '🤝'
+  }
+
+  // Improved dropdown handlers
+  const handleDropdownEnter = () => {
+    if (dropdownTimeout) {
+      clearTimeout(dropdownTimeout)
+      setDropdownTimeout(null)
+    }
+    setMinistriesDropdownOpen(true)
+  }
+
+  const handleDropdownLeave = () => {
+    const timeout = setTimeout(() => {
+      setMinistriesDropdownOpen(false)
+    }, 300) // Increased delay for easier navigation
+    setDropdownTimeout(timeout)
+  }
 
   const navStyle = {
     backgroundColor: 'white',
@@ -199,7 +238,22 @@ const Navbar = () => {
   }, [])
 
   return (
-    <nav style={navStyle}>
+    <>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(-10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
+      <nav style={navStyle}>
       <div style={isMobile ? mobileContainerStyle : containerStyle}>
         <Link to="/" style={{
           ...logoStyle,
@@ -253,31 +307,152 @@ const Navbar = () => {
           display: window.innerWidth >= 768 ? 'flex' : 'none'
         }}>
           {navigation.slice(0, -1).map((item) => (
-            <Link
-              key={item.name}
-              to={item.href}
-              style={{
-                ...linkStyle,
-                color: isActive(item.href) ? '#2d5a27' : '#4b5563',
-                backgroundColor: isActive(item.href) ? 'rgba(45, 90, 39, 0.08)' : 'transparent'
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive(item.href)) {
-                  e.target.style.color = '#2d5a27'
-                  e.target.style.backgroundColor = 'rgba(45, 90, 39, 0.05)'
-                  e.target.style.transform = 'translateY(-1px)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive(item.href)) {
-                  e.target.style.color = '#4b5563'
-                  e.target.style.backgroundColor = 'transparent'
-                  e.target.style.transform = 'translateY(0)'
-                }
-              }}
-            >
-              {item.name}
-            </Link>
+            item.hasDropdown ? (
+              <div
+                key={item.name}
+                style={{
+                  position: 'relative',
+                  display: 'inline-block'
+                }}
+                onMouseEnter={handleDropdownEnter}
+                onMouseLeave={handleDropdownLeave}
+              >
+                <div
+                  style={{
+                    ...linkStyle,
+                    color: isMinistryDropdownActive() ? '#2d5a27' : '#4b5563',
+                    backgroundColor: isMinistryDropdownActive() ? 'rgba(45, 90, 39, 0.08)' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    cursor: 'pointer',
+                    position: 'relative'
+                  }}
+                  onClick={() => setMinistriesDropdownOpen(!ministriesDropdownOpen)}
+                >
+                  <span style={{
+                    fontSize: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}>
+                    <span>{getDynamicButtonIcon()}</span>
+                    {getDynamicButtonText()}
+                  </span>
+
+                  {/* Active page indicator */}
+                  {isMinistryDropdownActive() && (
+                    <span style={{
+                      width: '4px',
+                      height: '4px',
+                      backgroundColor: '#2d5a27',
+                      borderRadius: '50%',
+                      flexShrink: 0
+                    }}></span>
+                  )}
+
+                  <svg
+                    style={{
+                      width: '12px',
+                      height: '12px',
+                      transform: ministriesDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease',
+                      marginLeft: 'auto'
+                    }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+
+                {/* Dropdown Menu */}
+                {ministriesDropdownOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: '0',
+                      backgroundColor: 'white',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                      border: '1px solid rgba(45, 90, 39, 0.1)',
+                      minWidth: '200px',
+                      zIndex: 1000,
+                      overflow: 'hidden',
+                      marginTop: '4px',
+                      animation: 'fadeIn 0.2s ease-out'
+                    }}
+                    onMouseEnter={handleDropdownEnter}
+                    onMouseLeave={handleDropdownLeave}
+                  >
+                    {item.dropdownItems.map((dropdownItem) => (
+                      <Link
+                        key={dropdownItem.name}
+                        to={dropdownItem.href}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '14px 20px',
+                          color: isActive(dropdownItem.href) ? '#2d5a27' : '#4b5563',
+                          backgroundColor: isActive(dropdownItem.href) ? 'rgba(45, 90, 39, 0.1)' : 'transparent',
+                          textDecoration: 'none',
+                          fontSize: '0.95rem',
+                          fontWeight: isActive(dropdownItem.href) ? '600' : '500',
+                          transition: 'all 0.2s ease',
+                          borderBottom: dropdownItem === item.dropdownItems[item.dropdownItems.length - 1] ? 'none' : '1px solid rgba(0, 0, 0, 0.05)',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setMinistriesDropdownOpen(false)}
+                        onMouseEnter={(e) => {
+                          if (!isActive(dropdownItem.href)) {
+                            e.target.style.backgroundColor = 'rgba(45, 90, 39, 0.08)'
+                            e.target.style.color = '#2d5a27'
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isActive(dropdownItem.href)) {
+                            e.target.style.backgroundColor = 'transparent'
+                            e.target.style.color = '#4b5563'
+                          }
+                        }}
+                      >
+                        <span style={{ fontSize: '1rem' }}>{dropdownItem.icon}</span>
+                        {dropdownItem.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                key={item.name}
+                to={item.href}
+                style={{
+                  ...linkStyle,
+                  color: isActive(item.href) ? '#2d5a27' : '#4b5563',
+                  backgroundColor: isActive(item.href) ? 'rgba(45, 90, 39, 0.08)' : 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive(item.href)) {
+                    e.target.style.color = '#2d5a27'
+                    e.target.style.backgroundColor = 'rgba(45, 90, 39, 0.05)'
+                    e.target.style.transform = 'translateY(-1px)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(item.href)) {
+                    e.target.style.color = '#4b5563'
+                    e.target.style.backgroundColor = 'transparent'
+                    e.target.style.transform = 'translateY(0)'
+                  }
+                }}
+              >
+                {item.name}
+              </Link>
+            )
           ))}
           {/* Special Give Button */}
           <Link
@@ -332,46 +507,94 @@ const Navbar = () => {
       <div style={mobileMenuStyle}>
         <div style={mobileMenuContainerStyle}>
           {navigation.slice(0, -1).map((item, index) => (
-            <Link
-              key={item.name}
-              to={item.href}
-              style={{
-                ...mobileLinkStyle,
-                color: isActive(item.href) ? '#2d5a27' : '#4b5563',
-                backgroundColor: isActive(item.href) ? 'rgba(45, 90, 39, 0.05)' : 'transparent',
-                animationDelay: `${index * 50}ms`
-              }}
-              onClick={() => setIsOpen(false)}
-              onTouchStart={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(45, 90, 39, 0.1)'
-              }}
-              onTouchEnd={(e) => {
-                setTimeout(() => {
-                  if (!isActive(item.href)) {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                  }
-                }, 150)
-              }}
-            >
-              <span style={{
-                fontSize: '1.25rem',
-                width: '24px',
-                textAlign: 'center',
-                flexShrink: 0
-              }}>
-                {item.icon}
-              </span>
-              <span style={{ flex: 1 }}>{item.name}</span>
-              {isActive(item.href) && (
+            item.hasDropdown ? (
+              <div key={item.name}>
+                {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
+                  <Link
+                    key={dropdownItem.name}
+                    to={dropdownItem.href}
+                    style={{
+                      ...mobileLinkStyle,
+                      color: isActive(dropdownItem.href) ? '#2d5a27' : '#4b5563',
+                      backgroundColor: isActive(dropdownItem.href) ? 'rgba(45, 90, 39, 0.05)' : 'transparent',
+                      animationDelay: `${(index + dropdownIndex) * 50}ms`,
+                      paddingLeft: '1rem'
+                    }}
+                    onClick={() => setIsOpen(false)}
+                    onTouchStart={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(45, 90, 39, 0.1)'
+                    }}
+                    onTouchEnd={(e) => {
+                      setTimeout(() => {
+                        if (!isActive(dropdownItem.href)) {
+                          e.currentTarget.style.backgroundColor = 'transparent'
+                        }
+                      }, 150)
+                    }}
+                  >
+                    <span style={{
+                      fontSize: '1.25rem',
+                      width: '24px',
+                      textAlign: 'center',
+                      flexShrink: 0
+                    }}>
+                      {dropdownItem.icon}
+                    </span>
+                    <span style={{ flex: 1 }}>{dropdownItem.name}</span>
+                    {isActive(dropdownItem.href) && (
+                      <span style={{
+                        width: '4px',
+                        height: '4px',
+                        backgroundColor: '#2d5a27',
+                        borderRadius: '50%',
+                        flexShrink: 0
+                      }}></span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Link
+                key={item.name}
+                to={item.href}
+                style={{
+                  ...mobileLinkStyle,
+                  color: isActive(item.href) ? '#2d5a27' : '#4b5563',
+                  backgroundColor: isActive(item.href) ? 'rgba(45, 90, 39, 0.05)' : 'transparent',
+                  animationDelay: `${index * 50}ms`
+                }}
+                onClick={() => setIsOpen(false)}
+                onTouchStart={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(45, 90, 39, 0.1)'
+                }}
+                onTouchEnd={(e) => {
+                  setTimeout(() => {
+                    if (!isActive(item.href)) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                    }
+                  }, 150)
+                }}
+              >
                 <span style={{
-                  width: '4px',
-                  height: '4px',
-                  backgroundColor: '#2d5a27',
-                  borderRadius: '50%',
+                  fontSize: '1.25rem',
+                  width: '24px',
+                  textAlign: 'center',
                   flexShrink: 0
-                }}></span>
-              )}
-            </Link>
+                }}>
+                  {item.icon}
+                </span>
+                <span style={{ flex: 1 }}>{item.name}</span>
+                {isActive(item.href) && (
+                  <span style={{
+                    width: '4px',
+                    height: '4px',
+                    backgroundColor: '#2d5a27',
+                    borderRadius: '50%',
+                    flexShrink: 0
+                  }}></span>
+                )}
+              </Link>
+            )
           ))}
           <Link
             to="/giving"
@@ -391,6 +614,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+    </>
   )
 }
 

@@ -211,9 +211,20 @@ const Contact = () => {
                     </svg>
                   ),
                   title: "Email",
-                  content: "info@thikasda.org",
-                  subtitle: "We'll respond within 24 hours",
+                  content: "thikamainsdachurchclerk@gmail.com",
+                  subtitle: "Church Clerk - Official correspondence",
                   color: "#2d5a27"
+                },
+                {
+                  icon: (
+                    <svg style={{ width: '1.5rem', height: '1.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  ),
+                  title: "General Email",
+                  content: "thikamainsdachurch@yahoo.com",
+                  subtitle: "General inquiries and information",
+                  color: "#f59e0b"
                 },
                 {
                   icon: (

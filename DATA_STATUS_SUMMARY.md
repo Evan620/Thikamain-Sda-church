@@ -14,6 +14,7 @@
 - **Treasurer:** Elder Joseph Kimilu
 - **Secretary:** Sister Effie Muthoni
 - **Head Deacon:** Kefa Nyaaga Nyakundi
+- **Head Deaconess:** Edwina Odongo
 - **Youth Leader:** Duncan Mageto Atati
 - **Children's Leader:** Erick Yonni
 - **Music Director:** Paul Odongo/Justus Arita
@@ -32,7 +33,7 @@
 - **Men's Ministry:** Benard Mogere
 - **Music Ministry:** Paul Odongo
 - **Health Ministry:** Elizabeth Sapato
-- **Prayer Ministry:** Rael Karim
+- **Prayer Ministry:** Rael Karimi
 - **Community Outreach:** Elder Abraham Sayah
 - **Family Life Ministry:** Elder Reuben Lusasi
 
@@ -48,16 +49,27 @@
 **✅ COMPLETE:**
 - **Current Active Members:** 299 (including 11 newly baptized members)
 
+### 📧 CONTACT INFORMATION
+**✅ COMPLETE:**
+- **Church Email 1:** thikamainsdachurchclerk@gmail.com
+- **Church Email 2:** thikamainsdachurch@yahoo.com
+
+### 🏛️ CHURCH HISTORY
+**✅ COMPLETE:**
+- **Year Established:** 2010
+- **Years of Service:** 15 years (as of 2025)
+- **Daughter Churches:** 10
+
 ---
 
 ## ❌ INFORMATION STILL NEEDED
 
 ### 🏠 BASIC CHURCH INFO
-- [ ] Official church name confirmation
+- [x] Official church name confirmation
 - [ ] Complete physical address
 - [ ] Phone numbers (main office, pastor, emergency)
-- [ ] Email addresses (main, pastor, departments)
-- [ ] Year established
+- [x] Email addresses (main, pastor, departments) ✅
+- [x] Year established ✅
 - [ ] Conference/Union affiliation
 
 ### ⏰ SERVICE TIMES
