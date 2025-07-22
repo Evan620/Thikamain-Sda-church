@@ -38,37 +38,69 @@
 
 ## 👨‍💼 CHURCH LEADERS
 
-**Pastor's Name:** FILL IN: ________________________________
+**Pastor's Name:** Pst. Charles Muritu Nganga
 
 **Pastor's Phone/Email:** FILL IN: ________________________________
 
-**Head Elder:** FILL IN: ________________________________
+**Pastor's Biography:** FILL IN: ________________________________
+________________________________
+________________________________
 
-**Youth Leader:** FILL IN: ________________________________
+**Years of Service:** FILL IN: ________________________________
 
-**Children's Leader:** FILL IN: ________________________________
+**Head Elder:** Elder Methucellah Mokua
 
-**Music Director:** FILL IN: ________________________________
+**Head Elder Contact:** +254 726 028 004
 
-**Treasurer:** FILL IN: ________________________________
+**Other Elders:**
+- Elder Reuben Lusasi
+- Elder Abraham Sayah
+- Elder David Juma
+- Elder James Mauti
 
-**Secretary:** FILL IN: ________________________________
+**Youth Leader:** Duncan Mageto Atati
+
+**Children's Leader:** Erick Yonni
+
+**Music Director:** Paul Odongo/Justus Arita
+
+**Treasurer:** Elder Joseph Kimilu
+
+**Secretary:** Sister Effie Muthoni
+
+**Head Deacon:** Kefa Nyaaga Nyakundi
+
+**Sabbath School Superintendent:** Charles Owiti
+
+**Other Department Heads:**
+- Paul Odhiambo - Strategic and Planning
+- Janet Joan Ouma - AWM (Adventist Women's Ministry)
+- Benard Mogere - AMM (Adventist Men's Ministry)
 
 ---
 
 ## 📖 MISSION & VISION
 
-**Our Mission (what we do):** 
+**Our Mission (what we do):**
+✅ Already provided in current website content
+
+**Our Vision (what we aim for):**
+✅ Already provided in current website content
+
+**Our Core Values:**
+✅ Already provided in current website content
+
+**Church History:**
+FILL IN: Still sourcing - please provide when available
+________________________________
+________________________________
+
+**Key Milestones & Important Dates:**
 FILL IN: ________________________________
 ________________________________
 ________________________________
 
-**Our Vision (what we aim for):** 
-FILL IN: ________________________________
-________________________________
-________________________________
-
-**Our Core Values:** 
+**Notable Achievements:**
 FILL IN: ________________________________
 ________________________________
 ________________________________
@@ -77,35 +109,35 @@ ________________________________
 
 ## 🤝 MINISTRIES
 
-**Youth Ministry - Leader & Activities:** 
+**Youth Ministry - Leader & Contact:**
+Duncan Mageto
+Contact: FILL IN: ________________________________
+
+**Children's Ministry - Leader & Contact:**
+Erick Yonni
+Contact: FILL IN: ________________________________
+
+**Women's Ministry (AWM) - Leader & Contact:**
+Janet Joan Ouma
+Contact: FILL IN: ________________________________
+
+**Men's Ministry (AMM) - Leader & Contact:**
+Benard Mogere
+Contact: FILL IN: ________________________________
+
+**Music Ministry - Director:**
+Paul Odongo
+Contact: FILL IN: ________________________________
+
+**Health Ministry - Leader & Contact:**
+Elizabeth Sapato
+Contact: FILL IN: ________________________________
+
+**Community Outreach - Coordinator & Programs:**
 FILL IN: ________________________________
 ________________________________
 
-**Children's Ministry - Leader & Activities:** 
-FILL IN: ________________________________
-________________________________
-
-**Women's Ministry - Leader & Activities:** 
-FILL IN: ________________________________
-________________________________
-
-**Men's Ministry - Leader & Activities:** 
-FILL IN: ________________________________
-________________________________
-
-**Music Ministry - Choirs & Groups:** 
-FILL IN: ________________________________
-________________________________
-
-**Health Ministry - Programs:** 
-FILL IN: ________________________________
-________________________________
-
-**Community Outreach - What we do:** 
-FILL IN: ________________________________
-________________________________
-
-**Other Ministries:** 
+**Other Ministries:**
 FILL IN: ________________________________
 ________________________________
 
@@ -146,7 +178,7 @@ ________________________________
 
 **WhatsApp Number:** FILL IN: ________________________________
 
-**YouTube Channel:** FILL IN: ________________________________
+**YouTube Channel:** Thika Main SDA Church
 
 **Instagram:** FILL IN: ________________________________
 

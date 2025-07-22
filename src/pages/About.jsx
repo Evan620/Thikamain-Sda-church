@@ -1046,51 +1046,51 @@ const About = () => {
           }}>
             {[
               {
-                name: "Pastor Samuel Mwangi",
+                name: "Pst. Charles Muritu Nganga",
                 position: "Senior Pastor",
-                description: "Leading our congregation with 15+ years of pastoral experience, Pastor Mwangi brings deep biblical knowledge and a heart for evangelism.",
-                education: "Master of Divinity, University of Eastern Africa",
-                specialties: ["Expository Preaching", "Church Growth", "Youth Ministry"],
+                description: "Leading our congregation with wisdom and dedication, Pastor Charles guides our church family in spiritual growth and community service.",
+                education: "Contact information pending",
+                specialties: ["Pastoral Care", "Biblical Teaching", "Church Leadership"],
                 color: '#2d5a27'
               },
               {
-                name: "Elder Grace Wanjiku",
-                position: "First Elder",
-                description: "A pillar of our church for over 20 years, Elder Wanjiku oversees our women's ministries and community outreach programs.",
-                education: "Bachelor of Theology, Adventist University",
-                specialties: ["Women's Ministry", "Community Outreach", "Prayer Ministry"],
+                name: "Elder Methucellah Mokua",
+                position: "Head Elder",
+                description: "Serving as our Head Elder, Elder Methucellah provides spiritual guidance and oversight to our church board and congregation.",
+                education: "Contact: +254 726 028 004",
+                specialties: ["Church Governance", "Spiritual Guidance", "Leadership"],
                 color: '#f59e0b'
               },
               {
-                name: "Deacon Peter Kamau",
+                name: "Kefa Nyaaga Nyakundi",
                 position: "Head Deacon",
-                description: "Coordinating our deacon board and facilities management, Deacon Kamau ensures our church operations run smoothly.",
-                education: "Certificate in Church Administration",
+                description: "Coordinating our deacon board and ensuring smooth church operations, Deacon Kefa serves with dedication and commitment.",
+                education: "Church Administration",
                 specialties: ["Church Administration", "Facilities Management", "Stewardship"],
                 color: '#2d5a27'
               },
               {
-                name: "Elder Mary Njeri",
-                position: "Church Elder",
-                description: "Passionate about children's ministry and Sabbath School, Elder Njeri has been instrumental in our educational programs.",
-                education: "Bachelor of Education, Kenyatta University",
-                specialties: ["Children's Ministry", "Sabbath School", "Education"],
+                name: "Sister Effie Muthoni",
+                position: "Church Secretary",
+                description: "Managing our church records and communications with dedication and attention to detail, ensuring effective church administration.",
+                education: "Church Administration",
+                specialties: ["Administration", "Communication", "Record Keeping"],
                 color: '#f59e0b'
               },
               {
-                name: "Deacon James Kiprotich",
-                position: "Youth Elder",
-                description: "Leading our vibrant youth ministry, Deacon Kiprotich connects with young people and guides them in their spiritual journey.",
-                education: "Bachelor of Social Work, University of Nairobi",
-                specialties: ["Youth Ministry", "Music Ministry", "Technology"],
+                name: "Elder Joseph Kimilu",
+                position: "Church Treasurer",
+                description: "Overseeing our church finances with integrity and transparency, ensuring responsible stewardship of God's resources.",
+                education: "Financial Management",
+                specialties: ["Financial Management", "Stewardship", "Church Finance"],
                 color: '#2d5a27'
               },
               {
-                name: "Elder Ruth Achieng",
-                position: "Health Ministries Leader",
-                description: "Coordinating our health and wellness programs, Elder Achieng promotes wholistic health in our community.",
-                education: "Bachelor of Nursing, Kenya Medical University",
-                specialties: ["Health Ministry", "Wellness Programs", "Community Health"],
+                name: "Charles Owiti",
+                position: "Sabbath School Superintendent",
+                description: "Leading our Sabbath School programs and educational ministries, fostering spiritual growth through biblical education.",
+                education: "Christian Education",
+                specialties: ["Sabbath School", "Christian Education", "Teaching"],
                 color: '#f59e0b'
               }
             ].map((leader, index) => (
@@ -1179,31 +1179,6 @@ const About = () => {
                     {leader.description}
                   </p>
 
-                  {/* Education */}
-                  <div style={{
-                    backgroundColor: 'rgba(45, 90, 39, 0.05)',
-                    padding: '1rem',
-                    borderRadius: '12px',
-                    marginBottom: '1.5rem',
-                    border: '1px solid rgba(45, 90, 39, 0.1)'
-                  }}>
-                    <div style={{
-                      fontSize: '0.85rem',
-                      color: '#6b7280',
-                      marginBottom: '0.25rem',
-                      fontWeight: '600'
-                    }}>
-                      Education
-                    </div>
-                    <div style={{
-                      fontSize: '0.9rem',
-                      color: '#374151',
-                      fontWeight: '500'
-                    }}>
-                      {leader.education}
-                    </div>
-                  </div>
-
                   {/* Specialties */}
                   <div style={{
                     display: 'flex',
@@ -1229,6 +1204,97 @@ const About = () => {
                     ))}
                   </div>
                 </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Other Church Elders */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '3rem',
+            marginTop: '4rem'
+          }}>
+            <h3 style={{
+              fontSize: '2rem',
+              fontWeight: '700',
+              color: '#2d5a27',
+              marginBottom: '1rem'
+            }}>
+              Our Church Elders
+            </h3>
+            <p style={{
+              fontSize: '1.1rem',
+              color: '#6b7280',
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: '1.6'
+            }}>
+              Additional elders who serve our congregation with dedication and spiritual guidance
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '4rem'
+          }}>
+            {[
+              { name: "Elder Reuben Lusasi", role: "Church Elder" },
+              { name: "Elder Abraham Sayah", role: "Church Elder" },
+              { name: "Elder David Juma", role: "Church Elder" },
+              { name: "Elder James Mauti", role: "Church Elder" }
+            ].map((elder, index) => (
+              <div
+                key={index}
+                style={{
+                  background: 'white',
+                  borderRadius: '16px',
+                  padding: '2rem',
+                  textAlign: 'center',
+                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid rgba(45, 90, 39, 0.1)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)'
+                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.12)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.08)'
+                }}
+              >
+                <div style={{
+                  width: '80px',
+                  height: '80px',
+                  background: 'linear-gradient(135deg, #2d5a27, #1c3a1c)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.5rem auto',
+                  color: 'white',
+                  fontSize: '2rem',
+                  fontWeight: 'bold'
+                }}>
+                  {elder.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <h4 style={{
+                  fontSize: '1.25rem',
+                  fontWeight: '700',
+                  color: '#2d5a27',
+                  marginBottom: '0.5rem'
+                }}>
+                  {elder.name}
+                </h4>
+                <p style={{
+                  color: '#6b7280',
+                  fontSize: '1rem',
+                  fontWeight: '500'
+                }}>
+                  {elder.role}
+                </p>
               </div>
             ))}
           </div>
