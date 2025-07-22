@@ -1092,6 +1092,14 @@ const About = () => {
                 education: "Christian Education",
                 specialties: ["Sabbath School", "Christian Education", "Teaching"],
                 color: '#f59e0b'
+              },
+              {
+                name: "Charles Kyalo Simon",
+                position: "Communication Leader",
+                description: "Managing church communications and ensuring effective information flow within our congregation and community outreach.",
+                education: "Communication Management",
+                specialties: ["Church Communication", "Media Management", "Information Systems"],
+                color: '#2d5a27'
               }
             ].map((leader, index) => (
               <div

@@ -1091,6 +1091,15 @@ const Ministries = () => {
                 ministries: ["Health Ministry", "Community Wellness"],
                 bio: "Promoting wholistic health and wellness in our community.",
                 color: "#f59e0b"
+              },
+              {
+                name: "Charles Kyalo Simon",
+                role: "Communication Leader",
+                email: "Contact information pending",
+                phone: "Contact information pending",
+                ministries: ["Church Communication", "Media Management"],
+                bio: "Managing church communications and information systems.",
+                color: "#2d5a27"
               }
             ].map((leader, index) => (
               <div

@@ -22,6 +22,7 @@
   - Paul Odhiambo - Strategic and Planning
   - Janet Joan Ouma - AWM (Adventist Women's Ministry)
   - Benard Mogere - AMM (Adventist Men's Ministry)
+  - Charles Kyalo Simon - Communication Leader
 
 ### 🤝 MINISTRY LEADERS
 **✅ COMPLETE:**
