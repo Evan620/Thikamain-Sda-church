@@ -1,8 +1,171 @@
 import React, { useState } from 'react'
 
 const Sermons = () => {
-  const [selectedFilter, setSelectedFilter] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedVideo, setSelectedVideo] = useState(null)
+
+  // Function to extract YouTube video ID from URL
+  const getYouTubeVideoId = (url) => {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([^"&?\/\s]{11})/
+    const match = url.match(regex)
+    return match ? match[1] : null
+  }
+
+  // Function to get YouTube thumbnail URL with fallback
+  const getYouTubeThumbnail = (url) => {
+    const videoId = getYouTubeVideoId(url)
+    return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null
+  }
+
+  // Function to check if thumbnail exists and create fallback
+  const getThumbnailWithFallback = (sermon) => {
+    const thumbnailUrl = getYouTubeThumbnail(sermon.url)
+    return {
+      url: thumbnailUrl,
+      fallback: !thumbnailUrl
+    }
+  }
+
+  // Function to get YouTube embed URL
+  const getYouTubeEmbedUrl = (url) => {
+    const videoId = getYouTubeVideoId(url)
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1` : null
+  }
+
+  // Real sermon data from YouTube
+  const sermons = [
+    {
+      id: 1,
+      title: "ARE YOUR FEET BLESSED",
+      speaker: "Pastor Charles Muritu",
+      date: "June 21, 2025",
+      url: "https://www.youtube.com/live/WPIfcmn6RE0?si=MEw4iMufQZJpbSor",
+      category: "Sabbath Service",
+      series: "Blessings",
+      description: "A powerful message about walking in God's blessings and being a blessing to others.",
+      color: '#2d5a27'
+    },
+    {
+      id: 2,
+      title: "ELDERS SABBATH",
+      speaker: "Elder Methuselah",
+      date: "July 19, 2025",
+      url: "https://www.youtube.com/live/ay_NGMxuR0o?si=gfPeZvcegetrjiWH",
+      category: "Special Service",
+      series: "Leadership",
+      description: "Special message honoring church elders and their role in spiritual leadership.",
+      color: '#f59e0b'
+    },
+    {
+      id: 3,
+      title: "COMMUNICATION SABBATH",
+      speaker: "Elder Kyalo",
+      date: "July 12, 2025",
+      url: "https://www.youtube.com/live/JtfzRIkqw2s?si=_ymC4T_wfdeFn5jH",
+      category: "Department Service",
+      series: "Ministry Focus",
+      description: "Exploring the importance of effective communication in church ministry and daily life.",
+      color: '#2d5a27'
+    },
+    {
+      id: 4,
+      title: "HOLY COMMUNION SABBATH",
+      speaker: "Church Leadership",
+      date: "June 28, 2025",
+      url: "https://www.youtube.com/live/rrXGI9oYfbk?si=5YhBKe9vsKzVKt5A",
+      category: "Special Service",
+      series: "Communion",
+      description: "Sacred service of Holy Communion, remembering Christ's sacrifice and love.",
+      color: '#f59e0b'
+    },
+    {
+      id: 5,
+      title: "HAPPY AMM SABBATH",
+      speaker: "Men's Ministry",
+      date: "May 31, 2025",
+      url: "https://www.youtube.com/live/-MnU-wFTxDo?si=JZehySBiUqUwknaR",
+      category: "Ministry Service",
+      series: "Men's Ministry",
+      description: "Celebrating Adventist Men's Ministry and their role in church and community.",
+      color: '#2d5a27'
+    },
+    {
+      id: 6,
+      title: "ADVENTURERS SABBATH",
+      speaker: "Children's Ministry",
+      date: "May 17, 2025",
+      url: "https://www.youtube.com/live/LTNkVd_pjcY?si=NetMdg08ihJOHxy_",
+      category: "Children's Service",
+      series: "Adventurers",
+      description: "Special service celebrating our Adventurer Club and children's ministry programs.",
+      color: '#f59e0b'
+    },
+    {
+      id: 7,
+      title: "CHAPLAINCY SABBATH",
+      speaker: "Elder Zachariah Orina",
+      date: "May 10, 2025",
+      url: "https://www.youtube.com/live/Idr9iL5pR2A?si=XuRss9ifrqgwARVa",
+      category: "Department Service",
+      series: "Chaplaincy",
+      description: "Message focusing on chaplaincy ministry and spiritual care in our community.",
+      color: '#2d5a27'
+    },
+    {
+      id: 8,
+      title: "PERSONAL MINISTRY SABBATH",
+      speaker: "Personal Ministry Team",
+      date: "May 3, 2025",
+      url: "https://www.youtube.com/live/KaA33qnAmns?si=MeHbDyu5HeIzyxC_",
+      category: "Ministry Service",
+      series: "Personal Ministry",
+      description: "Empowering members for personal evangelism and witnessing in daily life.",
+      color: '#f59e0b'
+    },
+    {
+      id: 9,
+      title: "AMBASSADOR'S SABBATH",
+      speaker: "Pastor Martin Kiogora",
+      date: "April 26, 2025",
+      url: "https://www.youtube.com/live/jWW5Mdwaz0I?si=eOJm5FKVJjCO_YPI",
+      category: "Youth Service",
+      series: "Ambassadors",
+      description: "Inspiring message for young ambassadors of Christ and their mission.",
+      color: '#2d5a27'
+    },
+    {
+      id: 10,
+      title: "VBS SABBATH",
+      speaker: "Ratemo",
+      date: "April 19, 2025",
+      url: "https://www.youtube.com/live/s5nTrUOZD7A?si=1vDs-A3rADRgdVso",
+      category: "Children's Service",
+      series: "VBS",
+      description: "Vacation Bible School celebration with special programming for children and families.",
+      color: '#f59e0b'
+    },
+    {
+      id: 11,
+      title: "CHOIR DAY SABBATH",
+      speaker: "Pastor Emmanuel Marwa",
+      date: "April 12, 2025",
+      url: "https://www.youtube.com/live/7fWm2uA_QNM?si=VQ-i_KBxgc-UIK8W",
+      category: "Music Service",
+      series: "Choir Ministry",
+      description: "Celebrating our choir ministry with special music and worship.",
+      color: '#2d5a27'
+    },
+    {
+      id: 12,
+      title: "FAMILY LIFE SABBATH",
+      speaker: "Elder Geoffrey Mutinda",
+      date: "April 5, 2025",
+      url: "https://www.youtube.com/live/usHu73k9yFE?si=SYVzUFat_LLm4vWr",
+      category: "Ministry Service",
+      series: "Family Life",
+      description: "Strengthening family relationships and building Christ-centered homes.",
+      color: '#f59e0b'
+    }
+  ]
 
   return (
     <div className="min-h-screen">
@@ -56,116 +219,7 @@ const Sermons = () => {
             </p>
           </div>
 
-          {/* Search and Filter Bar */}
-          <div style={{
-            background: 'white',
-            borderRadius: '16px',
-            padding: '1.5rem',
-            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.08)',
-            border: '1px solid rgba(45, 90, 39, 0.1)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem'
-          }}>
-            {/* Search Bar */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              flexWrap: 'wrap'
-            }}>
-              <div style={{
-                position: 'relative',
-                flex: '1',
-                minWidth: '300px'
-              }}>
-                <svg
-                  style={{
-                    position: 'absolute',
-                    left: '1rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '1.25rem',
-                    height: '1.25rem',
-                    color: '#6b7280'
-                  }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search sermons by title, speaker, or topic..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px 12px 3rem',
-                    borderRadius: '10px',
-                    border: '2px solid rgba(45, 90, 39, 0.1)',
-                    fontSize: '1rem',
-                    transition: 'all 0.3s ease',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#2d5a27'
-                    e.target.style.boxShadow = '0 0 0 3px rgba(45, 90, 39, 0.1)'
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(45, 90, 39, 0.1)'
-                    e.target.style.boxShadow = 'none'
-                  }}
-                />
-              </div>
-            </div>
 
-            {/* Filter Buttons */}
-            <div style={{
-              display: 'flex',
-              gap: '0.5rem',
-              flexWrap: 'wrap',
-              justifyContent: 'center'
-            }}>
-              {[
-                { id: 'all', label: 'All Sermons' },
-                { id: 'recent', label: 'Recent' },
-                { id: 'series', label: 'Series' },
-                { id: 'sabbath', label: 'Sabbath School' },
-                { id: 'evangelistic', label: 'Evangelistic' },
-                { id: 'youth', label: 'Youth' }
-              ].map((filter) => (
-                <button
-                  key={filter.id}
-                  onClick={() => setSelectedFilter(filter.id)}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: '20px',
-                    border: 'none',
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    backgroundColor: selectedFilter === filter.id ? '#2d5a27' : 'rgba(45, 90, 39, 0.1)',
-                    color: selectedFilter === filter.id ? 'white' : '#2d5a27'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (selectedFilter !== filter.id) {
-                      e.target.style.backgroundColor = 'rgba(45, 90, 39, 0.2)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedFilter !== filter.id) {
-                      e.target.style.backgroundColor = 'rgba(45, 90, 39, 0.1)'
-                    }
-                  }}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
@@ -224,51 +278,130 @@ const Sermons = () => {
             <div style={{
               position: 'relative',
               minHeight: '300px',
-              background: 'linear-gradient(135deg, #2d5a27 0%, #1c3a1c 100%)',
+              background: getThumbnailWithFallback(sermons[0]).fallback
+                ? `linear-gradient(135deg, ${sermons[0].color}, ${sermons[0].color}dd)`
+                : `url(${getThumbnailWithFallback(sermons[0]).url})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              {/* Play Button */}
+              {getThumbnailWithFallback(sermons[0]).fallback && (
+                <div style={{
+                  textAlign: 'center',
+                  color: 'white',
+                  padding: '2rem'
+                }}>
+                  <div style={{
+                    width: '5rem',
+                    height: '5rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 1.5rem',
+                    fontSize: '2rem',
+                    fontWeight: '700',
+                    border: '3px solid rgba(255, 255, 255, 0.3)'
+                  }}>
+                    {sermons[0].speaker.split(' ').map(n => n[0]).join('')}
+                  </div>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '25px',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    marginBottom: '1rem',
+                    display: 'inline-block'
+                  }}>
+                    {sermons[0].category}
+                  </div>
+                  <h3 style={{
+                    fontSize: '1.8rem',
+                    fontWeight: '700',
+                    marginBottom: '0.5rem',
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                    lineHeight: '1.2'
+                  }}>
+                    {sermons[0].title}
+                  </h3>
+                  <p style={{
+                    fontSize: '1.1rem',
+                    opacity: 0.9,
+                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                    marginBottom: '1rem'
+                  }}>
+                    by {sermons[0].speaker}
+                  </p>
+                  <div style={{
+                    fontSize: '0.95rem',
+                    opacity: 0.8,
+                    fontWeight: '500'
+                  }}>
+                    {sermons[0].date}
+                  </div>
+                </div>
+              )}
+              {/* Overlay */}
               <div style={{
-                width: '80px',
-                height: '80px',
-                background: 'rgba(255, 255, 255, 0.9)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.1)'
-                e.currentTarget.style.background = 'white'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)'
-              }}
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.3)'
+              }}></div>
+
+              {/* Play Button */}
+              <div
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2)',
+                  position: 'relative',
+                  zIndex: 2
+                }}
+                onClick={() => setSelectedVideo(sermons[0])}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.1)'
+                  e.currentTarget.style.background = 'white'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)'
+                }}
               >
                 <svg style={{ width: '2rem', height: '2rem', color: '#2d5a27', marginLeft: '4px' }} fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z"/>
                 </svg>
               </div>
 
-              {/* Duration Badge */}
+              {/* Live Badge */}
               <div style={{
                 position: 'absolute',
-                bottom: '1rem',
-                right: '1rem',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                top: '1rem',
+                left: '1rem',
+                backgroundColor: '#ff0000',
                 color: 'white',
                 padding: '4px 8px',
                 borderRadius: '4px',
                 fontSize: '0.8rem',
-                fontWeight: '600'
+                fontWeight: '600',
+                zIndex: 2
               }}>
-                45:32
+                LIVE
               </div>
             </div>
 
@@ -305,7 +438,7 @@ const Sermons = () => {
                     fontSize: '0.8rem',
                     fontWeight: '600'
                   }}>
-                    January 20, 2025
+                    {sermons[0].date}
                   </span>
                   <span style={{
                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
@@ -315,7 +448,7 @@ const Sermons = () => {
                     fontSize: '0.8rem',
                     fontWeight: '600'
                   }}>
-                    Sabbath Service
+                    {sermons[0].category}
                   </span>
                 </div>
 
@@ -327,7 +460,7 @@ const Sermons = () => {
                   marginBottom: '1rem',
                   lineHeight: '1.3'
                 }}>
-                  Walking by Faith: Trusting God's Plan in Uncertain Times
+                  {sermons[0].title}
                 </h3>
 
                 {/* Speaker */}
@@ -349,7 +482,7 @@ const Sermons = () => {
                     fontWeight: '600',
                     fontSize: '0.9rem'
                   }}>
-                    PM
+                    {sermons[0].speaker.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div>
                     <div style={{
@@ -357,13 +490,13 @@ const Sermons = () => {
                       color: '#374151',
                       fontSize: '1rem'
                     }}>
-                      Pastor Samuel Mwangi
+                      {sermons[0].speaker}
                     </div>
                     <div style={{
                       fontSize: '0.85rem',
                       color: '#6b7280'
                     }}>
-                      Senior Pastor
+                      Church Leadership
                     </div>
                   </div>
                 </div>
@@ -375,9 +508,7 @@ const Sermons = () => {
                   marginBottom: '2rem',
                   fontSize: '1rem'
                 }}>
-                  In this powerful message, Pastor Mwangi explores how we can maintain unwavering faith
-                  even when life's circumstances seem uncertain. Drawing from biblical examples and
-                  practical wisdom, discover how to trust God's perfect timing and plan.
+                  {sermons[0].description}
                 </p>
 
                 {/* Action Buttons */}
@@ -386,64 +517,112 @@ const Sermons = () => {
                   gap: '1rem',
                   flexWrap: 'wrap'
                 }}>
-                  <button style={{
-                    backgroundColor: '#2d5a27',
-                    color: 'white',
-                    fontWeight: '600',
-                    padding: '12px 24px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    fontSize: '1rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 4px 12px rgba(45, 90, 39, 0.3)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)'
-                    e.target.style.boxShadow = '0 6px 20px rgba(45, 90, 39, 0.4)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)'
-                    e.target.style.boxShadow = '0 4px 12px rgba(45, 90, 39, 0.3)'
-                  }}
+                  <button
+                    onClick={() => setSelectedVideo(sermons[0])}
+                    style={{
+                      backgroundColor: '#2d5a27',
+                      color: 'white',
+                      fontWeight: '600',
+                      padding: '12px 24px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 12px rgba(45, 90, 39, 0.3)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-2px)'
+                      e.target.style.boxShadow = '0 6px 20px rgba(45, 90, 39, 0.4)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)'
+                      e.target.style.boxShadow = '0 4px 12px rgba(45, 90, 39, 0.3)'
+                    }}
                   >
                     <svg style={{ width: '1rem', height: '1rem' }} fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z"/>
                     </svg>
                     Watch Now
                   </button>
-                  <button style={{
-                    backgroundColor: 'transparent',
-                    color: '#2d5a27',
-                    fontWeight: '600',
-                    padding: '12px 24px',
-                    borderRadius: '10px',
-                    border: '2px solid #2d5a27',
-                    fontSize: '1rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#2d5a27'
-                    e.target.style.color = 'white'
-                    e.target.style.transform = 'translateY(-2px)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent'
-                    e.target.style.color = '#2d5a27'
-                    e.target.style.transform = 'translateY(0)'
-                  }}
+                  <button
+                    onClick={() => window.open(sermons[0].url, '_blank')}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: '#2d5a27',
+                      fontWeight: '600',
+                      padding: '12px 24px',
+                      borderRadius: '10px',
+                      border: '2px solid #2d5a27',
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#2d5a27'
+                      e.target.style.color = 'white'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = '#2d5a27'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
                   >
                     <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
-                    Download Audio
+                    Open in YouTube
+                  </button>
+                  <button
+                    onClick={() => {
+                      const shareText = `Check out this sermon: ${sermons[0].title} by ${sermons[0].speaker} - ${sermons[0].url}`
+                      if (navigator.share) {
+                        navigator.share({
+                          title: sermons[0].title,
+                          text: shareText,
+                          url: sermons[0].url
+                        })
+                      } else {
+                        navigator.clipboard.writeText(shareText)
+                        alert('Link copied to clipboard!')
+                      }
+                    }}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: '#2d5a27',
+                      fontWeight: '600',
+                      padding: '12px 24px',
+                      borderRadius: '10px',
+                      border: '2px solid #2d5a27',
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#2d5a27'
+                      e.target.style.color = 'white'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = '#2d5a27'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    Share Sermon
                   </button>
                 </div>
               </div>
@@ -487,74 +666,7 @@ const Sermons = () => {
           gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
           gap: '2rem'
         }}>
-          {[
-            {
-              id: 1,
-              title: "The Power of Prayer in Daily Life",
-              speaker: "Pastor Samuel Mwangi",
-              date: "January 18, 2025",
-              duration: "38:45",
-              category: "Sabbath Service",
-              series: "Living Faith",
-              description: "Discover how prayer can transform your daily walk with God and strengthen your relationship with Him.",
-              color: '#2d5a27'
-            },
-            {
-              id: 2,
-              title: "Hope in Times of Trial",
-              speaker: "Elder Grace Wanjiku",
-              date: "January 15, 2025",
-              duration: "42:12",
-              category: "Midweek Service",
-              series: "Overcoming Challenges",
-              description: "Learn how to maintain hope and trust in God's goodness even during life's most difficult seasons.",
-              color: '#f59e0b'
-            },
-            {
-              id: 3,
-              title: "Youth and Purpose",
-              speaker: "Deacon James Kiprotich",
-              date: "January 12, 2025",
-              duration: "35:20",
-              category: "Youth Service",
-              series: "Finding Your Calling",
-              description: "A powerful message for young people about discovering God's unique purpose for their lives.",
-              color: '#2d5a27'
-            },
-            {
-              id: 4,
-              title: "The Sabbath: A Gift of Rest",
-              speaker: "Pastor Samuel Mwangi",
-              date: "January 11, 2025",
-              duration: "44:18",
-              category: "Sabbath School",
-              series: "Understanding the Sabbath",
-              description: "Explore the beautiful gift of Sabbath rest and its significance in our modern world.",
-              color: '#f59e0b'
-            },
-            {
-              id: 5,
-              title: "Community and Fellowship",
-              speaker: "Elder Mary Njeri",
-              date: "January 8, 2025",
-              duration: "36:55",
-              category: "Community Service",
-              series: "Building Relationships",
-              description: "Understanding the importance of Christian community and how we can support one another.",
-              color: '#2d5a27'
-            },
-            {
-              id: 6,
-              title: "Health and Wholeness",
-              speaker: "Elder Ruth Achieng",
-              date: "January 5, 2025",
-              duration: "40:30",
-              category: "Health Ministry",
-              series: "Wholistic Living",
-              description: "Discover God's plan for our physical, mental, and spiritual well-being.",
-              color: '#f59e0b'
-            }
-          ].map((sermon) => (
+          {sermons.slice(1).map((sermon, index) => (
             <div
               key={sermon.id}
               style={{
@@ -576,14 +688,186 @@ const Sermons = () => {
               }}
             >
               {/* Thumbnail Section */}
-              <div style={{
-                position: 'relative',
-                height: '200px',
-                background: `linear-gradient(135deg, ${sermon.color} 0%, ${sermon.color === '#2d5a27' ? '#1c3a1c' : '#d97706'} 100%)`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
+              <div
+                style={{
+                  position: 'relative',
+                  height: '200px',
+                  background: getThumbnailWithFallback(sermon).fallback
+                    ? `linear-gradient(135deg, ${sermon.color}, ${sermon.color}dd)`
+                    : `url(${getThumbnailWithFallback(sermon).url})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+                onClick={() => setSelectedVideo(sermon)}
+              >
+                {/* LIVE Badge for recent sermons */}
+                {index < 2 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    left: '1rem',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '15px',
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    zIndex: 2,
+                    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)'
+                  }}>
+                    LIVE
+                  </div>
+                )}
+
+                {/* Category Badge */}
+                <div style={{
+                  position: 'absolute',
+                  top: '1rem',
+                  right: '1rem',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  color: sermon.color,
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '15px',
+                  fontSize: '0.7rem',
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  zIndex: 2,
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                }}>
+                  {sermon.category}
+                </div>
+
+                {getThumbnailWithFallback(sermon).fallback && (
+                  <div style={{
+                    textAlign: 'center',
+                    color: 'white',
+                    padding: '1rem'
+                  }}>
+                    <div style={{
+                      width: '3rem',
+                      height: '3rem',
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 0.75rem',
+                      fontSize: '1.2rem',
+                      fontWeight: '600',
+                      border: '2px solid rgba(255, 255, 255, 0.3)'
+                    }}>
+                      {sermon.speaker.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div style={{
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                      lineHeight: '1.2',
+                      marginBottom: '0.25rem'
+                    }}>
+                      {sermon.title.length > 40 ? sermon.title.substring(0, 40) + '...' : sermon.title}
+                    </div>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      opacity: 0.9,
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)'
+                    }}>
+                      {sermon.speaker}
+                    </div>
+                  </div>
+                )}
+
+                {/* Play Button Overlay */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '5rem',
+                  height: '5rem',
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  border: '4px solid rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onClick={() => setSelectedVideo(sermons[0])}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translate(-50%, -50%) scale(1.1)'
+                  e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translate(-50%, -50%) scale(1)'
+                  e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'
+                }}
+                >
+                  <svg style={{
+                    width: '2rem',
+                    height: '2rem',
+                    color: 'white',
+                    marginLeft: '3px' // Slight offset to center the triangle
+                  }} fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+
+                {/* Play Button Overlay */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '4rem',
+                  height: '4rem',
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  border: '3px solid rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translate(-50%, -50%) scale(1.1)'
+                  e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translate(-50%, -50%) scale(1)'
+                  e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'
+                }}
+                >
+                  <svg style={{
+                    width: '1.5rem',
+                    height: '1.5rem',
+                    color: 'white',
+                    marginLeft: '2px' // Slight offset to center the triangle
+                  }} fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+                {/* Overlay */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'rgba(0, 0, 0, 0.3)'
+                }}></div>
+
                 {/* Play Button */}
                 <div style={{
                   width: '60px',
@@ -594,7 +878,9 @@ const Sermons = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                  zIndex: 2
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'scale(1.1)'
@@ -610,26 +896,29 @@ const Sermons = () => {
                   </svg>
                 </div>
 
-                {/* Duration Badge */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: '0.75rem',
-                  right: '0.75rem',
-                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                  color: 'white',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600'
-                }}>
-                  {sermon.duration}
-                </div>
-
-                {/* Series Badge */}
+                {/* Live Badge */}
                 <div style={{
                   position: 'absolute',
                   top: '0.75rem',
                   left: '0.75rem',
+                  backgroundColor: '#ff0000',
+                  color: 'white',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  fontSize: '0.7rem',
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  zIndex: 2
+                }}>
+                  LIVE
+                </div>
+
+                {/* Category Badge */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '0.75rem',
+                  right: '0.75rem',
                   backgroundColor: 'rgba(255, 255, 255, 0.9)',
                   color: sermon.color,
                   padding: '4px 8px',
@@ -637,9 +926,10 @@ const Sermons = () => {
                   fontSize: '0.7rem',
                   fontWeight: '600',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
+                  letterSpacing: '0.5px',
+                  zIndex: 2
                 }}>
-                  {sermon.series}
+                  {sermon.category}
                 </div>
               </div>
 
@@ -744,63 +1034,67 @@ const Sermons = () => {
                   display: 'flex',
                   gap: '0.5rem'
                 }}>
-                  <button style={{
-                    flex: 1,
-                    backgroundColor: sermon.color,
-                    color: 'white',
-                    fontWeight: '600',
-                    padding: '10px 16px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-1px)'
-                    e.target.style.boxShadow = `0 4px 12px ${sermon.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)'
-                    e.target.style.boxShadow = 'none'
-                  }}
+                  <button
+                    onClick={() => setSelectedVideo(sermon)}
+                    style={{
+                      flex: 1,
+                      backgroundColor: sermon.color,
+                      color: 'white',
+                      fontWeight: '600',
+                      padding: '10px 16px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-1px)'
+                      e.target.style.boxShadow = `0 4px 12px ${sermon.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)'
+                      e.target.style.boxShadow = 'none'
+                    }}
                   >
                     <svg style={{ width: '0.9rem', height: '0.9rem' }} fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z"/>
                     </svg>
                     Watch
                   </button>
-                  <button style={{
-                    backgroundColor: 'transparent',
-                    color: sermon.color,
-                    fontWeight: '600',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    border: `2px solid ${sermon.color}`,
-                    fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = sermon.color
-                    e.target.style.color = 'white'
-                    e.target.style.transform = 'translateY(-1px)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent'
-                    e.target.style.color = sermon.color
-                    e.target.style.transform = 'translateY(0)'
-                  }}
+                  <button
+                    onClick={() => window.open(sermon.url, '_blank')}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: sermon.color,
+                      fontWeight: '600',
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      border: `2px solid ${sermon.color}`,
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = sermon.color
+                      e.target.style.color = 'white'
+                      e.target.style.transform = 'translateY(-1px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = sermon.color
+                      e.target.style.transform = 'translateY(0)'
+                    }}
                   >
                     <svg style={{ width: '0.9rem', height: '0.9rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </button>
                 </div>
@@ -1176,6 +1470,228 @@ const Sermons = () => {
           </div>
         </div>
       </section>
+
+      {/* Video Popup Modal */}
+      {selectedVideo && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '2rem'
+        }}
+        onClick={() => setSelectedVideo(null)}
+        >
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '1200px',
+            aspectRatio: '16/9',
+            backgroundColor: 'black',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)'
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedVideo(null)}
+              style={{
+                position: 'absolute',
+                top: '-3rem',
+                right: '0',
+                width: '2.5rem',
+                height: '2.5rem',
+                borderRadius: '50%',
+                border: 'none',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                color: '#374151',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                transition: 'all 0.3s ease',
+                zIndex: 1001
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = 'white'
+                e.target.style.color = '#ef4444'
+                e.target.style.transform = 'scale(1.1)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'
+                e.target.style.color = '#374151'
+                e.target.style.transform = 'scale(1)'
+              }}
+            >
+              ×
+            </button>
+
+            {/* Video Title */}
+            <div style={{
+              position: 'absolute',
+              top: '-3rem',
+              left: '0',
+              right: '3rem',
+              color: 'white',
+              fontSize: '1.2rem',
+              fontWeight: '600',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+            }}>
+              {selectedVideo.title}
+            </div>
+
+            {/* YouTube Embed */}
+            <iframe
+              src={getYouTubeEmbedUrl(selectedVideo.url)}
+              title={selectedVideo.title}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none'
+              }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+
+            {/* Video Info Overlay */}
+            <div style={{
+              position: 'absolute',
+              bottom: '0',
+              left: '0',
+              right: '0',
+              background: 'linear-gradient(transparent, rgba(0, 0, 0, 0.8))',
+              padding: '2rem 1.5rem 1rem',
+              color: 'white'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                marginBottom: '0.5rem'
+              }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  background: 'linear-gradient(135deg, #2d5a27, #f59e0b)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: '600',
+                  fontSize: '0.9rem'
+                }}>
+                  {selectedVideo.speaker.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <div style={{
+                    fontWeight: '600',
+                    fontSize: '1rem'
+                  }}>
+                    {selectedVideo.speaker}
+                  </div>
+                  <div style={{
+                    fontSize: '0.9rem',
+                    opacity: 0.8
+                  }}>
+                    {selectedVideo.date} • {selectedVideo.category}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                marginTop: '1rem'
+              }}>
+                <button
+                  onClick={() => window.open(selectedVideo.url, '_blank')}
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
+                    e.target.style.transform = 'translateY(-1px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
+                    e.target.style.transform = 'translateY(0)'
+                  }}
+                >
+                  <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  Open in YouTube
+                </button>
+                <button
+                  onClick={() => {
+                    const shareText = `Check out this sermon: ${selectedVideo.title} by ${selectedVideo.speaker} - ${selectedVideo.url}`
+                    if (navigator.share) {
+                      navigator.share({
+                        title: selectedVideo.title,
+                        text: shareText,
+                        url: selectedVideo.url
+                      })
+                    } else {
+                      navigator.clipboard.writeText(shareText)
+                      alert('Link copied to clipboard!')
+                    }
+                  }}
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
+                    e.target.style.transform = 'translateY(-1px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
+                    e.target.style.transform = 'translateY(0)'
+                  }}
+                >
+                  <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                  </svg>
+                  Share
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
