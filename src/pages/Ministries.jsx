@@ -17,9 +17,9 @@ const Ministries = () => {
       name: "Youth Ministry",
       category: "age-groups",
       description: "Empowering young people aged 13-25 to grow in faith, build lasting friendships, and serve their community through dynamic programs and activities.",
-      leader: "Duncan Mageto Atati",
-      contact: "Contact information pending",
-      phone: "Contact information pending",
+      leader: "Duncan Mageto",
+      contact: "duncanmageto76@gmail.com",
+      phone: "704385185",
       meetingTime: "Fridays 6:00 PM",
       location: "Youth Hall",
       activities: ["Bible Study", "Community Service", "Sports", "Music"],
@@ -74,8 +74,8 @@ const Ministries = () => {
       category: "age-groups",
       description: "Nurturing children ages 3-12 in their relationship with Jesus Christ through engaging lessons, activities, and loving care.",
       leader: "Erick Yonni",
-      contact: "Contact information pending",
-      phone: "Contact information pending",
+      contact: "erickyonni@gmail.com",
+      phone: "723522933",
       meetingTime: "Saturdays 9:00 AM",
       location: "Children's Wing",
       activities: ["Sabbath School", "Vacation Bible School", "Children's Choir", "Crafts"],
@@ -200,8 +200,8 @@ const Ministries = () => {
       name: "Music Ministry",
       category: "worship",
       description: "Leading worship through music and praise, inspiring hearts to connect with God through the power of song.",
-      leader: "Paul Odongo/Justus Arita",
-      contact: "Contact information pending",
+      leader: "Paul Odongo",
+      contact: "paulodongo43@gmail.com",
       meetingTime: "Thursdays 7:00 PM",
       location: "Main Sanctuary",
       activities: ["Choir Practice", "Instrumental Training", "Worship Leading", "Special Music"],
@@ -224,20 +224,7 @@ const Ministries = () => {
       image: "/api/placeholder/400/250"
     },
     // Outreach
-    {
-      id: 7,
-      name: "Community Outreach",
-      category: "outreach",
-      description: "Serving our community through various outreach programs, demonstrating Christ's love through practical service.",
-      leader: "Elder Abraham Sayah",
-      contact: "Contact information pending",
-      meetingTime: "Sundays 10:00 AM",
-      location: "Community Center",
-      activities: ["Food Distribution", "Health Fairs", "Community Events", "Evangelism"],
-      icon: "🤝",
-      color: "#2d5a27",
-      image: "/api/placeholder/400/250"
-    },
+
     {
       id: 8,
       name: "Health Ministry",
@@ -253,32 +240,33 @@ const Ministries = () => {
       image: "/api/placeholder/400/250"
     },
     // Education
-    {
-      id: 9,
-      name: "Sabbath School",
-      category: "education",
-      description: "Systematic Bible study for all ages, fostering spiritual growth and biblical understanding.",
-      leader: "Charles Owiti",
-      contact: "Contact information pending",
-      meetingTime: "Saturdays 9:00 AM",
-      location: "Various Classrooms",
-      activities: ["Bible Study", "Discussion Groups", "Mission Stories", "Memory Verses"],
-      icon: "📚",
-      color: "#2d5a27",
-      image: "/api/placeholder/400/250"
-    },
+
     {
       id: 10,
       name: "Family Life Ministry",
       category: "support",
       description: "Strengthening families through counseling, workshops, and support programs for healthy relationships.",
-      leader: "Elder Reuben Lusasi",
-      contact: "Contact information pending",
+      leader: "Reuben Lusasi",
+      contact: "rlusasi@yahoo.com",
       meetingTime: "Third Sunday 2:00 PM",
       location: "Family Center",
       activities: ["Marriage Counseling", "Parenting Classes", "Family Retreats", "Support Groups"],
       icon: "💙",
       color: "#f59e0b",
+      image: "/api/placeholder/400/250"
+    },
+    {
+      id: 11,
+      name: "Choir Ministry",
+      category: "worship",
+      description: "Dedicated choir ministry that leads worship through beautiful harmonies and spiritual songs.",
+      leader: "Justus Arita",
+      contact: "justusarita@gmail.com",
+      meetingTime: "Thursdays 6:00 PM",
+      location: "Main Sanctuary",
+      activities: ["Choir Practice", "Worship Leading", "Special Performances", "Music Training"],
+      icon: "🎼",
+      color: "#2d5a27",
       image: "/api/placeholder/400/250"
     }
   ]
@@ -710,28 +698,28 @@ const Ministries = () => {
           }}>
             {[
               {
-                name: "Pst. Charles Muritu Nganga",
+                name: "Pst. Charles Muritu",
                 role: "Senior Pastor",
-                email: "Contact information pending",
-                phone: "Contact information pending",
+                email: "muritunganga77@gmail.com",
+                phone: "729071755",
                 ministries: ["Pastoral Care"],
                 bio: "Leading our church family with wisdom and dedication.",
                 color: "#2d5a27"
               },
               {
-                name: "Janet Joan Ouma",
+                name: "Joan Ouma",
                 role: "Women's Ministry (AWM) Leader",
                 email: "Contact information pending",
-                phone: "Contact information pending",
+                phone: "726385813",
                 ministries: ["Women's Ministry", "AWM Programs"],
                 bio: "Passionate about empowering women in their spiritual journey.",
                 color: "#f59e0b"
               },
               {
-                name: "Duncan Mageto Atati",
+                name: "Duncan Mageto",
                 role: "Youth Ministry Leader",
-                email: "Contact information pending",
-                phone: "Contact information pending",
+                email: "duncanmageto76@gmail.com",
+                phone: "704385185",
                 ministries: ["Youth Ministry", "Community Outreach"],
                 bio: "Dedicated to mentoring young people and building future leaders.",
                 color: "#2d5a27"
@@ -739,17 +727,17 @@ const Ministries = () => {
               {
                 name: "Erick Yonni",
                 role: "Children's Ministry Leader",
-                email: "Contact information pending",
-                phone: "Contact information pending",
+                email: "erickyonni@gmail.com",
+                phone: "723522933",
                 ministries: ["Children's Ministry", "Sabbath School"],
                 bio: "Nurturing the next generation with love and biblical foundation.",
                 color: "#f59e0b"
               },
               {
-                name: "Paul Odongo/Justus Arita",
+                name: "Paul Odongo",
                 role: "Music & Worship Ministry",
-                email: "Contact information pending",
-                phone: "Contact information pending",
+                email: "paulodongo43@gmail.com",
+                phone: "720051277",
                 ministries: ["Music Ministry", "Worship Team"],
                 bio: "Leading hearts to worship through the gift of music and praise.",
                 color: "#2d5a27"
@@ -758,16 +746,16 @@ const Ministries = () => {
                 name: "Elizabeth Sapato",
                 role: "Health & Wellness Ministry",
                 email: "Contact information pending",
-                phone: "Contact information pending",
+                phone: "724590844",
                 ministries: ["Health Ministry", "Community Wellness"],
                 bio: "Promoting wholistic health and wellness in our community.",
                 color: "#f59e0b"
               },
               {
-                name: "Charles Kyalo Simon",
+                name: "Charles Kyalo",
                 role: "Communication Leader",
-                email: "Contact information pending",
-                phone: "Contact information pending",
+                email: "charleskyalo77@gmail.com",
+                phone: "722937200",
                 ministries: ["Church Communication", "Media Management"],
                 bio: "Managing church communications and information systems.",
                 color: "#2d5a27"

@@ -108,7 +108,7 @@
 - [x] Interactive Google Maps embed with directions
 - [x] Mobile-optimized map interface
 - [x] Location cards with map links on Home page
-- [ ] Add staff directory with contact details
+- [x] Add staff directory with contact details ✅
 - [ ] Create prayer request submission form
 - [ ] Add pastoral care request system
 - [ ] Implement contact form email notifications
@@ -331,7 +331,9 @@
 - ✅ **CLIENT_DATA_REQUEST.md created** - Comprehensive document for collecting real church data
 - ✅ **REAL LEADERSHIP DATA UPDATED** - All pastor and ministry leader names updated with real information
 - ✅ **YOUTUBE CHANNEL LINKED** - Footer now links to "Thika Main SDA Church" YouTube channel
-- 🔄 Currently working on: Collecting remaining contact information and photos
+- ✅ **CONTACT INFORMATION COMPLETE** - All church officers' contact information (2025) updated across website
+- ✅ **DEPARTMENTS & MINISTRIES UPDATED** - Added missing departments, fixed ministry vs department distinctions, updated all contact details
+- 🔄 Currently working on: Collecting photos and enhancing content
 
 ### Next Immediate Tasks (Frontend Focus)
 1. ✅ ~~Add Google Maps integration to Contact page~~ **COMPLETED**
@@ -347,7 +349,7 @@
 11. Implement site-wide search functionality
 12. Add loading animations and transitions
 13. Complete accessibility features (ARIA labels, keyboard navigation)
-14. **PRIORITY: Collect remaining contact information (phone, email, addresses)**
+14. ✅ ~~**PRIORITY: Collect remaining contact information (phone, email, addresses)**~~ **COMPLETED**
 15. **PRIORITY: Collect and add real photos of church and leadership**
 16. Replace remaining placeholder content with real church information
 17. **Backend tasks postponed until frontend completion**

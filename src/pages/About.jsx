@@ -288,8 +288,8 @@ const About = () => {
               margin: '0 auto',
               lineHeight: '1.6'
             }}>
-              From humble beginnings to a thriving community of faith, discover the journey of
-              Thika Main SDA Church through the decades.
+              From humble beginnings in 1980 to a thriving mother church with 15 daughter congregations,
+              discover the remarkable 45-year journey of faith, growth, and community impact.
             </p>
           </div>
 
@@ -367,16 +367,16 @@ const About = () => {
                         color: '#f59e0b',
                         marginBottom: '0.5rem'
                       }}>
-                        1960s - Foundation
+                        1980 - Foundation
                       </h4>
                       <p style={{
                         color: '#6b7280',
                         lineHeight: '1.6'
                       }}>
-                        Thika Main SDA Church was established in 2010 by a small group of dedicated believers who
-                        felt called to share the Adventist message in the growing town of Thika. Starting
-                        with just 15 members, they met in a simple structure that would become the foundation
-                        of our current church.
+                        Thika Main SDA Church was established in 1980 by a small group of dedicated believers who
+                        felt called to share the Adventist message in the rapidly growing town of Thika. Starting
+                        with just 25 members, they met in a simple structure in Makongeni, laying the foundation
+                        for what would become a mother church to many congregations across the region.
                       </p>
                     </div>
                   </div>
@@ -425,15 +425,16 @@ const About = () => {
                         color: '#2d5a27',
                         marginBottom: '0.5rem'
                       }}>
-                        1980s - Growth
+                        1990s - Expansion
                       </h4>
                       <p style={{
                         color: '#6b7280',
                         lineHeight: '1.6'
                       }}>
-                        As Thika developed into a major commercial center, our church grew significantly.
-                        We expanded our facilities, established multiple ministries, and became a mother
-                        church, successfully planting 10 daughter churches throughout the region over our 15 years of service.
+                        As Thika developed into a major commercial and agricultural center, our church experienced
+                        remarkable growth. We expanded our facilities, established comprehensive ministries for all
+                        age groups, and began our mission of church planting. During this decade, we successfully
+                        planted our first 5 daughter churches in surrounding communities.
                       </p>
                     </div>
                   </div>
@@ -495,7 +496,7 @@ const About = () => {
                     </div>
                   </div>
 
-                  {/* Today */}
+                  {/* 2010s */}
                   <div style={{
                     position: 'relative',
                     paddingLeft: '5rem'
@@ -539,15 +540,74 @@ const About = () => {
                         color: '#2d5a27',
                         marginBottom: '0.5rem'
                       }}>
-                        Today - Digital Age
+                        2010s - Multiplication
                       </h4>
                       <p style={{
                         color: '#6b7280',
                         lineHeight: '1.6'
                       }}>
-                        Today, we continue to grow and adapt, embracing digital ministry while maintaining
-                        our core values. With over 800 active members, we serve as a spiritual home for
-                        families across Thika and surrounding areas.
+                        A decade of remarkable church planting success. We established 10 additional daughter
+                        churches, bringing our total to 15 thriving congregations across Central Kenya. Our
+                        membership grew to over 500 active members, and we became a regional center for
+                        Adventist education and community development.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Today */}
+                  <div style={{
+                    position: 'relative',
+                    paddingLeft: '5rem'
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      left: '1rem',
+                      top: '1rem',
+                      width: '2rem',
+                      height: '2rem',
+                      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                      border: '4px solid white'
+                    }}>
+                      <span style={{ color: 'white', fontWeight: 'bold', fontSize: '0.8rem' }}>5</span>
+                    </div>
+                    <div style={{
+                      backgroundColor: 'white',
+                      padding: '2rem',
+                      borderRadius: '16px',
+                      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.08)',
+                      border: '1px solid rgba(245, 158, 11, 0.1)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateX(8px)'
+                      e.currentTarget.style.boxShadow = '0 12px 40px rgba(245, 158, 11, 0.15)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateX(0)'
+                      e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.08)'
+                    }}
+                    >
+                      <h4 style={{
+                        fontSize: '1.3rem',
+                        fontWeight: '700',
+                        color: '#f59e0b',
+                        marginBottom: '0.5rem'
+                      }}>
+                        2025 - 45 Years Strong
+                      </h4>
+                      <p style={{
+                        color: '#6b7280',
+                        lineHeight: '1.6'
+                      }}>
+                        Today, after 45 years of faithful service, we celebrate God's goodness with 299 active
+                        members and 15 daughter churches. We continue to embrace digital ministry, community
+                        outreach, and holistic development while maintaining our commitment to biblical truth
+                        and Adventist values.
                       </p>
                     </div>
                   </div>
@@ -649,7 +709,7 @@ const About = () => {
                       color: '#f59e0b',
                       marginBottom: '0.5rem',
                       lineHeight: '1'
-                    }}>15</div>
+                    }}>45</div>
                     <p style={{
                       color: '#6b7280',
                       fontWeight: '600',
@@ -713,7 +773,7 @@ const About = () => {
                       color: '#f59e0b',
                       marginBottom: '0.5rem',
                       lineHeight: '1'
-                    }}>10</div>
+                    }}>15</div>
                     <p style={{
                       color: '#6b7280',
                       fontWeight: '600',
@@ -743,9 +803,9 @@ const About = () => {
                     lineHeight: '1.6',
                     fontSize: '1rem'
                   }}>
-                    Through community health programs, educational initiatives, and spiritual outreach,
-                    we've touched thousands of lives in Thika and beyond, demonstrating Christ's love
-                    through practical service.
+                    Over 45 years of faithful service, we've established 15 daughter churches, trained
+                    hundreds of church leaders, and touched thousands of lives through community health
+                    programs, educational initiatives, and spiritual outreach across Central Kenya.
                   </p>
                 </div>
               </div>
