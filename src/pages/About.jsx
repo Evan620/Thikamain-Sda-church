@@ -1106,28 +1106,52 @@ const About = () => {
           }}>
             {[
               {
-                name: "Pst. Charles Muritu Nganga",
+                name: "Pst. Charles Muritu",
                 position: "Senior Pastor",
                 description: "Leading our congregation with wisdom and dedication, Pastor Charles guides our church family in spiritual growth and community service.",
-                education: "Contact information pending",
+                education: "Phone: +254 729 071 755 | Email: muritunganga77@gmail.com",
                 specialties: ["Pastoral Care", "Biblical Teaching", "Church Leadership"],
                 color: '#2d5a27'
               },
               {
                 name: "Elder Methucellah Mokua",
-                position: "Head Elder",
-                description: "Serving as our Head Elder, Elder Methucellah provides spiritual guidance and oversight to our church board and congregation.",
-                education: "Contact: +254 726 028 004",
+                position: "First Elder",
+                description: "Serving as our First Elder, Elder Methucellah provides spiritual guidance and oversight to our church board and congregation.",
+                education: "Phone: +254 726 028 004 | Email: mokuamariera@gmail.com",
                 specialties: ["Church Governance", "Spiritual Guidance", "Leadership"],
                 color: '#f59e0b'
               },
               {
-                name: "Kefa Nyaaga Nyakundi",
+                name: "Kefa Nyakundi",
                 position: "Head Deacon",
                 description: "Coordinating our deacon board and ensuring smooth church operations, Deacon Kefa serves with dedication and commitment.",
-                education: "Church Administration",
+                education: "Phone: +254 724 357 783",
                 specialties: ["Church Administration", "Facilities Management", "Stewardship"],
                 color: '#2d5a27'
+              },
+              {
+                name: "Joseph Kimilu",
+                position: "Church Treasurer",
+                description: "Managing church finances with integrity and transparency, ensuring proper stewardship of God's resources.",
+                education: "Phone: +254 720 930 703 | Email: jkimilu963@gmail.com",
+                specialties: ["Financial Management", "Stewardship", "Budget Planning"],
+                color: '#f59e0b'
+              },
+              {
+                name: "Effie Muthoni",
+                position: "Church Clerk",
+                description: "Maintaining accurate church records and facilitating effective communication within our church family.",
+                education: "Phone: +254 723 379 186 | Email: effiemuthoni3@gmail.com",
+                specialties: ["Record Keeping", "Communication", "Administration"],
+                color: '#2d5a27'
+              },
+              {
+                name: "Edwina Odongo",
+                position: "Head Deaconess",
+                description: "Leading our deaconess team in caring for church members and coordinating women's service activities.",
+                education: "Phone: +254 723 506 923",
+                specialties: ["Member Care", "Women's Leadership", "Service Coordination"],
+                color: '#f59e0b'
               },
               {
                 name: "Edwina Odongo",
@@ -1316,10 +1340,30 @@ const About = () => {
             marginBottom: '4rem'
           }}>
             {[
-              { name: "Elder Reuben Lusasi", role: "Church Elder" },
-              { name: "Elder Abraham Sayah", role: "Church Elder" },
-              { name: "Elder David Juma", role: "Church Elder" },
-              { name: "Elder James Mauti", role: "Church Elder" }
+              {
+                name: "Elder Reuben Lusasi",
+                role: "Church Elder & Family Life Ministry",
+                contact: "+254 721 885 849",
+                email: "rlusasi@yahoo.com"
+              },
+              {
+                name: "Elder Abraham Sayah",
+                role: "Church Elder",
+                contact: "+254 705 476 095",
+                email: "sayahabraham22@gmail.com"
+              },
+              {
+                name: "Elder David Juma",
+                role: "Church Elder",
+                contact: "+254 724 322 889",
+                email: "davyjumah@gmail.com"
+              },
+              {
+                name: "Elder James Mauti",
+                role: "Church Elder",
+                contact: "+254 711 617 542",
+                email: "jamesmogere530@gmail.com"
+              }
             ].map((elder, index) => (
               <div
                 key={index}
@@ -1367,10 +1411,30 @@ const About = () => {
                 <p style={{
                   color: '#6b7280',
                   fontSize: '1rem',
-                  fontWeight: '500'
+                  fontWeight: '500',
+                  marginBottom: '0.5rem'
                 }}>
                   {elder.role}
                 </p>
+                {elder.contact && (
+                  <p style={{
+                    color: '#2d5a27',
+                    fontSize: '0.85rem',
+                    fontWeight: '500',
+                    marginBottom: '0.25rem'
+                  }}>
+                    📞 {elder.contact}
+                  </p>
+                )}
+                {elder.email && (
+                  <p style={{
+                    color: '#2d5a27',
+                    fontSize: '0.85rem',
+                    fontWeight: '500'
+                  }}>
+                    ✉️ {elder.email}
+                  </p>
+                )}
               </div>
             ))}
           </div>

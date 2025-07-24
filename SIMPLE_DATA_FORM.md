@@ -14,7 +14,7 @@
 
 **Church Address:** FILL IN: ________________________________
 
-**Phone Number:** FILL IN: ________________________________
+**Phone Number:** +254 723 379 186
 
 **Email Address:** FILL IN: ________________________________
 
@@ -38,45 +38,56 @@
 
 ## 👨‍💼 CHURCH LEADERS
 
-**Pastor's Name:** Pst. Charles Muritu Nganga
-
-**Pastor's Phone/Email:** FILL IN: ________________________________
-
-**Pastor's Biography:** FILL IN: ________________________________
-________________________________
-________________________________
-
+### 🙏 PASTORAL TEAM
+**Pastor:** Charles Muritu
+**Phone:** +254 729 071 755
+**Email:** muritunganga77@gmail.com
+**Biography:** FILL IN: ________________________________
 **Years of Service:** FILL IN: ________________________________
 
-**Head Elder:** Elder Methucellah Mokua
-
-**Head Elder Contact:** +254 726 028 004
+### 👥 CHURCH ELDERS
+**First Elder:** Methucellah Mokua
+**Phone:** +254 726 028 004
+**Email:** mokuamariera@gmail.com
 
 **Other Elders:**
-- Elder Reuben Lusasi
-- Elder Abraham Sayah
-- Elder David Juma
-- Elder James Mauti
+- Abraham Sayah - +254 705 476 095 - sayahabraham22@gmail.com
+- Reuben Lusasi - +254 721 885 849 - rlusasi@yahoo.com
+- James Mauti - +254 711 617 542 - jamesmogere530@gmail.com
+- David Juma - +254 724 322 889 - davyjumah@gmail.com
 
-**Youth Leader:** Duncan Mageto Atati
+### ⛪ CHURCH OFFICERS
+**Head Deacon:** Kefa Nyakundi
+**Phone:** +254 724 357 783
 
-**Children's Leader:** Erick Yonni
+**Head Deaconess:** Edwina Odongo
+**Phone:** +254 723 506 923
 
-**Music Director:** Paul Odongo/Justus Arita
+**Church Clerk:** Effie Muthoni
+**Phone:** +254 723 379 186
+**Email:** effiemuthoni3@gmail.com
 
-**Treasurer:** Elder Joseph Kimilu
+**Church Treasurer:** Joseph Kimilu
+**Phone:** +254 720 930 703
+**Email:** jkimilu963@gmail.com
 
-**Secretary:** Sister Effie Muthoni
-
-**Head Deacon:** Kefa Nyaaga Nyakundi
-
+### 📚 EDUCATION & SABBATH SCHOOL
 **Sabbath School Superintendent:** Charles Owiti
+**Phone:** +254 719 723 194
 
-**Other Department Heads:**
-- Paul Odhiambo - Strategic and Planning
-- Janet Joan Ouma - AWM (Adventist Women's Ministry)
-- Benard Mogere - AMM (Adventist Men's Ministry)
-- Charles Kyalo Simon - Communication Leader
+**Del Monte SS Superintendent:** Joash Maguthu
+**Phone:** +254 712 903 228
+
+**Kenyatta Farm SS Superintendent:** Daniel Githinji
+**Phone:** +254 799 357 975
+
+**Education Director:** Hellen Kiteme
+**Phone:** +254 727 752 972
+**Email:** alkobus@gmail.com
+
+**School Coordinator:** Allan Kobiya
+**Phone:** +254 724 758 278
+**Email:** alkobus@gmail.com
 
 ---
 
@@ -108,39 +119,87 @@ ________________________________
 
 ---
 
-## 🤝 MINISTRIES
+## 🤝 MINISTRIES & DEPARTMENTS
 
-**Youth Ministry - Leader & Contact:**
-Duncan Mageto
-Contact: FILL IN: ________________________________
+### 👨‍👩‍👧‍👦 FAMILY & YOUTH MINISTRIES
+**Youth Ministry:** Duncan Mageto
+**Phone:** +254 704 385 185
+**Email:** duncanmageto76@gmail.com
 
-**Children's Ministry - Leader & Contact:**
-Erick Yonni
-Contact: FILL IN: ________________________________
+**Children's Ministry:** Erick Yonni
+**Phone:** +254 723 522 933
+**Email:** erickyonni@gmail.com
 
-**Women's Ministry (AWM) - Leader & Contact:**
-Janet Joan Ouma
-Contact: FILL IN: ________________________________
+**Family Life Ministry:** Reuben Lusasi
+**Phone:** +254 721 885 849
+**Email:** rlusasi@yahoo.com
 
-**Men's Ministry (AMM) - Leader & Contact:**
-Benard Mogere
-Contact: FILL IN: ________________________________
+**Singles Ministry:** Joyce Ngure
+**Phone:** +254 722 405 223
+**Email:** marubejoyce747@gmail.com
 
-**Music Ministry - Director:**
-Paul Odongo
-Contact: FILL IN: ________________________________
+### 👩‍🤝‍👨 GENDER MINISTRIES
+**Adventist Women's Ministry (AWM):** Joan Ouma
+**Phone:** +254 726 385 813
 
-**Health Ministry - Leader & Contact:**
-Elizabeth Sapato
-Contact: FILL IN: ________________________________
+**Adventist Men's Ministry (AMM):** Benard Mogere
+**Phone:** +254 721 785 862
 
-**Community Outreach - Coordinator & Programs:**
-FILL IN: ________________________________
-________________________________
+### 🎵 MUSIC & WORSHIP
+**Music Coordinator:** Paul Odongo
+**Phone:** +254 720 051 277
+**Email:** paulodongo43@gmail.com
 
-**Other Ministries:**
-FILL IN: ________________________________
-________________________________
+**Choir Director:** Justus Arita
+**Phone:** +254 721 880 818
+**Email:** justusarita@gmail.com
+
+### 🏕️ YOUTH CLUBS & ACTIVITIES
+**Pathfinder/Masateguide:** Judy Jaji
+**Phone:** +254 722 855 747
+**Email:** judyjaji99@gmail.com
+
+**Adventurer Club:** Jenniffer Kambua
+**Phone:** +254 716 902 195
+
+**Ambassadors Club:** Gladys Arita
+**Phone:** +254 721 746 143
+
+### 🏥 HEALTH & WELFARE
+**Health Ministry:** Elizabeth Sapato
+**Phone:** +254 724 590 844
+
+**Welfare/Special Needs:** Thomas Jachong
+**Phone:** +254 721 269 038
+**Email:** jachongthomas@gmail.com
+
+### 📢 COMMUNICATION & OUTREACH
+**Communication Director:** Charles Kyalo
+**Phone:** +254 722 937 200
+**Email:** charleskyalo77@gmail.com
+
+**Personal Ministry:** Erick Mogeni
+**Phone:** +254 713 567 192
+
+**Publishing/Chaplaincy:** Monicah Mosoti
+**Phone:** +254 712 521 766
+**Email:** mosotikoreti05@gmail.com
+
+### 💰 STEWARDSHIP & DEVELOPMENT
+**Stewardship Director:** Linet Kerubo
+**Phone:** +254 726 596 243
+
+**Development Coordinator:** Margaret Nyambati
+**Phone:** +254 717 688 343
+**Email:** margymoraa@gmail.com
+
+**Strategic Planning:** Paul Odhiambo
+**Phone:** +254 721 153 152
+**Email:** odhiambop57@gmail.com
+
+### 🙏 SPIRITUAL MINISTRIES
+**Prayer Ministry:** Rael Karimi
+**Phone:** +254 720 671 289
 
 ---
 

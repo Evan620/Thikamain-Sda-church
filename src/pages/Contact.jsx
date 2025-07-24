@@ -200,7 +200,7 @@ const Contact = () => {
                     </svg>
                   ),
                   title: "Phone",
-                  content: "+254 712 345 678",
+                  content: "+254 723 379 186",
                   subtitle: "Call us for immediate assistance",
                   color: "#f59e0b"
                 },

@@ -19,7 +19,7 @@ const Ministries = () => {
       description: "Empowering young people aged 13-25 to grow in faith, build lasting friendships, and serve their community through dynamic programs and activities.",
       leader: "Duncan Mageto",
       contact: "duncanmageto76@gmail.com",
-      phone: "704385185",
+      phone: "+254 704 385 185",
       meetingTime: "Fridays 6:00 PM",
       location: "Youth Hall",
       activities: ["Bible Study", "Community Service", "Sports", "Music"],
@@ -75,7 +75,7 @@ const Ministries = () => {
       description: "Nurturing children ages 3-12 in their relationship with Jesus Christ through engaging lessons, activities, and loving care.",
       leader: "Erick Yonni",
       contact: "erickyonni@gmail.com",
-      phone: "723522933",
+      phone: "+254 723 522 933",
       meetingTime: "Saturdays 9:00 AM",
       location: "Children's Wing",
       activities: ["Sabbath School", "Vacation Bible School", "Children's Choir", "Crafts"],
@@ -129,9 +129,9 @@ const Ministries = () => {
       name: "Women's Ministry",
       category: "age-groups",
       description: "Supporting and encouraging women in their spiritual journey through fellowship, study, and service opportunities.",
-      leader: "Janet Joan Ouma",
-      contact: "Contact information pending",
-      phone: "Contact information pending",
+      leader: "Joan Ouma",
+      contact: "AWM/Dorcas Ministry",
+      phone: "+254 726 385 813",
       meetingTime: "Second Sunday 2:00 PM",
       location: "Fellowship Hall",
       activities: ["Bible Study", "Prayer Groups", "Community Service", "Retreats"],
@@ -701,7 +701,7 @@ const Ministries = () => {
                 name: "Pst. Charles Muritu",
                 role: "Senior Pastor",
                 email: "muritunganga77@gmail.com",
-                phone: "729071755",
+                phone: "+254 729 071 755",
                 ministries: ["Pastoral Care"],
                 bio: "Leading our church family with wisdom and dedication.",
                 color: "#2d5a27"
@@ -709,8 +709,8 @@ const Ministries = () => {
               {
                 name: "Joan Ouma",
                 role: "Women's Ministry (AWM) Leader",
-                email: "Contact information pending",
-                phone: "726385813",
+                email: "AWM/Dorcas Ministry",
+                phone: "+254 726 385 813",
                 ministries: ["Women's Ministry", "AWM Programs"],
                 bio: "Passionate about empowering women in their spiritual journey.",
                 color: "#f59e0b"
@@ -1048,7 +1048,7 @@ const Ministries = () => {
                     color: '#2d5a27',
                     fontWeight: '600'
                   }}>
-                    +254 712 345 678
+                    +254 723 379 186
                   </p>
                 </div>
 

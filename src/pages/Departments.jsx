@@ -17,7 +17,7 @@ const Departments = () => {
       description: "Responsible for long-term church planning, vision implementation, and strategic decision-making processes.",
       head: "Paul Odhiambo",
       contact: "odhiambop57@gmail.com",
-      phone: "721153152",
+      phone: "+254 721 153 152",
       responsibilities: ["Strategic Planning", "Vision Implementation", "Policy Development", "Resource Allocation"],
       icon: "📊",
       color: "#2d5a27"
@@ -79,7 +79,7 @@ const Departments = () => {
       description: "Coordinates church development projects and community improvement initiatives.",
       head: "Margaret Nyambati",
       contact: "margymoraa@gmail.com",
-      phone: "717688343",
+      phone: "+254 717 688 343",
       responsibilities: ["Project Management", "Community Development", "Infrastructure Planning", "Resource Mobilization"],
       icon: "🏗️",
       color: "#f59e0b"
@@ -90,8 +90,8 @@ const Departments = () => {
       category: "ministry",
       description: "Equips members for personal evangelism and spiritual growth through training and outreach programs.",
       head: "Erick Mogeni",
-      contact: "Contact information pending",
-      phone: "713567192",
+      contact: "Personal Ministry Department",
+      phone: "+254 713 567 192",
       responsibilities: ["Evangelism Training", "Outreach Programs", "Spiritual Growth", "Witnessing"],
       icon: "🙏",
       color: "#2d5a27"
@@ -102,8 +102,8 @@ const Departments = () => {
       category: "ministry",
       description: "Teaches biblical principles of stewardship and manages church resource allocation and giving programs.",
       head: "Linet Kerubo",
-      contact: "Contact information pending",
-      phone: "726596243",
+      contact: "Stewardship Department",
+      phone: "+254 726 596 243",
       responsibilities: ["Stewardship Education", "Giving Programs", "Resource Management", "Financial Literacy"],
       icon: "💝",
       color: "#f59e0b"
@@ -115,7 +115,7 @@ const Departments = () => {
       description: "Manages church publications, literature distribution, and provides chaplaincy services.",
       head: "Monicah Mosoti",
       contact: "mosotikoreti05@gmail.com",
-      phone: "712521766",
+      phone: "+254 712 521 766",
       responsibilities: ["Literature Distribution", "Publishing", "Chaplaincy Services", "Educational Materials"],
       icon: "📖",
       color: "#2d5a27"
@@ -127,7 +127,7 @@ const Departments = () => {
       description: "Provides support for members with special needs and coordinates welfare assistance programs.",
       head: "Thomas Jachong",
       contact: "jachongthomas@gmail.com",
-      phone: "721269038",
+      phone: "+254 721 269 038",
       responsibilities: ["Special Needs Support", "Welfare Programs", "Community Assistance", "Disability Services"],
       icon: "🤝",
       color: "#f59e0b"
@@ -139,7 +139,7 @@ const Departments = () => {
       description: "Provides fellowship, support, and programs specifically designed for single members.",
       head: "Joyce Ngure",
       contact: "marubejoyce747@gmail.com",
-      phone: "722405223",
+      phone: "+254 722 405 223",
       responsibilities: ["Singles Fellowship", "Social Programs", "Support Groups", "Community Building"],
       icon: "💫",
       color: "#f59e0b"
@@ -150,8 +150,8 @@ const Departments = () => {
       category: "ministry",
       description: "Coordinates Sabbath School programs, curriculum, and systematic Bible study for all age groups.",
       head: "Charles Owiti",
-      contact: "Contact information pending",
-      phone: "719723194",
+      contact: "Sabbath School Department",
+      phone: "+254 719 723 194",
       responsibilities: ["Sabbath School Coordination", "Bible Study Programs", "Curriculum Management", "Teacher Training"],
       icon: "📚",
       color: "#2d5a27"
@@ -163,7 +163,7 @@ const Departments = () => {
       description: "Coordinates community service programs and outreach initiatives to serve the local community.",
       head: "Abraham Sayah",
       contact: "sayahabraham22@gmail.com",
-      phone: "705476095",
+      phone: "+254 705 476 095",
       responsibilities: ["Community Service", "Outreach Programs", "Evangelism Coordination", "Public Relations"],
       icon: "🤝",
       color: "#f59e0b"
@@ -198,10 +198,82 @@ const Departments = () => {
       category: "ministry",
       description: "Manages Ambassadors Club programs for leadership development and service training.",
       head: "Gladys Arita",
-      contact: "Contact information pending",
-      phone: "721746143",
+      contact: "Ambassadors Club",
+      phone: "+254 721 746 143",
       responsibilities: ["Leadership Development", "Service Training", "Youth Programs", "Community Service"],
       icon: "🎖️",
+      color: "#2d5a27"
+    },
+    {
+      id: 17,
+      name: "Adventist Men's Ministry (AMM)",
+      category: "ministry",
+      description: "Empowers men to be spiritual leaders in their families, church, and community through fellowship and service.",
+      head: "Benard Mogere",
+      contact: "AMM Department",
+      phone: "+254 721 785 862",
+      responsibilities: ["Men's Fellowship", "Leadership Development", "Family Ministry", "Community Service"],
+      icon: "👨‍👦",
+      color: "#f59e0b"
+    },
+    {
+      id: 18,
+      name: "Health Ministry",
+      category: "ministry",
+      description: "Promotes physical, mental, and spiritual health through education, programs, and community health initiatives.",
+      head: "Elizabeth Sapato",
+      contact: "Health Ministry Department",
+      phone: "+254 724 590 844",
+      responsibilities: ["Health Education", "Wellness Programs", "Community Health", "Lifestyle Medicine"],
+      icon: "🏥",
+      color: "#2d5a27"
+    },
+    {
+      id: 19,
+      name: "Music Ministry",
+      category: "ministry",
+      description: "Coordinates all musical activities and worship services, developing musical talents for God's glory.",
+      head: "Paul Odongo",
+      contact: "paulodongo43@gmail.com",
+      phone: "+254 720 051 277",
+      responsibilities: ["Worship Music", "Choir Coordination", "Musical Training", "Special Events"],
+      icon: "🎵",
+      color: "#f59e0b"
+    },
+    {
+      id: 20,
+      name: "Communication",
+      category: "administrative",
+      description: "Manages church communications, media, and information dissemination across all platforms.",
+      head: "Charles Kyalo",
+      contact: "charleskyalo77@gmail.com",
+      phone: "+254 722 937 200",
+      responsibilities: ["Media Management", "Communications", "Website", "Social Media"],
+      icon: "📢",
+      color: "#2d5a27"
+    },
+    {
+      id: 21,
+      name: "Education",
+      category: "administrative",
+      description: "Oversees educational programs, training, and academic development within the church community.",
+      head: "Hellen Kiteme",
+      contact: "alkobus@gmail.com",
+      phone: "+254 727 752 972",
+      responsibilities: ["Educational Programs", "Training Coordination", "Academic Development", "Curriculum"],
+      icon: "🎓",
+      color: "#f59e0b"
+    },
+    {
+      id: 22,
+      name: "Prayer Ministry",
+      category: "ministry",
+      description: "Coordinates prayer activities, intercessory prayer, and spiritual warfare ministries.",
+      head: "Rael Karimi",
+      contact: "Prayer Ministry Department",
+      phone: "+254 720 671 289",
+      responsibilities: ["Prayer Coordination", "Intercessory Prayer", "Prayer Groups", "Spiritual Warfare"],
+      icon: "🙏",
       color: "#2d5a27"
     }
 

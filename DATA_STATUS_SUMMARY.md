@@ -3,39 +3,48 @@
 ## ✅ INFORMATION RECEIVED
 
 ### 👨‍💼 CHURCH LEADERSHIP
-**✅ COMPLETE:**
-- **Pastor:** Pst. Charles Muritu Nganga
-- **Head Elder:** Elder Methucellah Mokua (+254 726 028 004)
-- **Other Elders:** 
-  - Elder Reuben Lusasi
-  - Elder Abraham Sayah
-  - Elder David Juma
-  - Elder James Mauti
-- **Treasurer:** Elder Joseph Kimilu
-- **Secretary:** Sister Effie Muthoni
-- **Head Deacon:** Kefa Nyaaga Nyakundi
-- **Head Deaconess:** Edwina Odongo
-- **Youth Leader:** Duncan Mageto Atati
-- **Children's Leader:** Erick Yonni
-- **Music Director:** Paul Odongo/Justus Arita
-- **Sabbath School Superintendent:** Charles Owiti
-- **Department Heads:**
-  - Paul Odhiambo - Strategic and Planning
-  - Janet Joan Ouma - AWM (Adventist Women's Ministry)
-  - Benard Mogere - AMM (Adventist Men's Ministry)
-  - Charles Kyalo Simon - Communication Leader
+**✅ COMPLETE - ALL 2025 OFFICERS UPDATED GLOBALLY:**
+- **Pastor:** Charles Muritu (+254 729 071 755) - muritunganga77@gmail.com
+- **First Elder:** Methucellah Mokua (+254 726 028 004) - mokuamariera@gmail.com
+- **Church Elders:**
+  - Abraham Sayah (+254 705 476 095) - sayahabraham22@gmail.com
+  - Reuben Lusasi (+254 721 885 849) - rlusasi@yahoo.com
+  - James Mauti (+254 711 617 542) - jamesmogere530@gmail.com
+  - David Juma (+254 724 322 889) - davyjumah@gmail.com
+- **Church Officers:**
+  - Treasurer: Joseph Kimilu (+254 720 930 703) - jkimilu963@gmail.com
+  - Clerk: Effie Muthoni (+254 723 379 186) - effiemuthoni3@gmail.com
+  - Head Deacon: Kefa Nyakundi (+254 724 357 783)
+  - Head Deaconess: Edwina Odongo (+254 723 506 923)
+- **Education & Sabbath School:**
+  - SS Superintendent: Charles Owiti (+254 719 723 194)
+  - Del Monte SS: Joash Maguthu (+254 712 903 228)
+  - Kenyatta Farm SS: Daniel Githinji (+254 799 357 975)
+  - Education Director: Hellen Kiteme (+254 727 752 972)
+  - School Coordinator: Allan Kobiya (+254 724 758 278)
 
 ### 🤝 MINISTRY LEADERS
-**✅ COMPLETE:**
-- **Youth Ministry:** Duncan Mageto
-- **Children's Ministry:** Erick Yonni
-- **Women's Ministry:** Janet Joan Ouma
-- **Men's Ministry:** Benard Mogere
-- **Music Ministry:** Paul Odongo
-- **Health Ministry:** Elizabeth Sapato
-- **Prayer Ministry:** Rael Karimi
-- **Community Outreach:** Elder Abraham Sayah
-- **Family Life Ministry:** Elder Reuben Lusasi
+**✅ COMPLETE - ALL 35 OFFICERS WITH FULL CONTACT INFO:**
+- **Youth Ministry:** Duncan Mageto (+254 704 385 185) - duncanmageto76@gmail.com
+- **Children's Ministry:** Erick Yonni (+254 723 522 933) - erickyonni@gmail.com
+- **AWM (Women's Ministry):** Joan Ouma (+254 726 385 813)
+- **AMM (Men's Ministry):** Benard Mogere (+254 721 785 862)
+- **Music Ministry:** Paul Odongo (+254 720 051 277) - paulodongo43@gmail.com
+- **Choir Director:** Justus Arita (+254 721 880 818) - justusarita@gmail.com
+- **Health Ministry:** Elizabeth Sapato (+254 724 590 844)
+- **Prayer Ministry:** Rael Karimi (+254 720 671 289)
+- **Personal Ministry:** Erick Mogeni (+254 713 567 192)
+- **Family Life Ministry:** Reuben Lusasi (+254 721 885 849) - rlusasi@yahoo.com
+- **Communication:** Charles Kyalo (+254 722 937 200) - charleskyalo77@gmail.com
+- **Development:** Margaret Nyambati (+254 717 688 343) - margymoraa@gmail.com
+- **Stewardship:** Linet Kerubo (+254 726 596 243)
+- **Strategic Planning:** Paul Odhiambo (+254 721 153 152) - odhiambop57@gmail.com
+- **Publishing/Chaplaincy:** Monicah Mosoti (+254 712 521 766) - mosotikoreti05@gmail.com
+- **Welfare/Special Needs:** Thomas Jachong (+254 721 269 038) - jachongthomas@gmail.com
+- **Singles Ministry:** Joyce Ngure (+254 722 405 223) - marubejoyce747@gmail.com
+- **Pathfinder/Masterguide:** Judy Jaji (+254 722 855 747) - judyjaji99@gmail.com
+- **Adventurer Club:** Jenniffer Kambua (+254 716 902 195)
+- **Ambassadors Club:** Gladys Arita (+254 721 746 143)
 
 ### 📱 SOCIAL MEDIA
 **✅ COMPLETE:**
