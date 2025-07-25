@@ -25,6 +25,176 @@ const Home = () => {
   const [modalType, setModalType] = useState('')
   const [modalData, setModalData] = useState({})
 
+  // Daily Bible verses array - 31 verses for daily rotation
+  const dailyVerses = [
+    {
+      verse: "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.",
+      reference: "Proverbs 3:5-6",
+      reflection: "Let this verse guide your day. Trust in God's wisdom and direction as you walk in faith."
+    },
+    {
+      verse: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future.",
+      reference: "Jeremiah 29:11",
+      reflection: "God has wonderful plans for your life. Trust in His perfect timing and purpose."
+    },
+    {
+      verse: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.",
+      reference: "Joshua 1:9",
+      reflection: "Take courage today knowing that God is always with you in every situation."
+    },
+    {
+      verse: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.",
+      reference: "Romans 8:28",
+      reflection: "Even in difficult times, God is working everything together for your good."
+    },
+    {
+      verse: "The Lord is my shepherd, I lack nothing. He makes me lie down in green pastures, he leads me beside quiet waters.",
+      reference: "Psalm 23:1-2",
+      reflection: "Find peace and rest in God's loving care and provision for your life."
+    },
+    {
+      verse: "Cast all your anxiety on him because he cares for you.",
+      reference: "1 Peter 5:7",
+      reflection: "Give your worries to God today. He cares deeply about every concern you have."
+    },
+    {
+      verse: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.",
+      reference: "Isaiah 40:31",
+      reflection: "Find renewed strength and energy as you put your hope in the Lord."
+    },
+    {
+      verse: "The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you; in his love he will no longer rebuke you, but will rejoice over you with singing.",
+      reference: "Zephaniah 3:17",
+      reflection: "Remember that God delights in you and rejoices over you with singing."
+    },
+    {
+      verse: "Come to me, all you who are weary and burdened, and I will give you rest.",
+      reference: "Matthew 11:28",
+      reflection: "Jesus invites you to find rest and peace in His loving presence."
+    },
+    {
+      verse: "And my God will meet all your needs according to the riches of his glory in Christ Jesus.",
+      reference: "Philippians 4:19",
+      reflection: "Trust that God will provide for all your needs according to His abundant riches."
+    },
+    {
+      verse: "The Lord is close to the brokenhearted and saves those who are crushed in spirit.",
+      reference: "Psalm 34:18",
+      reflection: "In times of pain, remember that God is especially close to those who are hurting."
+    },
+    {
+      verse: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.",
+      reference: "John 3:16",
+      reflection: "Marvel at God's incredible love demonstrated through Jesus Christ."
+    },
+    {
+      verse: "I can do all this through him who gives me strength.",
+      reference: "Philippians 4:13",
+      reflection: "With Christ's strength, you can overcome any challenge that comes your way."
+    },
+    {
+      verse: "The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you; the Lord turn his face toward you and give you peace.",
+      reference: "Numbers 6:24-26",
+      reflection: "Receive God's blessing, grace, and peace as you begin this new day."
+    },
+    {
+      verse: "This is the day the Lord has made; we will rejoice and be glad in it.",
+      reference: "Psalm 118:24",
+      reflection: "Choose joy today, knowing that this day is a gift from God."
+    },
+    {
+      verse: "But seek first his kingdom and his righteousness, and all these things will be given to you as well.",
+      reference: "Matthew 6:33",
+      reflection: "Make God's kingdom your priority, and trust Him to provide for everything else."
+    },
+    {
+      verse: "The name of the Lord is a fortified tower; the righteous run to it and are safe.",
+      reference: "Proverbs 18:10",
+      reflection: "Find safety and security in the powerful name of the Lord."
+    },
+    {
+      verse: "He heals the brokenhearted and binds up their wounds.",
+      reference: "Psalm 147:3",
+      reflection: "God is the ultimate healer of hearts and the comforter of souls."
+    },
+    {
+      verse: "In their hearts humans plan their course, but the Lord establishes their steps.",
+      reference: "Proverbs 16:9",
+      reflection: "Make your plans, but trust God to direct your path according to His will."
+    },
+    {
+      verse: "The Lord is my light and my salvation—whom shall I fear? The Lord is the stronghold of my life—of whom shall I be afraid?",
+      reference: "Psalm 27:1",
+      reflection: "Walk in confidence today, knowing that God is your light, salvation, and stronghold."
+    },
+    {
+      verse: "Give thanks to the Lord, for he is good; his love endures forever.",
+      reference: "Psalm 107:1",
+      reflection: "Start your day with gratitude, remembering God's goodness and eternal love."
+    },
+    {
+      verse: "Peace I leave with you; my peace I give you. I do not give to you as the world gives. Do not let your hearts be troubled and do not be afraid.",
+      reference: "John 14:27",
+      reflection: "Receive the peace that only Jesus can give, a peace that surpasses understanding."
+    },
+    {
+      verse: "Therefore do not worry about tomorrow, for tomorrow will worry about itself. Each day has enough trouble of its own.",
+      reference: "Matthew 6:34",
+      reflection: "Focus on today and trust God with your future. He holds tomorrow in His hands."
+    },
+    {
+      verse: "Weeping may stay for the night, but rejoicing comes in the morning.",
+      reference: "Psalm 30:5",
+      reflection: "If you're going through a difficult time, hold onto hope—joy is coming."
+    },
+    {
+      verse: "Let us hold unswervingly to the hope we profess, for he who promised is faithful.",
+      reference: "Hebrews 10:23",
+      reflection: "Hold tight to your hope in God, for He is completely faithful to His promises."
+    },
+    {
+      verse: "The Lord will fight for you; you need only to be still.",
+      reference: "Exodus 14:14",
+      reflection: "Rest in knowing that God fights your battles. Sometimes the best action is stillness."
+    },
+    {
+      verse: "Delight yourself in the Lord, and he will give you the desires of your heart.",
+      reference: "Psalm 37:4",
+      reflection: "Find your joy in the Lord, and watch how He aligns your heart with His will."
+    },
+    {
+      verse: "Every good and perfect gift is from above, coming down from the Father of the heavenly lights, who does not change like shifting shadows.",
+      reference: "James 1:17",
+      reflection: "Recognize that every blessing in your life comes from your unchanging, loving Father."
+    },
+    {
+      verse: "And God is able to bless you abundantly, so that in all things at all times, having all that you need, you will abound in every good work.",
+      reference: "2 Corinthians 9:8",
+      reflection: "Trust in God's abundant provision and His desire to use you for good works."
+    },
+    {
+      verse: "The steadfast love of the Lord never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.",
+      reference: "Lamentations 3:22-23",
+      reflection: "Start each morning with the assurance of God's fresh mercies and unchanging love."
+    },
+    {
+      verse: "Commit to the Lord whatever you do, and he will establish your plans.",
+      reference: "Proverbs 16:3",
+      reflection: "Dedicate your work and plans to God, and trust Him to make them successful."
+    }
+  ]
+
+  // Function to get today's verse based on the current date
+  const getTodaysVerse = () => {
+    const today = new Date()
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24))
+    const verseIndex = (dayOfYear - 1) % dailyVerses.length
+    return dailyVerses[verseIndex]
+  }
+
+  // Get today's verse
+  const todaysVerse = getTodaysVerse()
+
   React.useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768)
@@ -1276,11 +1446,31 @@ const Home = () => {
               fontSize: 'clamp(2rem, 4vw, 3.5rem)',
               fontWeight: '700',
               color: '#2d5a27',
-              marginBottom: '2rem',
+              marginBottom: '1rem',
               lineHeight: '1.2'
             }}>
               Today's Verse
             </h2>
+            <div style={{
+              fontSize: '0.9rem',
+              color: '#6b7280',
+              fontWeight: '500',
+              marginBottom: '2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
+            }}>
+              <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })} • Changes daily at midnight
+            </div>
           </div>
 
           <div style={{
@@ -1326,8 +1516,7 @@ const Home = () => {
                 marginBottom: '2rem',
                 textAlign: 'center'
               }}>
-                "Trust in the Lord with all your heart and lean not on your own understanding;
-                in all your ways submit to him, and he will make your paths straight."
+                "{todaysVerse.verse}"
               </blockquote>
 
               <cite style={{
@@ -1339,7 +1528,7 @@ const Home = () => {
                 display: 'block',
                 marginBottom: '2rem'
               }}>
-                — Proverbs 3:5-6
+                — {todaysVerse.reference}
               </cite>
 
               <div style={{
@@ -1353,7 +1542,7 @@ const Home = () => {
                   lineHeight: '1.6',
                   fontStyle: 'italic'
                 }}>
-                  Let this verse guide your day. Trust in God's wisdom and direction as you walk in faith.
+                  {todaysVerse.reflection}
                 </p>
               </div>
             </div>
