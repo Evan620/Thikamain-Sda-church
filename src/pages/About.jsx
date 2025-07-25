@@ -1154,14 +1154,6 @@ const About = () => {
                 color: '#f59e0b'
               },
               {
-                name: "Elder Joseph Kimilu",
-                position: "Church Treasurer",
-                description: "Overseeing our church finances with integrity and transparency, ensuring responsible stewardship of God's resources.",
-                education: "Financial Management",
-                specialties: ["Financial Management", "Stewardship", "Church Finance"],
-                color: '#2d5a27'
-              },
-              {
                 name: "Charles Owiti",
                 position: "Sabbath School Superintendent",
                 description: "Leading our Sabbath School programs and educational ministries, fostering spiritual growth through biblical education.",
