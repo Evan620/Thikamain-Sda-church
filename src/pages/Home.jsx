@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import InfoModal from '../components/InfoModal'
 
 // Church images for hero background (from public folder)
 const image1 = '/assets/image1.png'
@@ -18,6 +19,11 @@ const Home = () => {
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0)
   const [imagesLoaded, setImagesLoaded] = React.useState(false)
   const heroImages = [image1, image2, image3, image4, image5]
+
+  // Modal state for Learn More functionality
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalType, setModalType] = useState('')
+  const [modalData, setModalData] = useState({})
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -166,6 +172,19 @@ const Home = () => {
     letterSpacing: '1px',
     width: isMobile ? '280px' : 'auto',
     textAlign: 'center'
+  }
+
+  // Helper function to open modals with specific content
+  const openModal = (type, data) => {
+    setModalType(type)
+    setModalData(data)
+    setModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setModalOpen(false)
+    setModalType('')
+    setModalData({})
   }
 
   return (
@@ -1476,7 +1495,22 @@ const Home = () => {
                 </svg>
                 9:00 AM - 1:00 PM
               </div>
-              <button style={{
+              <button
+                onClick={() => openModal('service', {
+                  name: 'Sabbath',
+                  time: '9:00 AM - 1:00 PM',
+                  duration: '4 hours',
+                  description: 'Join us for our weekly Sabbath worship service, a time of spiritual renewal, fellowship, and community. Our service includes inspiring music, meaningful prayer, and biblical teaching that will strengthen your faith and connect you with God and fellow believers.',
+                  activities: [
+                    'Opening hymns and praise music',
+                    'Community prayer time',
+                    'Scripture reading and sermon',
+                    'Special music presentations',
+                    'Fellowship and refreshments',
+                    'Children\'s programs available'
+                  ]
+                })}
+                style={{
                 width: '100%',
                 backgroundColor: 'transparent',
                 color: '#2d5a27',
@@ -1579,7 +1613,22 @@ const Home = () => {
                 </svg>
                 6:00 PM - 8:00 PM
               </div>
-              <button style={{
+              <button
+                onClick={() => openModal('service', {
+                  name: 'Prayer',
+                  time: '6:00 PM - 8:00 PM',
+                  duration: '2 hours',
+                  description: 'Join us for our midweek prayer meeting, a time of spiritual connection, Bible study, and community prayer. This intimate gathering strengthens our faith and builds deeper relationships with God and each other.',
+                  activities: [
+                    'Opening devotional and prayer',
+                    'Interactive Bible study',
+                    'Group prayer and testimonies',
+                    'Prayer requests and intercession',
+                    'Fellowship and light refreshments',
+                    'Special prayer focus topics'
+                  ]
+                })}
+                style={{
                 width: '100%',
                 backgroundColor: 'transparent',
                 color: '#f59e0b',
@@ -1682,7 +1731,22 @@ const Home = () => {
                 </svg>
                 6:00 PM - 8:00 PM
               </div>
-              <button style={{
+              <button
+                onClick={() => openModal('service', {
+                  name: 'Youth',
+                  time: '6:00 PM - 8:00 PM',
+                  duration: '2 hours',
+                  description: 'Join our vibrant youth community for an evening of worship, fun activities, and meaningful connections. Our youth meetings are designed to help young people grow in faith while building lasting friendships in a supportive environment.',
+                  activities: [
+                    'Contemporary worship and music',
+                    'Interactive Bible study for youth',
+                    'Fun games and team activities',
+                    'Youth-led discussions and testimonies',
+                    'Snacks and fellowship time',
+                    'Special events and outings planning'
+                  ]
+                })}
+                style={{
                 width: '100%',
                 backgroundColor: 'transparent',
                 color: '#6b7280',
@@ -1749,6 +1813,14 @@ const Home = () => {
           100% { transform: rotate(360deg); }
         }
       `}</style>
+
+      {/* Info Modal */}
+      <InfoModal
+        isOpen={modalOpen}
+        onClose={closeModal}
+        type={modalType}
+        data={modalData}
+      />
     </div>
   )
 }

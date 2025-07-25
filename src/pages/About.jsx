@@ -1154,22 +1154,6 @@ const About = () => {
                 color: '#f59e0b'
               },
               {
-                name: "Edwina Odongo",
-                position: "Head Deaconess",
-                description: "Leading our deaconess board with grace and compassion, Deaconess Edwina coordinates women's service ministries and pastoral care.",
-                education: "Church Ministry",
-                specialties: ["Women's Ministry", "Pastoral Care", "Community Service"],
-                color: '#f59e0b'
-              },
-              {
-                name: "Sister Effie Muthoni",
-                position: "Church Secretary",
-                description: "Managing our church records and communications with dedication and attention to detail, ensuring effective church administration.",
-                education: "Church Administration",
-                specialties: ["Administration", "Communication", "Record Keeping"],
-                color: '#f59e0b'
-              },
-              {
                 name: "Elder Joseph Kimilu",
                 position: "Church Treasurer",
                 description: "Overseeing our church finances with integrity and transparency, ensuring responsible stewardship of God's resources.",

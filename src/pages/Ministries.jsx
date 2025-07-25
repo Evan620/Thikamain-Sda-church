@@ -1,10 +1,16 @@
 import React, { useState } from 'react'
+import InfoModal from '../components/InfoModal'
 
 const Ministries = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedMinistry, setSelectedMinistry] = useState(null)
   const [showVolunteerForm, setShowVolunteerForm] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
+
+  // Modal state for Learn More functionality
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalType, setModalType] = useState('')
+  const [modalData, setModalData] = useState({})
 
   // Check if we're on mobile
   const isMobile = window.innerWidth < 768
@@ -270,6 +276,19 @@ const Ministries = () => {
       image: "/api/placeholder/400/250"
     }
   ]
+
+  // Helper function to open modals with specific content
+  const openModal = (type, data) => {
+    setModalType(type)
+    setModalData(data)
+    setModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setModalOpen(false)
+    setModalType('')
+    setModalData({})
+  }
 
   return (
     <div className="min-h-screen">
@@ -575,71 +594,7 @@ const Ministries = () => {
                     )}
                   </div>
 
-                  {/* Action Buttons */}
-                  <div style={{
-                    display: 'flex',
-                    gap: '0.5rem'
-                  }}>
-                    <button style={{
-                      flex: 1,
-                      backgroundColor: ministry.color,
-                      color: 'white',
-                      fontWeight: '600',
-                      padding: '10px 16px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      fontSize: '0.9rem',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.5rem'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.transform = 'translateY(-1px)'
-                      e.target.style.boxShadow = `0 4px 12px ${ministry.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.transform = 'translateY(0)'
-                      e.target.style.boxShadow = 'none'
-                    }}
-                    >
-                      <svg style={{ width: '0.9rem', height: '0.9rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                      </svg>
-                      Join Ministry
-                    </button>
-                    <button style={{
-                      backgroundColor: 'transparent',
-                      color: ministry.color,
-                      fontWeight: '600',
-                      padding: '10px 12px',
-                      borderRadius: '8px',
-                      border: `2px solid ${ministry.color}`,
-                      fontSize: '0.9rem',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = ministry.color
-                      e.target.style.color = 'white'
-                      e.target.style.transform = 'translateY(-1px)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent'
-                      e.target.style.color = ministry.color
-                      e.target.style.transform = 'translateY(0)'
-                    }}
-                    >
-                      <svg style={{ width: '0.9rem', height: '0.9rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </button>
-                  </div>
+
                 </div>
               </div>
             ))}
@@ -912,37 +867,7 @@ const Ministries = () => {
                     </div>
                   </div>
 
-                  {/* Contact Button */}
-                  <button style={{
-                    width: '100%',
-                    backgroundColor: leader.color,
-                    color: 'white',
-                    fontWeight: '600',
-                    padding: '10px 16px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)'
-                    e.target.style.boxShadow = `0 8px 25px ${leader.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)'
-                    e.target.style.boxShadow = 'none'
-                  }}
-                  >
-                    <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    Contact Leader
-                  </button>
+
                 </div>
               </div>
             ))}
@@ -1146,32 +1071,16 @@ const Ministries = () => {
                 justifyContent: 'center',
                 flexWrap: 'wrap'
               }}>
-                <button style={{
-                  backgroundColor: '#2d5a27',
-                  color: 'white',
-                  fontWeight: '600',
-                  padding: '16px 32px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  boxShadow: '0 8px 25px rgba(45, 90, 39, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-3px)'
-                  e.target.style.boxShadow = '0 12px 40px rgba(45, 90, 39, 0.4)'
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)'
-                  e.target.style.boxShadow = '0 8px 25px rgba(45, 90, 39, 0.3)'
-                }}
-                >
-                  Join a Ministry Today
-                </button>
-                <button style={{
+
+                <button
+                  onClick={() => openModal('ministry', {
+                    name: 'Church Ministries',
+                    description: 'Our church offers a wide variety of ministries designed to help you grow in faith, serve others, and build meaningful relationships. From youth programs to community outreach, there\'s a place for everyone to get involved and make a difference.',
+                    leader: 'Ministry Coordinators',
+                    contact: '+254 723 379 186',
+                    meetingTime: 'Various times throughout the week'
+                  })}
+                  style={{
                   backgroundColor: 'transparent',
                   color: '#2d5a27',
                   fontWeight: '600',
@@ -1202,6 +1111,14 @@ const Ministries = () => {
           </div>
         </div>
       </section>
+
+      {/* Info Modal */}
+      <InfoModal
+        isOpen={modalOpen}
+        onClose={closeModal}
+        type={modalType}
+        data={modalData}
+      />
     </div>
   )
 }

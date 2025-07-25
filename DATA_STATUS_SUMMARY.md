@@ -8,7 +8,7 @@
 - **First Elder:** Methucellah Mokua (+254 726 028 004) - mokuamariera@gmail.com
 - **Church Elders:**
   - Abraham Sayah (+254 705 476 095) - sayahabraham22@gmail.com
-  - Reuben Lusasi (+254 721 885 849) - rlusasi@yahoo.com
+  - Reuben Lusasi (+254 721 885 849) - rlusasi@yahoo.com (Family Life Ministry)
   - James Mauti (+254 711 617 542) - jamesmogere530@gmail.com
   - David Juma (+254 724 322 889) - davyjumah@gmail.com
 - **Church Officers:**
@@ -34,7 +34,6 @@
 - **Health Ministry:** Elizabeth Sapato (+254 724 590 844)
 - **Prayer Ministry:** Rael Karimi (+254 720 671 289)
 - **Personal Ministry:** Erick Mogeni (+254 713 567 192)
-- **Family Life Ministry:** Reuben Lusasi (+254 721 885 849) - rlusasi@yahoo.com
 - **Communication:** Charles Kyalo (+254 722 937 200) - charleskyalo77@gmail.com
 - **Development:** Margaret Nyambati (+254 717 688 343) - margymoraa@gmail.com
 - **Stewardship:** Linet Kerubo (+254 726 596 243)

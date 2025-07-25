@@ -1,11 +1,80 @@
 import React, { useState } from 'react'
+import InfoModal from '../components/InfoModal'
 
 const Events = () => {
   const [selectedQuarter, setSelectedQuarter] = useState('Q1') // Q1, Q2, Q3, Q4
 
+  // Modal state for Learn More functionality
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalType, setModalType] = useState('')
+  const [modalData, setModalData] = useState({})
+
   // Check if we're on mobile
   const isMobile = window.innerWidth < 768
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+
+  // Helper function to open modals with specific content
+  const openModal = (type, data) => {
+    setModalType(type)
+    setModalData(data)
+    setModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setModalOpen(false)
+    setModalType('')
+    setModalData({})
+  }
+
+  // Helper function to create calendar event
+  const addToCalendar = (event) => {
+    // Parse the date and time
+    const eventDate = new Date(event.date)
+    const [time, period] = event.time.split(' ')
+    const [hours, minutes] = time.split(':')
+    let hour24 = parseInt(hours)
+
+    if (period === 'PM' && hour24 !== 12) {
+      hour24 += 12
+    } else if (period === 'AM' && hour24 === 12) {
+      hour24 = 0
+    }
+
+    eventDate.setHours(hour24, parseInt(minutes) || 0, 0, 0)
+
+    // Create end time (assume 2 hours duration for most events)
+    const endDate = new Date(eventDate)
+    if (event.time.includes('All Day')) {
+      endDate.setDate(endDate.getDate() + 1)
+    } else {
+      endDate.setHours(endDate.getHours() + 2)
+    }
+
+    // Format dates for calendar
+    const formatDate = (date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+    }
+
+    const startTime = formatDate(eventDate)
+    const endTime = formatDate(endDate)
+
+    // Create calendar URLs
+    const title = encodeURIComponent(event.title)
+    const description = encodeURIComponent(`${event.description}\n\nLocation: ${event.location}\nAttendees: ${event.attendees}`)
+    const location = encodeURIComponent(`${event.location}, Thika Main SDA Church`)
+
+    const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startTime}/${endTime}&details=${description}&location=${location}`
+    const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startTime}&enddt=${endTime}&body=${description}&location=${location}`
+
+    // Show options to user
+    const choice = confirm(`Add "${event.title}" to your calendar?\n\nClick OK for Google Calendar\nClick Cancel for Outlook Calendar`)
+
+    if (choice) {
+      window.open(googleUrl, '_blank')
+    } else {
+      window.open(outlookUrl, '_blank')
+    }
+  }
 
   return (
     <div className="min-h-screen">
@@ -1166,7 +1235,17 @@ const Events = () => {
                     gap: '1rem',
                     flexWrap: 'wrap'
                   }}>
-                    <button style={{
+                    <button
+                      onClick={() => openModal('event', {
+                        title: event.title,
+                        date: event.date,
+                        time: event.time,
+                        location: event.location,
+                        description: event.description,
+                        attendees: event.attendees,
+                        department: event.department
+                      })}
+                      style={{
                       backgroundColor: event.color,
                       color: 'white',
                       fontWeight: '600',
@@ -1196,7 +1275,9 @@ const Events = () => {
                       </svg>
                       Learn More
                     </button>
-                    <button style={{
+                    <button
+                      onClick={() => addToCalendar(event)}
+                      style={{
                       backgroundColor: 'transparent',
                       color: event.color,
                       fontWeight: '600',
@@ -1432,118 +1513,15 @@ const Events = () => {
         </div>
       </section>
 
-      {/* Call to Action Section */}
-      <section style={{
-        padding: '4rem 0',
-        background: 'linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%)'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '0 2rem',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: '20px',
-            padding: '3rem',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
-            border: '1px solid rgba(45, 90, 39, 0.1)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            {/* Background decoration */}
-            <div style={{
-              position: 'absolute',
-              top: '-100px',
-              right: '-100px',
-              width: '200px',
-              height: '200px',
-              background: 'radial-gradient(circle, rgba(245, 158, 11, 0.05) 0%, transparent 70%)',
-              borderRadius: '50%'
-            }}></div>
 
-            <div style={{ position: 'relative', zIndex: 2 }}>
-              <h2 style={{
-                fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
-                fontWeight: '700',
-                color: '#2d5a27',
-                marginBottom: '1rem'
-              }}>
-                Stay Connected
-              </h2>
-              <p style={{
-                color: '#6b7280',
-                fontSize: '1.1rem',
-                marginBottom: '2rem',
-                maxWidth: '600px',
-                margin: '0 auto 2rem auto',
-                lineHeight: '1.6'
-              }}>
-                Never miss an event! Subscribe to our newsletter or follow us on social media to stay updated with all our activities and special events.
-              </p>
-              <div style={{
-                display: 'flex',
-                gap: '1rem',
-                justifyContent: 'center',
-                flexWrap: 'wrap'
-              }}>
-                <button style={{
-                  backgroundColor: '#2d5a27',
-                  color: 'white',
-                  fontWeight: '600',
-                  padding: '16px 32px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  boxShadow: '0 8px 25px rgba(45, 90, 39, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-3px)'
-                  e.target.style.boxShadow = '0 12px 40px rgba(45, 90, 39, 0.4)'
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)'
-                  e.target.style.boxShadow = '0 8px 25px rgba(45, 90, 39, 0.3)'
-                }}
-                >
-                  Subscribe to Newsletter
-                </button>
-                <button style={{
-                  backgroundColor: 'transparent',
-                  color: '#2d5a27',
-                  fontWeight: '600',
-                  padding: '16px 32px',
-                  borderRadius: '12px',
-                  border: '2px solid #2d5a27',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#2d5a27'
-                  e.target.style.color = 'white'
-                  e.target.style.transform = 'translateY(-3px)'
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent'
-                  e.target.style.color = '#2d5a27'
-                  e.target.style.transform = 'translateY(0)'
-                }}
-                >
-                  Follow Us
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+
+      {/* Info Modal */}
+      <InfoModal
+        isOpen={modalOpen}
+        onClose={closeModal}
+        type={modalType}
+        data={modalData}
+      />
     </div>
   )
 }
