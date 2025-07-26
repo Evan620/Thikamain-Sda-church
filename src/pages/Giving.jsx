@@ -1,9 +1,54 @@
-import React from 'react'
+import React, { useState } from 'react'
+import MpesaPaymentModal from '../components/MpesaPaymentModal'
 
 const Giving = () => {
+  // Form state
+  const [amount, setAmount] = useState('')
+  const [givingType, setGivingType] = useState('tithe')
+  const [showMpesaModal, setShowMpesaModal] = useState(false)
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
 
-  // Check if we're on mobile
+  // Mobile detection
   const isMobile = window.innerWidth < 768
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    // Validate amount
+    if (!amount || parseFloat(amount) < 1) {
+      alert('Please enter a valid amount (minimum KES 1)')
+      return
+    }
+
+    // Open M-PESA payment modal
+    setShowMpesaModal(true)
+  }
+
+  const handlePaymentSuccess = (paymentData) => {
+    console.log('Payment successful:', paymentData)
+    setPaymentSuccess(true)
+    setShowMpesaModal(false)
+
+    // Show success message
+    alert(`Thank you for your generous ${paymentData.givingType} of KES ${paymentData.amount}! Your payment has been processed successfully.`)
+
+    // Reset form
+    setAmount('')
+    setGivingType('tithe')
+
+    // Reset success state after 5 seconds
+    setTimeout(() => setPaymentSuccess(false), 5000)
+  }
+
+  const handlePaymentError = (errorData) => {
+    console.error('Payment error:', errorData)
+    setShowMpesaModal(false)
+
+    // Show error message
+    alert(`Payment failed: ${errorData.error}. Please try again or contact support.`)
+  }
+
+  // Check if we're on mobile and tablet
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
 
   return (
@@ -399,6 +444,311 @@ const Giving = () => {
         </div>
       </section>
 
+      {/* M-PESA STK Push Donation Form */}
+      <section style={{
+        padding: '4rem 0',
+        background: 'linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%)'
+      }}>
+        <div style={{
+          maxWidth: '800px',
+          margin: '0 auto',
+          padding: '0 2rem'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '3rem'
+          }}>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+              fontWeight: '700',
+              color: '#2d5a27',
+              marginBottom: '1rem'
+            }}>
+              Make a Donation
+            </h2>
+            <p style={{
+              color: '#6b7280',
+              fontSize: '1.1rem',
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: '1.6'
+            }}>
+              Support our ministry through secure M-PESA STK Push payment
+            </p>
+          </div>
+
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: '2rem',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.08)',
+            border: '1px solid rgba(45, 90, 39, 0.1)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            {/* Background decoration */}
+            <div style={{
+              position: 'absolute',
+              top: '-50px',
+              left: '-50px',
+              width: '100px',
+              height: '100px',
+              background: 'radial-gradient(circle, rgba(45, 90, 39, 0.1) 0%, transparent 70%)',
+              borderRadius: '50%'
+            }}></div>
+
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <form onSubmit={handleSubmit} style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5rem'
+              }}>
+                {/* Preset Amount Buttons */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '1rem'
+                  }}>
+                    Quick Amount Selection (KES)
+                  </label>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+                    gap: '0.5rem',
+                    marginBottom: '1rem'
+                  }}>
+                    {[500, 1000, 2000, 5000, 10000].map((presetAmount) => (
+                      <button
+                        key={presetAmount}
+                        type="button"
+                        onClick={() => setAmount(presetAmount.toString())}
+                        style={{
+                          padding: isMobile ? '14px 16px' : '12px 16px',
+                          borderRadius: '10px',
+                          border: amount === presetAmount.toString() ? '2px solid #2d5a27' : '2px solid rgba(45, 90, 39, 0.1)',
+                          backgroundColor: amount === presetAmount.toString() ? 'rgba(45, 90, 39, 0.1)' : 'white',
+                          color: amount === presetAmount.toString() ? '#2d5a27' : '#6b7280',
+                          fontSize: isMobile ? '1rem' : '0.9rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          minHeight: isMobile ? '48px' : 'auto'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isMobile && amount !== presetAmount.toString()) {
+                            e.target.style.borderColor = 'rgba(45, 90, 39, 0.3)'
+                            e.target.style.backgroundColor = 'rgba(45, 90, 39, 0.05)'
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isMobile && amount !== presetAmount.toString()) {
+                            e.target.style.borderColor = 'rgba(45, 90, 39, 0.1)'
+                            e.target.style.backgroundColor = 'white'
+                          }
+                        }}
+                      >
+                        {presetAmount.toLocaleString()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Amount Input */}
+                <div>
+                  <label
+                    htmlFor="amount"
+                    style={{
+                      display: 'block',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      color: '#374151',
+                      marginBottom: '0.5rem'
+                    }}
+                  >
+                    Custom Amount (KES) *
+                  </label>
+                  <input
+                    type="number"
+                    id="amount"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    required
+                    min="1"
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '14px 16px' : '12px 16px',
+                      border: '2px solid rgba(45, 90, 39, 0.1)',
+                      borderRadius: '10px',
+                      fontSize: isMobile ? '16px' : '1rem',
+                      transition: 'all 0.3s ease',
+                      outline: 'none',
+                      backgroundColor: 'white',
+                      color: '#000000',
+                      minHeight: isMobile ? '48px' : 'auto'
+                    }}
+                    placeholder="Enter custom amount"
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#2d5a27'
+                      e.target.style.boxShadow = '0 0 0 3px rgba(45, 90, 39, 0.1)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(45, 90, 39, 0.1)'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Giving Type Selection */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '1rem'
+                  }}>
+                    Type of Giving *
+                  </label>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem'
+                  }}>
+                    {[
+                      { value: 'tithe', label: 'Tithe', description: '10% of income', icon: '💰' },
+                      { value: 'offering', label: 'Offering', description: 'General giving', icon: '🙏' },
+                      { value: 'special', label: 'Special Project', description: 'Specific purpose', icon: '🎯' }
+                    ].map((option) => (
+                      <label
+                        key={option.value}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '1rem',
+                          borderRadius: '12px',
+                          border: givingType === option.value ? '2px solid #2d5a27' : '2px solid rgba(45, 90, 39, 0.1)',
+                          backgroundColor: givingType === option.value ? 'rgba(45, 90, 39, 0.05)' : 'white',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          minHeight: isMobile ? '60px' : 'auto'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isMobile && givingType !== option.value) {
+                            e.currentTarget.style.borderColor = 'rgba(45, 90, 39, 0.3)'
+                            e.currentTarget.style.backgroundColor = 'rgba(45, 90, 39, 0.02)'
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isMobile && givingType !== option.value) {
+                            e.currentTarget.style.borderColor = 'rgba(45, 90, 39, 0.1)'
+                            e.currentTarget.style.backgroundColor = 'white'
+                          }
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="givingType"
+                          value={option.value}
+                          checked={givingType === option.value}
+                          onChange={(e) => setGivingType(e.target.value)}
+                          style={{
+                            marginRight: '0.75rem',
+                            transform: 'scale(1.2)',
+                            accentColor: '#2d5a27'
+                          }}
+                        />
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          flex: 1
+                        }}>
+                          <span style={{ fontSize: '1.25rem' }}>{option.icon}</span>
+                          <div>
+                            <div style={{
+                              fontWeight: '600',
+                              color: '#374151',
+                              fontSize: '1rem'
+                            }}>
+                              {option.label}
+                            </div>
+                            <div style={{
+                              fontSize: '0.85rem',
+                              color: '#6b7280'
+                            }}>
+                              {option.description}
+                            </div>
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#2d5a27',
+                    color: 'white',
+                    fontWeight: '600',
+                    padding: isMobile ? '16px' : '14px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    fontSize: isMobile ? '1.1rem' : '1rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    minHeight: isMobile ? '56px' : '48px',
+                    boxShadow: '0 4px 12px rgba(45, 90, 39, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#1e3a1a'
+                      e.target.style.transform = 'translateY(-2px)'
+                      e.target.style.boxShadow = '0 8px 25px rgba(45, 90, 39, 0.4)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isMobile) {
+                      e.target.style.backgroundColor = '#2d5a27'
+                      e.target.style.transform = 'translateY(0)'
+                      e.target.style.boxShadow = '0 4px 12px rgba(45, 90, 39, 0.3)'
+                    }
+                  }}
+                >
+                  <span style={{ fontSize: '1.2rem' }}>📱</span>
+                  Pay with M-PESA STK Push
+                </button>
+
+                <p style={{
+                  fontSize: '0.85rem',
+                  color: '#6b7280',
+                  textAlign: 'center',
+                  margin: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span style={{ fontSize: '1rem' }}>🔒</span>
+                  Your donation is secure and encrypted. STK Push will be sent to your phone.
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Payment Information Section */}
       <section style={{
         padding: '4rem 0',
@@ -700,6 +1050,52 @@ const Giving = () => {
           </div>
         </div>
       </section>
+
+      {/* M-PESA Payment Modal */}
+      <MpesaPaymentModal
+        isOpen={showMpesaModal}
+        onClose={() => setShowMpesaModal(false)}
+        amount={parseFloat(amount) || 0}
+        givingType={givingType}
+        onPaymentSuccess={handlePaymentSuccess}
+        onPaymentError={handlePaymentError}
+      />
+
+      {/* Success Message Overlay */}
+      {paymentSuccess && (
+        <div style={{
+          position: 'fixed',
+          top: '2rem',
+          right: '2rem',
+          backgroundColor: '#10b981',
+          color: 'white',
+          padding: '1rem 1.5rem',
+          borderRadius: '10px',
+          boxShadow: '0 8px 25px rgba(16, 185, 129, 0.3)',
+          zIndex: 1001,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          animation: 'slideIn 0.3s ease'
+        }}>
+          <span style={{ fontSize: '1.2rem' }}>✅</span>
+          <span style={{ fontWeight: '600' }}>Payment Successful!</span>
+        </div>
+      )}
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
 
     </div>
   )

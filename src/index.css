@@ -1890,3 +1890,165 @@ body {
     }
   }
 }
+
+/* ========================================
+   GLOBAL SCROLLBAR HIDING STYLES
+   ======================================== */
+
+/* Hide scrollbars globally while maintaining scroll functionality */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+}
+
+/* Internet Explorer and Edge Legacy */
+body {
+  -ms-overflow-style: none;
+}
+
+/* Additional global scrollbar hiding for all elements */
+html, body, div, section, article, aside, nav, header, footer, main,
+ul, ol, li, p, h1, h2, h3, h4, h5, h6, blockquote, pre, code,
+table, thead, tbody, tfoot, tr, td, th, form, fieldset, legend,
+input, textarea, select, button, label, iframe, embed, object,
+video, audio, canvas, svg, img, figure, figcaption {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Webkit scrollbar hiding for all elements */
+html::-webkit-scrollbar, body::-webkit-scrollbar, div::-webkit-scrollbar,
+section::-webkit-scrollbar, article::-webkit-scrollbar, aside::-webkit-scrollbar,
+nav::-webkit-scrollbar, header::-webkit-scrollbar, footer::-webkit-scrollbar,
+main::-webkit-scrollbar, ul::-webkit-scrollbar, ol::-webkit-scrollbar,
+li::-webkit-scrollbar, p::-webkit-scrollbar, h1::-webkit-scrollbar,
+h2::-webkit-scrollbar, h3::-webkit-scrollbar, h4::-webkit-scrollbar,
+h5::-webkit-scrollbar, h6::-webkit-scrollbar, blockquote::-webkit-scrollbar,
+pre::-webkit-scrollbar, code::-webkit-scrollbar, table::-webkit-scrollbar,
+thead::-webkit-scrollbar, tbody::-webkit-scrollbar, tfoot::-webkit-scrollbar,
+tr::-webkit-scrollbar, td::-webkit-scrollbar, th::-webkit-scrollbar,
+form::-webkit-scrollbar, fieldset::-webkit-scrollbar, legend::-webkit-scrollbar,
+input::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar,
+button::-webkit-scrollbar, label::-webkit-scrollbar, iframe::-webkit-scrollbar,
+embed::-webkit-scrollbar, object::-webkit-scrollbar, video::-webkit-scrollbar,
+audio::-webkit-scrollbar, canvas::-webkit-scrollbar, svg::-webkit-scrollbar,
+img::-webkit-scrollbar, figure::-webkit-scrollbar, figcaption::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+
+/* Ensure smooth scrolling is maintained */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Mobile touch scrolling optimization */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Remove any existing scrollbar styles from components */
+.mobile-menu-scrollable::-webkit-scrollbar {
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+/* Override any custom scrollbar styles */
+*::-webkit-scrollbar {
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* Ensure scrolling functionality remains intact */
+.scrollable {
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+
+/* Mobile-specific scrollbar hiding */
+@media (max-width: 767px) {
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0px !important;
+    height: 0px !important;
+    background: transparent !important;
+    display: none !important;
+  }
+}
+
+/* Tablet-specific scrollbar hiding */
+@media (min-width: 768px) and (max-width: 1023px) {
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0px !important;
+    height: 0px !important;
+    background: transparent !important;
+    display: none !important;
+  }
+}
+
+/* Desktop scrollbar hiding */
+@media (min-width: 1024px) {
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0px !important;
+    height: 0px !important;
+    background: transparent !important;
+    display: none !important;
+  }
+}

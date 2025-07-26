@@ -181,14 +181,16 @@ const Navbar = () => {
     visibility: isOpen ? 'visible' : 'hidden',
     transition: 'all 0.3s ease',
     zIndex: 50,
-    maxHeight: isOpen ? '400px' : '0',
-    overflow: 'hidden'
+    maxHeight: isOpen ? '70vh' : '0',
+    overflow: isOpen ? 'auto' : 'hidden',
+    WebkitOverflowScrolling: 'touch' // Smooth scrolling on iOS
   }
 
   const mobileMenuContainerStyle = {
     maxWidth: '1400px',
     margin: '0 auto',
-    padding: '1rem'
+    padding: '1rem',
+    paddingBottom: '1.5rem' // Extra padding at bottom for better scrolling
   }
 
   const mobileLinkStyle = {
@@ -251,6 +253,8 @@ const Navbar = () => {
               transform: translateY(0);
             }
           }
+
+
         `}
       </style>
       <nav style={navStyle}>
@@ -504,7 +508,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu */}
-      <div style={mobileMenuStyle}>
+      <div style={mobileMenuStyle} className="mobile-menu-scrollable">
         <div style={mobileMenuContainerStyle}>
           {navigation.slice(0, -1).map((item, index) => (
             item.hasDropdown ? (
@@ -611,6 +615,20 @@ const Navbar = () => {
           >
             Give
           </Link>
+
+          {/* Scroll indicator for mobile */}
+          {isOpen && (
+            <div style={{
+              textAlign: 'center',
+              padding: '0.5rem 0',
+              color: '#6b7280',
+              fontSize: '0.75rem',
+              borderTop: '1px solid rgba(0, 0, 0, 0.05)',
+              marginTop: '0.5rem'
+            }}>
+              <span style={{ opacity: 0.7 }}>↕️ Scroll for more options</span>
+            </div>
+          )}
         </div>
       </div>
     </nav>
