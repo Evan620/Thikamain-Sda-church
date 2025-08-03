@@ -33,12 +33,16 @@ const ContactForm = ({
   }
 
   const handleSubmit = async (e) => {
+    console.log('Form submit triggered')
     e.preventDefault()
+    e.stopPropagation()
+
     setIsSubmitting(true)
     setSubmitStatus(null)
     setErrorMessage('')
 
     try {
+      console.log('Preparing contact data...')
       // Prepare contact data
       const contactData = {
         ...formData,
@@ -48,18 +52,37 @@ const ContactForm = ({
         timestamp: new Date().toISOString()
       }
 
+      console.log('Contact data prepared:', contactData)
+
       if (onSubmit) {
+        console.log('Calling onSubmit handler...')
         await onSubmit(contactData)
+        console.log('onSubmit completed successfully')
       }
 
+      console.log('Setting success status...')
       setSubmitStatus('success')
       setTimeout(() => {
+        console.log('Closing modal...')
         onClose()
       }, 2500)
     } catch (error) {
-      console.error('Error sending message:', error)
+      console.error('Error in form submission:', error)
+      console.error('Error type:', typeof error)
+      console.error('Error details:', error)
+
+      let errorMessage = 'Failed to send message. Please try again.'
+
+      if (error && error.message) {
+        errorMessage = error.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      } else if (error && error.text) {
+        errorMessage = error.text
+      }
+
       setSubmitStatus('error')
-      setErrorMessage(error.message || 'Failed to send message. Please try again.')
+      setErrorMessage(errorMessage)
     } finally {
       setIsSubmitting(false)
     }

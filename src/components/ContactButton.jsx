@@ -16,27 +16,35 @@ const ContactButton = ({
 
   const handleSubmit = async (contactData) => {
     try {
-      console.log('Contact form submitted:', contactData)
+      console.log('ContactButton: handleSubmit called with:', contactData)
 
       // Check if EmailJS is configured
-      if (!validateEmailConfig()) {
+      const isConfigured = validateEmailConfig()
+      console.log('EmailJS configured:', isConfigured)
+
+      if (!isConfigured) {
         console.warn('EmailJS not configured - email will not be sent')
         // Still show success for demo purposes
+        console.log('Returning early due to no EmailJS config')
         return
       }
 
+      console.log('Attempting to send email via EmailJS...')
       // Send email using EmailJS
       await sendContactEmail(contactData)
+      console.log('EmailJS send completed successfully!')
 
       // Call custom onSubmit handler if provided
       if (onSubmit) {
+        console.log('Calling custom onSubmit handler...')
         await onSubmit(contactData)
       }
 
       console.log('Email sent successfully!')
 
     } catch (error) {
-      console.error('Failed to send email:', error)
+      console.error('ContactButton: Failed to send email:', error)
+      console.error('Error details:', error.stack)
       throw error // Re-throw to let ContactForm handle the error
     }
   }

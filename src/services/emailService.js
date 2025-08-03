@@ -3,7 +3,7 @@ import emailjs from '@emailjs/browser'
 // EmailJS Configuration - CONFIGURED AND READY!
 const EMAILJS_CONFIG = {
   serviceId: 'service_hmnt5h6', // Gmail service
-  templateId: 'j4xst4u', // Your email template
+  templateId: 'template_18z8pvf', // Your email template
   publicKey: '4XpukMVevzEbfA8ik' // Your public key
 }
 
@@ -64,9 +64,12 @@ const EMAIL_RECIPIENTS = {
  */
 export const sendContactEmail = async (contactData) => {
   try {
+    console.log('EmailService: sendContactEmail called with:', contactData)
+
     // Get recipient email
     const recipientEmail = EMAIL_RECIPIENTS[contactData.recipientName] || EMAIL_RECIPIENTS.default
-    
+    console.log('Recipient email resolved to:', recipientEmail)
+
     // Prepare email template parameters
     const templateParams = {
       // Sender information
@@ -100,7 +103,13 @@ export const sendContactEmail = async (contactData) => {
     }
     
     console.log('Sending email with params:', templateParams)
-    
+    console.log('EmailJS config:', EMAILJS_CONFIG)
+
+    // Check if emailjs is available
+    if (!emailjs || typeof emailjs.send !== 'function') {
+      throw new Error('EmailJS is not properly loaded or initialized')
+    }
+
     // Send email using EmailJS
     const response = await emailjs.send(
       EMAILJS_CONFIG.serviceId,
@@ -113,7 +122,26 @@ export const sendContactEmail = async (contactData) => {
     
   } catch (error) {
     console.error('Failed to send email:', error)
-    throw new Error(`Failed to send email: ${error.message || error}`)
+    console.error('Error type:', typeof error)
+    console.error('Error details:', JSON.stringify(error, null, 2))
+
+    let errorMessage = 'Unknown error occurred'
+
+    if (error && typeof error === 'object') {
+      if (error.message) {
+        errorMessage = error.message
+      } else if (error.text) {
+        errorMessage = error.text
+      } else if (error.status) {
+        errorMessage = `EmailJS Error: ${error.status}`
+      } else {
+        errorMessage = `EmailJS Error: ${JSON.stringify(error)}`
+      }
+    } else if (typeof error === 'string') {
+      errorMessage = error
+    }
+
+    throw new Error(`Failed to send email: ${errorMessage}`)
   }
 }
 
@@ -124,7 +152,7 @@ export const sendContactEmail = async (contactData) => {
 export const validateEmailConfig = () => {
   const isConfigured =
     EMAILJS_CONFIG.serviceId === 'service_hmnt5h6' &&
-    EMAILJS_CONFIG.templateId === 'j4xst4u' &&
+    EMAILJS_CONFIG.templateId === 'template_18z8pvf' &&
     EMAILJS_CONFIG.publicKey === '4XpukMVevzEbfA8ik'
 
   if (!isConfigured) {
