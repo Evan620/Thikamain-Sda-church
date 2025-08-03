@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import InfoModal from '../components/InfoModal'
+import ContactButton from '../components/ContactButton'
 
 const Ministries = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -648,8 +649,13 @@ const Ministries = () => {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '2rem'
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : isTablet
+                ? 'repeat(2, 1fr)'
+                : 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: isMobile ? '1.5rem' : '2rem',
+            maxWidth: '100%'
           }}>
             {[
               {
@@ -722,18 +728,22 @@ const Ministries = () => {
                   background: `linear-gradient(135deg, ${leader.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.02)' : 'rgba(245, 158, 11, 0.02)'} 0%, ${leader.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.05)' : 'rgba(245, 158, 11, 0.05)'} 100%)`,
                   border: `1px solid ${leader.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.1)' : 'rgba(245, 158, 11, 0.1)'}`,
                   borderRadius: '20px',
-                  padding: '2rem',
-                  transition: 'all 0.3s ease',
+                  padding: isMobile ? '1.5rem' : '2rem',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   position: 'relative',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  isolation: 'isolate',
+                  zIndex: 1
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-5px)'
-                  e.currentTarget.style.boxShadow = `0 15px 40px ${leader.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.15)' : 'rgba(245, 158, 11, 0.15)'}`
+                  e.currentTarget.style.transform = 'translateY(-3px)'
+                  e.currentTarget.style.boxShadow = `0 10px 30px ${leader.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.12)' : 'rgba(245, 158, 11, 0.12)'}`
+                  e.currentTarget.style.borderColor = leader.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.2)' : 'rgba(245, 158, 11, 0.2)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)'
                   e.currentTarget.style.boxShadow = 'none'
+                  e.currentTarget.style.borderColor = leader.color === '#2d5a27' ? 'rgba(45, 90, 39, 0.1)' : 'rgba(245, 158, 11, 0.1)'
                 }}
               >
                 {/* Background decoration */}
@@ -837,34 +847,16 @@ const Ministries = () => {
                   {/* Contact Info */}
                   <div style={{
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.5rem',
+                    justifyContent: 'center',
                     marginBottom: '1.5rem'
                   }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      fontSize: '0.85rem',
-                      color: '#6b7280'
-                    }}>
-                      <svg style={{ width: '0.9rem', height: '0.9rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <span>{leader.email}</span>
-                    </div>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      fontSize: '0.85rem',
-                      color: '#6b7280'
-                    }}>
-                      <svg style={{ width: '0.9rem', height: '0.9rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      <span>{leader.phone}</span>
-                    </div>
+                    <ContactButton
+                      recipientName={leader.name}
+                      recipientRole={leader.role}
+                      buttonText="Contact"
+                      buttonStyle="secondary"
+                      size="medium"
+                    />
                   </div>
 
 

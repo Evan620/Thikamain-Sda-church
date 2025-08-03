@@ -1,12 +1,45 @@
 import React, { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
-const Modal = ({ 
-  isOpen, 
-  onClose, 
-  title, 
-  children, 
+// Add CSS animations
+const modalStyles = `
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+`
+
+// Inject styles if not already present
+if (typeof document !== 'undefined' && !document.getElementById('modal-styles')) {
+  const styleSheet = document.createElement('style')
+  styleSheet.id = 'modal-styles'
+  styleSheet.textContent = modalStyles
+  document.head.appendChild(styleSheet)
+}
+
+const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  children,
   size = 'medium',
-  showCloseButton = true 
+  showCloseButton = true
 }) => {
   // Handle escape key press
   useEffect(() => {
@@ -30,19 +63,40 @@ const Modal = ({
   if (!isOpen) return null
 
   const getSizeStyles = () => {
+    const isMobile = window.innerWidth < 768
+    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+
     switch (size) {
       case 'small':
-        return { maxWidth: '400px', width: '90%' }
+        return {
+          maxWidth: isMobile ? '95vw' : '400px',
+          width: isMobile ? '95%' : '90%',
+          margin: isMobile ? '0.5rem' : '1rem'
+        }
       case 'large':
-        return { maxWidth: '800px', width: '95%' }
+        return {
+          maxWidth: isMobile ? '95vw' : isTablet ? '700px' : '800px',
+          width: '95%',
+          margin: isMobile ? '0.5rem' : '1rem'
+        }
       case 'full':
-        return { maxWidth: '95vw', width: '95%', height: '90vh' }
+        return {
+          maxWidth: '95vw',
+          width: '95%',
+          height: isMobile ? '95vh' : '90vh',
+          margin: '0.5rem'
+        }
       default:
-        return { maxWidth: '600px', width: '90%' }
+        return {
+          maxWidth: isMobile ? '95vw' : isTablet ? '550px' : '600px',
+          width: isMobile ? '95%' : '90%',
+          margin: isMobile ? '0.5rem' : '1rem'
+        }
     }
   }
 
-  return (
+  // Create modal content
+  const modalContent = (
     <div
       style={{
         position: 'fixed',
@@ -50,13 +104,16 @@ const Modal = ({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000,
+        zIndex: 9999,
         padding: '1rem',
-        backdropFilter: 'blur(4px)'
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        animation: isOpen ? 'fadeIn 0.3s ease-out' : 'fadeOut 0.3s ease-in',
+        transition: 'all 0.3s ease'
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
@@ -67,20 +124,23 @@ const Modal = ({
       <div
         style={{
           backgroundColor: 'white',
-          borderRadius: '16px',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
+          borderRadius: '20px',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(0, 0, 0, 0.15)',
           position: 'relative',
-          maxHeight: '90vh',
+          maxHeight: window.innerWidth < 768 ? '95vh' : '90vh',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
+          transform: isOpen ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+          transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
           ...getSizeStyles()
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div style={{
-          padding: '1.5rem 2rem',
+          padding: window.innerWidth < 768 ? '1rem 1.5rem' : '1.5rem 2rem',
           borderBottom: '1px solid #e5e7eb',
           display: 'flex',
           alignItems: 'center',
@@ -130,7 +190,7 @@ const Modal = ({
 
         {/* Content */}
         <div style={{
-          padding: '2rem',
+          padding: window.innerWidth < 768 ? '1.5rem' : '2rem',
           overflowY: 'auto',
           flex: 1
         }}>
@@ -139,6 +199,9 @@ const Modal = ({
       </div>
     </div>
   )
+
+  // Render modal using portal to ensure it appears above everything
+  return createPortal(modalContent, document.body)
 }
 
 export default Modal

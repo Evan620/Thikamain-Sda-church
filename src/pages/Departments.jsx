@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import ContactButton from '../components/ContactButton'
 
 const Departments = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -763,188 +764,55 @@ const Departments = () => {
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '0.75rem'
+                  gap: '1.5rem',
+                  alignItems: 'center',
+                  textAlign: 'center'
                 }}>
-                  {/* Phone */}
                   <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem'
+                    padding: '1.5rem',
+                    backgroundColor: 'rgba(45, 90, 39, 0.05)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(45, 90, 39, 0.1)',
+                    width: '100%'
                   }}>
                     <div style={{
-                      width: '2rem',
-                      height: '2rem',
-                      backgroundColor: selectedContact.color,
-                      borderRadius: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white'
+                      fontSize: '1rem',
+                      color: '#374151',
+                      marginBottom: '1rem',
+                      lineHeight: '1.5'
                     }}>
-                      <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
+                      To contact <strong>{selectedContact.head}</strong> regarding {selectedContact.name} matters,
+                      please use the secure contact form below. Your message will be forwarded directly to them.
                     </div>
-                    <div>
-                      <div style={{
-                        fontSize: '0.8rem',
-                        color: '#6b7280',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        fontWeight: '500'
-                      }}>
-                        Phone
-                      </div>
-                      <a
-                        href={`tel:+254${selectedContact.phone}`}
-                        style={{
-                          fontSize: '1rem',
-                          color: '#374151',
-                          textDecoration: 'none',
-                          fontWeight: '500'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.color = selectedContact.color
-                          e.target.style.textDecoration = 'underline'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.color = '#374151'
-                          e.target.style.textDecoration = 'none'
-                        }}
-                      >
-                        +254 {selectedContact.phone}
-                      </a>
-                    </div>
-                  </div>
 
-                  {/* Email */}
-                  {selectedContact.contact !== "Contact information pending" && (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem'
-                    }}>
-                      <div style={{
-                        width: '2rem',
-                        height: '2rem',
-                        backgroundColor: selectedContact.color,
-                        borderRadius: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white'
-                      }}>
-                        <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div style={{
-                          fontSize: '0.8rem',
-                          color: '#6b7280',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          fontWeight: '500'
-                        }}>
-                          Email
-                        </div>
-                        <a
-                          href={`mailto:${selectedContact.contact}`}
-                          style={{
-                            fontSize: '1rem',
-                            color: '#374151',
-                            textDecoration: 'none',
-                            fontWeight: '500'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.color = selectedContact.color
-                            e.target.style.textDecoration = 'underline'
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.color = '#374151'
-                            e.target.style.textDecoration = 'none'
-                          }}
-                        >
-                          {selectedContact.contact}
-                        </a>
-                      </div>
-                    </div>
-                  )}
+                    <ContactButton
+                      recipientName={selectedContact.head}
+                      recipientRole={`${selectedContact.name} Department Head`}
+                      department={selectedContact.name}
+                      buttonText="Send Message"
+                      buttonStyle="primary"
+                      size="large"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Quick Actions */}
+              {/* Additional Information */}
               <div style={{
-                display: 'grid',
-                gridTemplateColumns: selectedContact.contact !== "Contact information pending" ? '1fr 1fr' : '1fr',
-                gap: '1rem'
+                padding: '1rem',
+                backgroundColor: '#f8fafc',
+                borderRadius: '8px',
+                border: '1px solid #e5e7eb'
               }}>
-                <a
-                  href={`tel:+254${selectedContact.phone}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    padding: '0.75rem 1rem',
-                    backgroundColor: selectedContact.color,
-                    color: 'white',
-                    textDecoration: 'none',
-                    borderRadius: '10px',
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = selectedContact.color === '#2d5a27' ? '#1c3a1c' : '#d97706'
-                    e.target.style.transform = 'translateY(-1px)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = selectedContact.color
-                    e.target.style.transform = 'translateY(0)'
-                  }}
-                >
-                  <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  Call Now
-                </a>
-
-                {selectedContact.contact !== "Contact information pending" && (
-                  <a
-                    href={`mailto:${selectedContact.contact}`}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.5rem',
-                      padding: '0.75rem 1rem',
-                      backgroundColor: 'rgba(45, 90, 39, 0.1)',
-                      color: selectedContact.color,
-                      textDecoration: 'none',
-                      borderRadius: '10px',
-                      fontSize: '0.9rem',
-                      fontWeight: '600',
-                      border: `1px solid ${selectedContact.color}`,
-                      transition: 'all 0.3s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = selectedContact.color
-                      e.target.style.color = 'white'
-                      e.target.style.transform = 'translateY(-1px)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'rgba(45, 90, 39, 0.1)'
-                      e.target.style.color = selectedContact.color
-                      e.target.style.transform = 'translateY(0)'
-                    }}
-                  >
-                    <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Send Email
-                  </a>
-                )}
+                <p style={{
+                  fontSize: '0.875rem',
+                  color: '#6b7280',
+                  margin: 0,
+                  textAlign: 'center'
+                }}>
+                  All messages are sent securely and your contact information is protected.
+                  The department head will receive your message directly and respond as soon as possible.
+                </p>
               </div>
             </div>
           </div>

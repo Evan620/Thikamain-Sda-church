@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import ContactButton from '../components/ContactButton'
 
 const About = () => {
   // Check if we're on mobile
@@ -1318,27 +1319,19 @@ const About = () => {
             {[
               {
                 name: "Elder Reuben Lusasi",
-                role: "Church Elder & Family Life Ministry",
-                contact: "+254 721 885 849",
-                email: "rlusasi@yahoo.com"
+                role: "Church Elder & Family Life Ministry"
               },
               {
                 name: "Elder Abraham Sayah",
-                role: "Church Elder",
-                contact: "+254 705 476 095",
-                email: "sayahabraham22@gmail.com"
+                role: "Church Elder"
               },
               {
                 name: "Elder David Juma",
-                role: "Church Elder",
-                contact: "+254 724 322 889",
-                email: "davyjumah@gmail.com"
+                role: "Church Elder"
               },
               {
                 name: "Elder James Mauti",
-                role: "Church Elder",
-                contact: "+254 711 617 542",
-                email: "jamesmogere530@gmail.com"
+                role: "Church Elder"
               }
             ].map((elder, index) => (
               <div
@@ -1388,29 +1381,36 @@ const About = () => {
                   color: '#6b7280',
                   fontSize: '1rem',
                   fontWeight: '500',
-                  marginBottom: '0.5rem'
+                  marginBottom: '1.5rem'
                 }}>
                   {elder.role}
                 </p>
-                {elder.contact && (
+
+                {/* Secure Contact Section */}
+                <div style={{
+                  padding: '1rem',
+                  backgroundColor: 'rgba(45, 90, 39, 0.05)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(45, 90, 39, 0.1)',
+                  marginTop: '1rem'
+                }}>
                   <p style={{
-                    color: '#2d5a27',
-                    fontSize: '0.85rem',
-                    fontWeight: '500',
-                    marginBottom: '0.25rem'
+                    fontSize: '0.875rem',
+                    color: '#6b7280',
+                    marginBottom: '1rem',
+                    textAlign: 'center'
                   }}>
-                    📞 {elder.contact}
+                    Contact {elder.name.split(' ')[1]} securely about church matters
                   </p>
-                )}
-                {elder.email && (
-                  <p style={{
-                    color: '#2d5a27',
-                    fontSize: '0.85rem',
-                    fontWeight: '500'
-                  }}>
-                    ✉️ {elder.email}
-                  </p>
-                )}
+
+                  <ContactButton
+                    recipientName={elder.name}
+                    recipientRole={elder.role}
+                    buttonText="Send Message"
+                    buttonStyle="primary"
+                    size="medium"
+                  />
+                </div>
               </div>
             ))}
           </div>
