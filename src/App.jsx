@@ -11,6 +11,7 @@ import Ministries from './pages/Ministries'
 import Departments from './pages/Departments'
 import Contact from './pages/Contact'
 import Giving from './pages/Giving'
+import Submissions from './pages/Submissions'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/departments" element={<Departments />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/giving" element={<Giving />} />
+            <Route path="/submissions" element={<Submissions />} />
           </Routes>
         </main>
         <Footer />

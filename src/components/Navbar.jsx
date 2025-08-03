@@ -23,6 +23,7 @@ const Navbar = () => {
       ]
     },
     { name: 'Contact', href: '/contact', icon: '📞' },
+    { name: 'Submissions', href: '/submissions', icon: '📝' },
     { name: 'Give', href: '/giving', icon: '💝' },
   ]
 
