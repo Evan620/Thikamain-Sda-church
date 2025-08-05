@@ -1,0 +1,280 @@
+-- Thika Main SDA Church Database Schema
+-- Run this SQL in your Supabase SQL Editor
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Users table (extends Supabase auth.users)
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    role VARCHAR(50) DEFAULT 'MEMBER' CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'MINISTRY_LEADER', 'DEPARTMENT_HEAD', 'ELDER', 'MEMBER', 'VISITOR')),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Church Members
+CREATE TABLE IF NOT EXISTS members (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    membership_number VARCHAR(50) UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    date_of_birth DATE,
+    address TEXT,
+    phone VARCHAR(20),
+    email VARCHAR(255),
+    marital_status VARCHAR(20) CHECK (marital_status IN ('single', 'married', 'divorced', 'widowed')),
+    baptism_date DATE,
+    membership_date DATE,
+    is_active BOOLEAN DEFAULT true,
+    emergency_contact JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Sermons
+CREATE TABLE IF NOT EXISTS sermons (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    speaker VARCHAR(255),
+    sermon_date DATE NOT NULL,
+    audio_url VARCHAR(500),
+    video_url VARCHAR(500),
+    notes_url VARCHAR(500),
+    series VARCHAR(255),
+    tags TEXT[],
+    is_published BOOLEAN DEFAULT false,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Events
+CREATE TABLE IF NOT EXISTS events (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    start_date TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_date TIMESTAMP WITH TIME ZONE,
+    location VARCHAR(255),
+    event_type VARCHAR(100),
+    max_attendees INTEGER,
+    current_attendees INTEGER DEFAULT 0,
+    cost DECIMAL(10,2) DEFAULT 0,
+    requires_registration BOOLEAN DEFAULT false,
+    is_published BOOLEAN DEFAULT false,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Ministries
+CREATE TABLE IF NOT EXISTS ministries (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    leader_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    meeting_schedule VARCHAR(255),
+    contact_email VARCHAR(255),
+    contact_phone VARCHAR(20),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Departments
+CREATE TABLE IF NOT EXISTS departments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    head_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    budget_allocation DECIMAL(12,2),
+    contact_info JSONB,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Giving Records
+CREATE TABLE IF NOT EXISTS giving_records (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    member_id UUID REFERENCES members(id) ON DELETE SET NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    giving_type VARCHAR(100) NOT NULL CHECK (giving_type IN ('tithe', 'offering', 'special_project', 'building_fund', 'missions')),
+    payment_method VARCHAR(50) CHECK (payment_method IN ('mpesa', 'cash', 'bank_transfer', 'check')),
+    transaction_id VARCHAR(255),
+    giving_date DATE NOT NULL,
+    notes TEXT,
+    is_verified BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Prayer Requests
+CREATE TABLE IF NOT EXISTS prayer_requests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    requester_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    urgency VARCHAR(20) DEFAULT 'normal' CHECK (urgency IN ('low', 'normal', 'high', 'urgent')),
+    privacy_level VARCHAR(20) DEFAULT 'private' CHECK (privacy_level IN ('public', 'private', 'leadership_only')),
+    status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'answered', 'closed')),
+    assigned_to UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Announcements
+CREATE TABLE IF NOT EXISTS announcements (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    priority VARCHAR(20) DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+    start_date DATE NOT NULL,
+    end_date DATE,
+    target_audience VARCHAR(100) DEFAULT 'all' CHECK (target_audience IN ('all', 'members', 'visitors', 'ministry_leaders', 'elders')),
+    is_published BOOLEAN DEFAULT false,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Attendance Tracking
+CREATE TABLE IF NOT EXISTS attendance (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    event_id UUID REFERENCES events(id) ON DELETE CASCADE,
+    member_id UUID REFERENCES members(id) ON DELETE CASCADE,
+    attendance_date DATE NOT NULL,
+    service_type VARCHAR(100) CHECK (service_type IN ('sabbath_school', 'divine_service', 'prayer_meeting', 'youth_meeting', 'special_event')),
+    present BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(event_id, member_id, attendance_date)
+);
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_members_user_id ON members(user_id);
+CREATE INDEX IF NOT EXISTS idx_members_active ON members(is_active);
+CREATE INDEX IF NOT EXISTS idx_sermons_date ON sermons(sermon_date DESC);
+CREATE INDEX IF NOT EXISTS idx_sermons_published ON sermons(is_published);
+CREATE INDEX IF NOT EXISTS idx_events_date ON events(start_date);
+CREATE INDEX IF NOT EXISTS idx_events_published ON events(is_published);
+CREATE INDEX IF NOT EXISTS idx_giving_date ON giving_records(giving_date DESC);
+CREATE INDEX IF NOT EXISTS idx_giving_member ON giving_records(member_id);
+CREATE INDEX IF NOT EXISTS idx_prayer_requests_status ON prayer_requests(status);
+CREATE INDEX IF NOT EXISTS idx_announcements_published ON announcements(is_published);
+CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(attendance_date DESC);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sermons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ministries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE departments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE giving_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE prayer_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies
+
+-- Users policies
+CREATE POLICY "Users can view own profile" ON users FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON users FOR UPDATE USING (auth.uid() = id);
+
+-- Members policies
+CREATE POLICY "Members can view own profile" ON members FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Admins can manage all members" ON members FOR ALL USING (
+    EXISTS (
+        SELECT 1 FROM users 
+        WHERE users.id = auth.uid() 
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN')
+    )
+);
+
+-- Sermons policies
+CREATE POLICY "Public can view published sermons" ON sermons FOR SELECT USING (is_published = true);
+CREATE POLICY "Admins can manage all sermons" ON sermons FOR ALL USING (
+    EXISTS (
+        SELECT 1 FROM users 
+        WHERE users.id = auth.uid() 
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN')
+    )
+);
+
+-- Events policies
+CREATE POLICY "Public can view published events" ON events FOR SELECT USING (is_published = true);
+CREATE POLICY "Admins can manage all events" ON events FOR ALL USING (
+    EXISTS (
+        SELECT 1 FROM users 
+        WHERE users.id = auth.uid() 
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN')
+    )
+);
+
+-- Giving records policies
+CREATE POLICY "Members can view own giving" ON giving_records FOR SELECT USING (
+    member_id IN (
+        SELECT id FROM members WHERE user_id = auth.uid()
+    )
+);
+CREATE POLICY "Admins can view all giving" ON giving_records FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM users 
+        WHERE users.id = auth.uid() 
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN')
+    )
+);
+
+-- Prayer requests policies
+CREATE POLICY "Users can view own prayer requests" ON prayer_requests FOR SELECT USING (requester_id = auth.uid());
+CREATE POLICY "Public prayer requests visible to all" ON prayer_requests FOR SELECT USING (privacy_level = 'public');
+CREATE POLICY "Leadership can view leadership-only requests" ON prayer_requests FOR SELECT USING (
+    privacy_level = 'leadership_only' AND
+    EXISTS (
+        SELECT 1 FROM users 
+        WHERE users.id = auth.uid() 
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN', 'ELDER')
+    )
+);
+
+-- Announcements policies
+CREATE POLICY "Public can view published announcements" ON announcements FOR SELECT USING (is_published = true);
+CREATE POLICY "Admins can manage announcements" ON announcements FOR ALL USING (
+    EXISTS (
+        SELECT 1 FROM users 
+        WHERE users.id = auth.uid() 
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN')
+    )
+);
+
+-- Create updated_at trigger function
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Add updated_at triggers
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_members_updated_at BEFORE UPDATE ON members FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_sermons_updated_at BEFORE UPDATE ON sermons FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_events_updated_at BEFORE UPDATE ON events FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_ministries_updated_at BEFORE UPDATE ON ministries FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_departments_updated_at BEFORE UPDATE ON departments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_prayer_requests_updated_at BEFORE UPDATE ON prayer_requests FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_announcements_updated_at BEFORE UPDATE ON announcements FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Insert sample admin user (you'll need to create this user in Supabase Auth first)
+-- This is just a placeholder - you'll need to replace with actual user ID after creating in Supabase Auth
+-- INSERT INTO users (id, email, full_name, role) VALUES 
+-- ('your-user-id-here', 'admin@thikamainsdachurch.org', 'Church Administrator', 'SUPER_ADMIN');
+
+-- Success message
+SELECT 'Database schema created successfully! 🎉' as message;
