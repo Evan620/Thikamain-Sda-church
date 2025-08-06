@@ -6,8 +6,11 @@ const AuthContext = createContext()
 
 // Role hierarchy for permission checking
 const ROLE_HIERARCHY = {
-  'SUPER_ADMIN': 5,
-  'ADMIN': 4,
+  'SUPER_ADMIN': 6,
+  'ADMIN': 5,
+  'FINANCE_ADMIN': 4,
+  'CONTENT_ADMIN': 4,
+  'MEMBER_ADMIN': 4,
   'MINISTRY_LEADER': 3,
   'DEPARTMENT_HEAD': 3,
   'ELDER': 2,
@@ -225,21 +228,82 @@ export const AuthProvider = ({ children }) => {
   // Check if user has specific permission
   const hasPermission = (permission) => {
     if (!userProfile?.role) return false
-    
-    const userPermissions = PERMISSIONS[userProfile.role] || []
-    
+
     // Super admin has all permissions
-    if (userPermissions.includes('*')) return true
-    
+    if (userProfile.role === 'SUPER_ADMIN') return true
+
+    // Check user's custom permissions first (from admin_users_management)
+    if (userProfile.permissions && Array.isArray(userProfile.permissions)) {
+      if (userProfile.permissions.includes(permission)) return true
+    }
+
+    // Fallback to role-based permissions
+    const userPermissions = PERMISSIONS[userProfile.role] || []
+
     // Check exact permission match
     if (userPermissions.includes(permission)) return true
-    
+
     // Check wildcard permissions
     const [action, resource] = permission.split(':')
     if (userPermissions.includes(`${action}:*`)) return true
     if (userPermissions.includes(`*:${resource}`)) return true
-    
+
     return false
+  }
+
+  // Check multiple permissions (user must have ALL)
+  const hasAllPermissions = (permissions) => {
+    if (!userProfile) return false
+    if (userProfile.role === 'SUPER_ADMIN') return true
+
+    return permissions.every(permission => hasPermission(permission))
+  }
+
+  // Check multiple permissions (user must have ANY)
+  const hasAnyPermission = (permissions) => {
+    if (!userProfile) return false
+    if (userProfile.role === 'SUPER_ADMIN') return true
+
+    return permissions.some(permission => hasPermission(permission))
+  }
+
+  // Get user's permissions
+  const getUserPermissions = () => {
+    if (!userProfile) return []
+    if (userProfile.role === 'SUPER_ADMIN') {
+      // Return all possible permissions for Super Admin
+      return [
+        'manage_users', 'manage_admins', 'view_audit_logs', 'system_settings',
+        'manage_content', 'manage_sermons', 'manage_events', 'manage_announcements',
+        'manage_members', 'view_member_details', 'manage_attendance',
+        'manage_finances', 'view_financial_reports', 'manage_donations', 'manage_budget',
+        'manage_prayer_requests', 'send_communications'
+      ]
+    }
+    return userProfile.permissions || []
+  }
+
+  // Check if user can access a specific route
+  const canAccessRoute = (route) => {
+    const routePermissions = {
+      '/admin/dashboard': [], // Everyone can access dashboard
+      '/admin/sermons': ['manage_sermons'],
+      '/admin/events': ['manage_events'],
+      '/admin/announcements': ['manage_announcements'],
+      '/admin/members': ['manage_members'],
+      '/admin/financial': ['view_financial_reports'],
+      '/admin/donations': ['manage_donations'],
+      '/admin/budget': ['manage_budget'],
+      '/admin/prayer-requests': ['manage_prayer_requests'],
+      '/admin/admin-users': ['manage_admins'],
+      '/admin/activity-logs': ['view_audit_logs'],
+      '/admin/settings': ['system_settings']
+    }
+
+    const requiredPermissions = routePermissions[route]
+    if (!requiredPermissions || requiredPermissions.length === 0) return true
+
+    return hasAnyPermission(requiredPermissions)
   }
 
   // Check if user is admin (ADMIN or SUPER_ADMIN)
@@ -284,6 +348,10 @@ export const AuthProvider = ({ children }) => {
     // Permissions
     hasRole,
     hasPermission,
+    hasAllPermissions,
+    hasAnyPermission,
+    getUserPermissions,
+    canAccessRoute,
     isAdmin,
     isSuperAdmin,
     

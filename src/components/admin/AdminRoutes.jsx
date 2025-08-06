@@ -2,21 +2,17 @@ import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import AuthGuard from './AuthGuard'
 import Dashboard from '../../pages/admin/Dashboard'
-
-// Placeholder components for future implementation
-const MemberManagement = () => (
-  <div className="bg-white rounded-lg shadow p-6">
-    <h1 className="text-2xl font-bold text-gray-900 mb-4">Member Management</h1>
-    <p className="text-gray-600">Member management system coming soon...</p>
-  </div>
-)
-
-const ContentManagement = () => (
-  <div className="bg-white rounded-lg shadow p-6">
-    <h1 className="text-2xl font-bold text-gray-900 mb-4">Content Management</h1>
-    <p className="text-gray-600">Content management system coming soon...</p>
-  </div>
-)
+import SermonsManagement from '../../pages/admin/SermonsManagement'
+import EventsManagement from '../../pages/admin/EventsManagement'
+import AnnouncementsManagement from '../../pages/admin/AnnouncementsManagement'
+import PrayerRequestsManagement from '../../pages/admin/PrayerRequestsManagement'
+import MembersManagement from '../../pages/admin/MembersManagement'
+import DonationsManagement from '../../pages/admin/DonationsManagement'
+import FinancialDashboard from '../../pages/admin/FinancialDashboard'
+import BudgetManagement from '../../pages/admin/BudgetManagement'
+import AdminUsersManagement from '../../pages/admin/AdminUsersManagement'
+import ActivityLogs from '../../pages/admin/ActivityLogs'
+import SystemSettings from '../../pages/admin/SystemSettings'
 
 const FinancialManagement = () => (
   <div className="bg-white rounded-lg shadow p-6">
@@ -39,12 +35,7 @@ const ReportsAnalytics = () => (
   </div>
 )
 
-const SystemSettings = () => (
-  <div className="bg-white rounded-lg shadow p-6">
-    <h1 className="text-2xl font-bold text-gray-900 mb-4">System Settings</h1>
-    <p className="text-gray-600">System settings coming soon...</p>
-  </div>
-)
+
 
 const AdminRoutes = () => {
   return (
@@ -63,33 +54,78 @@ const AdminRoutes = () => {
       />
       
       {/* Member Management - Admin and above */}
-      <Route 
-        path="/members/*" 
+      <Route
+        path="/members"
         element={
           <AuthGuard requiredRole="ADMIN">
-            <MemberManagement />
+            <MembersManagement />
           </AuthGuard>
-        } 
+        }
+      />
+
+      {/* Content Management Routes - Admin and above */}
+      <Route
+        path="/sermons"
+        element={
+          <AuthGuard requiredRole="ADMIN">
+            <SermonsManagement />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/events"
+        element={
+          <AuthGuard requiredRole="ADMIN">
+            <EventsManagement />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/announcements"
+        element={
+          <AuthGuard requiredRole="ADMIN">
+            <AnnouncementsManagement />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/prayer-requests"
+        element={
+          <AuthGuard requiredRole="ELDER">
+            <PrayerRequestsManagement />
+          </AuthGuard>
+        }
       />
       
-      {/* Content Management - Admin and above */}
-      <Route 
-        path="/content/*" 
+      {/* Financial Management Routes - Admin and above */}
+      <Route
+        path="/financial"
         element={
           <AuthGuard requiredRole="ADMIN">
-            <ContentManagement />
+            <FinancialDashboard />
           </AuthGuard>
-        } 
+        }
       />
-      
-      {/* Financial Management - Admin and above */}
-      <Route 
-        path="/financial/*" 
+
+      <Route
+        path="/donations"
         element={
           <AuthGuard requiredRole="ADMIN">
-            <FinancialManagement />
+            <DonationsManagement />
           </AuthGuard>
-        } 
+        }
+      />
+
+      <Route
+        path="/budget"
+        element={
+          <AuthGuard requiredRole="ADMIN">
+            <BudgetManagement />
+          </AuthGuard>
+        }
       />
       
       {/* Communication Hub - Elder and above */}
@@ -112,16 +148,34 @@ const AdminRoutes = () => {
         } 
       />
       
-      {/* System Settings - Super Admin only */}
-      <Route 
-        path="/settings/*" 
+      {/* Super Admin Routes - Super Admin only */}
+      <Route
+        path="/admin-users"
+        element={
+          <AuthGuard requiredRole="SUPER_ADMIN">
+            <AdminUsersManagement />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/activity-logs"
+        element={
+          <AuthGuard requiredRole="SUPER_ADMIN">
+            <ActivityLogs />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/settings"
         element={
           <AuthGuard requiredRole="SUPER_ADMIN">
             <SystemSettings />
           </AuthGuard>
-        } 
+        }
       />
-      
+
       {/* Catch all - redirect to dashboard */}
       <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
     </Routes>

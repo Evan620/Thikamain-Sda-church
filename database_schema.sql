@@ -168,6 +168,71 @@ CREATE INDEX IF NOT EXISTS idx_prayer_requests_status ON prayer_requests(status)
 CREATE INDEX IF NOT EXISTS idx_announcements_published ON announcements(is_published);
 CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(attendance_date DESC);
 
+-- Admin Activity Logs Table
+CREATE TABLE admin_activity_logs (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    admin_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    action VARCHAR(100) NOT NULL,
+    details JSONB,
+    ip_address INET,
+    user_agent TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- System Settings Table
+CREATE TABLE system_settings (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    key VARCHAR(100) UNIQUE NOT NULL,
+    value TEXT,
+    description TEXT,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Add permissions column to users table
+ALTER TABLE users ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '[]'::jsonb;
+
+-- Insert default system settings
+INSERT INTO system_settings (key, value, description) VALUES
+('church_name', 'Thikamain SDA Church', 'Official church name'),
+('church_address', '', 'Church physical address'),
+('church_phone', '', 'Church contact phone number'),
+('church_email', '', 'Church contact email address'),
+('church_website', '', 'Church website URL'),
+('pastor_name', '', 'Lead pastor name'),
+('established_year', '', 'Year the church was established'),
+('denomination', 'Seventh-day Adventist', 'Church denomination'),
+('sabbath_service_time', '09:00', 'Sabbath service start time'),
+('prayer_meeting_time', '18:00', 'Prayer meeting start time'),
+('youth_meeting_time', '15:00', 'Youth meeting start time'),
+('bible_study_time', '18:30', 'Bible study start time'),
+('service_duration', '120', 'Average service duration in minutes'),
+('currency', 'KES', 'Default currency for financial transactions'),
+('enable_online_giving', 'false', 'Enable online giving functionality'),
+('financial_year_start', 'January', 'Financial year start month'),
+('session_timeout', '480', 'Session timeout in minutes'),
+('password_min_length', '6', 'Minimum password length'),
+('require_2fa', 'false', 'Require two-factor authentication'),
+('login_attempts_limit', '5', 'Maximum login attempts before lockout'),
+('lockout_duration', '30', 'Account lockout duration in minutes'),
+('enable_audit_logs', 'true', 'Enable audit logging'),
+('backup_frequency', 'daily', 'Backup frequency'),
+('email_notifications', 'true', 'Enable email notifications'),
+('sms_notifications', 'false', 'Enable SMS notifications'),
+('birthday_reminders', 'true', 'Send birthday reminders'),
+('event_reminders', 'true', 'Send event reminders'),
+('payment_confirmations', 'true', 'Send payment confirmations'),
+('attendance_followups', 'false', 'Send attendance follow-ups'),
+('reminder_hours_before', '24', 'Event reminder hours before event')
+ON CONFLICT (key) DO NOTHING;
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_admin_activity_logs_admin_id ON admin_activity_logs(admin_id);
+CREATE INDEX IF NOT EXISTS idx_admin_activity_logs_action ON admin_activity_logs(action);
+CREATE INDEX IF NOT EXISTS idx_admin_activity_logs_created_at ON admin_activity_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
+
 -- Enable Row Level Security (RLS)
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
@@ -179,6 +244,8 @@ ALTER TABLE giving_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE prayer_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_activity_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE system_settings ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 
