@@ -29,7 +29,7 @@ const AdminHeader = ({ onMenuClick }) => {
   }, [dropdownOpen])
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white shadow-sm border-b border-gray-200 hidden md:block">
       <div className="flex items-center justify-between px-6 py-4">
         {/* Left side - Menu button and title */}
         <div className="flex items-center">
