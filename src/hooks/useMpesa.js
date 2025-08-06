@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import mpesaService from '../services/mpesaService'
+import notificationService from '../services/notificationService'
 
 /**
  * Custom React Hook for M-PESA STK Push Integration

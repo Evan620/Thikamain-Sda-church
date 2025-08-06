@@ -13,6 +13,8 @@ import BudgetManagement from '../../pages/admin/BudgetManagement'
 import AdminUsersManagement from '../../pages/admin/AdminUsersManagement'
 import ActivityLogs from '../../pages/admin/ActivityLogs'
 import SystemSettings from '../../pages/admin/SystemSettings'
+import CommunicationHub from '../../pages/admin/CommunicationHub'
+import ReportsAnalytics from '../../pages/admin/ReportsAnalytics'
 
 const FinancialManagement = () => (
   <div className="bg-white rounded-lg shadow p-6">
@@ -21,19 +23,9 @@ const FinancialManagement = () => (
   </div>
 )
 
-const CommunicationHub = () => (
-  <div className="bg-white rounded-lg shadow p-6">
-    <h1 className="text-2xl font-bold text-gray-900 mb-4">Communication Hub</h1>
-    <p className="text-gray-600">Communication hub coming soon...</p>
-  </div>
-)
 
-const ReportsAnalytics = () => (
-  <div className="bg-white rounded-lg shadow p-6">
-    <h1 className="text-2xl font-bold text-gray-900 mb-4">Reports & Analytics</h1>
-    <p className="text-gray-600">Reports and analytics coming soon...</p>
-  </div>
-)
+
+
 
 
 

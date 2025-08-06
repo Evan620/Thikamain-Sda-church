@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../services/supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
+import '../../styles/admin-layout.css'
+import '../../styles/admin-donations.css'
 
 const DonationsManagement = () => {
   const { user } = useAuth()
@@ -197,89 +199,78 @@ const DonationsManagement = () => {
   }
 
   return (
-    <div className="admin-content-management">
+    <div className="clean-admin-container">
       {/* Header */}
-      <div className="admin-content-header">
+      <div className="clean-donations-header">
         <div>
-          <h1>Donations Management</h1>
-          <p>Track and manage church donations, tithes, and offerings</p>
+          <h1 className="clean-donations-title">Donations Management</h1>
+          <p className="clean-donations-subtitle">Track and manage church donations, tithes, and offerings</p>
         </div>
-        <button
-          onClick={() => {
-            setShowForm(true)
-            setEditingDonation(null)
-            setFormData({
-              member_id: '',
-              amount: '',
-              giving_type: 'tithe',
-              payment_method: 'mpesa',
-              transaction_id: '',
-              giving_date: new Date().toISOString().split('T')[0],
-              notes: '',
-              is_verified: false
-            })
-          }}
-          className="admin-btn-primary"
-        >
-          <svg className="admin-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Record Donation
-        </button>
+        <div className="clean-donations-actions">
+          <button
+            onClick={() => {
+              setShowForm(true)
+              setEditingDonation(null)
+              setFormData({
+                member_id: '',
+                amount: '',
+                giving_type: 'tithe',
+                payment_method: 'mpesa',
+                transaction_id: '',
+                giving_date: new Date().toISOString().split('T')[0],
+                notes: '',
+                is_verified: false
+              })
+            }}
+            className="clean-record-donation-btn"
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Record Donation
+          </button>
+        </div>
       </div>
 
       {/* Financial Summary Cards */}
-      <div className="financial-summary-cards">
-        <div className="financial-card total">
-          <div className="financial-card-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      <div className="clean-donations-stats">
+        <div className="clean-stat-card">
+          <div className="clean-stat-header">
+            <h3 className="clean-stat-title">Total Donations</h3>
+            <div className="clean-stat-icon">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <div className="financial-card-content">
-            <h3>Total Donations</h3>
-            <p className="financial-amount">{formatCurrency(totals.total)}</p>
-            <span className="financial-period">Current Period</span>
-          </div>
+          <p className="clean-stat-amount">{formatCurrency(totals.total)}</p>
+          <p className="clean-stat-label">Current Period</p>
         </div>
 
-        <div className="financial-card tithe">
-          <div className="financial-card-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-            </svg>
+        <div className="clean-stat-card tithes">
+          <div className="clean-stat-header">
+            <h3 className="clean-stat-title">Tithes</h3>
+            <div className="clean-stat-icon">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+            </div>
           </div>
-          <div className="financial-card-content">
-            <h3>Tithes</h3>
-            <p className="financial-amount">{formatCurrency(totals.tithe || 0)}</p>
-            <span className="financial-period">Current Period</span>
-          </div>
+          <p className="clean-stat-amount">{formatCurrency(totals.tithe || 0)}</p>
+          <p className="clean-stat-label">Current Period</p>
         </div>
 
-        <div className="financial-card offering">
-          <div className="financial-card-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
+        <div className="clean-stat-card offerings">
+          <div className="clean-stat-header">
+            <h3 className="clean-stat-title">Offerings</h3>
+            <div className="clean-stat-icon">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
           </div>
-          <div className="financial-card-content">
-            <h3>Offerings</h3>
-            <p className="financial-amount">{formatCurrency(totals.offering || 0)}</p>
-            <span className="financial-period">Current Period</span>
-          </div>
-        </div>
-
-        <div className="financial-card special">
-          <div className="financial-card-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-          </div>
-          <div className="financial-card-content">
-            <h3>Special Projects</h3>
-            <p className="financial-amount">{formatCurrency(totals.special_project || 0)}</p>
-            <span className="financial-period">Current Period</span>
-          </div>
+          <p className="clean-stat-amount">{formatCurrency(totals.offering || 0)}</p>
+          <p className="clean-stat-label">Current Period</p>
         </div>
       </div>
 
@@ -463,29 +454,31 @@ const DonationsManagement = () => {
       )}
 
       {/* Donations List */}
-      <div className="admin-content-list">
+      <div className="clean-donations-table-container">
+        <div className="clean-donations-table-header">
+          <h2 className="clean-donations-table-title">Recent Donations</h2>
+        </div>
         {donations.length === 0 ? (
-          <div className="admin-empty-state">
-            <svg className="admin-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="clean-donations-empty">
+            <svg className="clean-donations-empty-icon" width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3>No donations recorded</h3>
-            <p>Start by recording your first donation</p>
+            <h3 className="clean-donations-empty-title">No donations recorded</h3>
+            <p className="clean-donations-empty-text">Start by recording your first donation</p>
           </div>
         ) : (
-          <div className="admin-table-container">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Member</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Payment Method</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+          <table className="clean-donations-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Member</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
               <tbody>
                 {donations.map((donation) => (
                   <tr key={donation.id}>
@@ -497,45 +490,59 @@ const DonationsManagement = () => {
                       }
                     </td>
                     <td>
-                      <span className="admin-type-badge">
+                      <span className={`clean-donation-type-badge ${donation.giving_type}`}>
                         {donation.giving_type.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="financial-amount-cell">
+                    <td style={{fontWeight: '600'}}>
                       {formatCurrency(donation.amount)}
                     </td>
                     <td>
-                      <span className="admin-payment-badge">
-                        {donation.payment_method}
-                      </span>
+                      {donation.payment_method.toUpperCase()}
                     </td>
                     <td>
-                      <span className={`admin-status-badge ${donation.is_verified ? 'verified' : 'pending'}`}>
+                      <button
+                        onClick={() => toggleVerification(donation)}
+                        className="clean-btn"
+                        style={{
+                          padding: '0.25rem 0.75rem',
+                          fontSize: '0.75rem',
+                          background: donation.is_verified ? 'var(--admin-primary-green)' : '#6b7280',
+                          color: 'white'
+                        }}
+                      >
                         {donation.is_verified ? 'Verified' : 'Pending'}
-                      </span>
+                      </button>
                     </td>
                     <td>
-                      <div className="admin-table-actions">
-                        <button
-                          onClick={() => toggleVerification(donation)}
-                          className={`admin-btn-sm ${donation.is_verified ? 'admin-btn-warning' : 'admin-btn-success'}`}
-                          title={donation.is_verified ? 'Mark as Pending' : 'Verify'}
-                        >
-                          {donation.is_verified ? 'Unverify' : 'Verify'}
-                        </button>
+                      <div style={{display: 'flex', gap: '0.5rem'}}>
                         <button
                           onClick={() => handleEdit(donation)}
-                          className="admin-btn-sm admin-btn-secondary"
+                          className="clean-btn"
+                          style={{
+                            padding: '0.5rem',
+                            background: '#3b82f6',
+                            color: 'white'
+                          }}
                           title="Edit"
                         >
-                          Edit
+                          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
                         </button>
                         <button
                           onClick={() => handleDelete(donation.id)}
-                          className="admin-btn-sm admin-btn-danger"
+                          className="clean-btn"
+                          style={{
+                            padding: '0.5rem',
+                            background: '#ef4444',
+                            color: 'white'
+                          }}
                           title="Delete"
                         >
-                          Delete
+                          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
                         </button>
                       </div>
                     </td>
@@ -543,7 +550,6 @@ const DonationsManagement = () => {
                 ))}
               </tbody>
             </table>
-          </div>
         )}
       </div>
     </div>

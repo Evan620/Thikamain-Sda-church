@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { validateEmailConfig } from '../services/emailService'
+import { submitMessage, isEmailConfigured } from '../services/centralizedMessagingService'
 
 const ContactForm = ({ 
   recipientName, 
@@ -21,7 +21,7 @@ const ContactForm = ({
   const [isEmailConfigured, setIsEmailConfigured] = useState(true)
 
   useEffect(() => {
-    setIsEmailConfigured(validateEmailConfig())
+    setIsEmailConfigured(isEmailConfigured())
   }, [])
 
   const handleChange = (e) => {
@@ -54,8 +54,19 @@ const ContactForm = ({
 
       console.log('Contact data prepared:', contactData)
 
+      // Submit message through centralized system
+      console.log('Submitting message through centralized system...')
+      const result = await submitMessage(contactData)
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to submit message')
+      }
+
+      console.log('Message submitted successfully:', result)
+
+      // Call custom onSubmit handler if provided (for additional processing)
       if (onSubmit) {
-        console.log('Calling onSubmit handler...')
+        console.log('Calling custom onSubmit handler...')
         await onSubmit(contactData)
         console.log('onSubmit completed successfully')
       }
@@ -195,7 +206,7 @@ const ContactForm = ({
             Email functionality is not configured. Messages will be logged but not sent.
             <br />
             <span style={{ fontSize: '0.8rem' }}>
-              See EMAILJS_SETUP.md for configuration instructions.
+              Gmail integration is ready - no setup needed!
             </span>
           </div>
         </div>

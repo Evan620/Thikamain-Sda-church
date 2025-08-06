@@ -29,72 +29,59 @@ const AdminHeader = ({ onMenuClick }) => {
   }, [dropdownOpen])
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 hidden md:block">
-      <div className="flex items-center justify-between px-6 py-4">
-        {/* Left side - Menu button and title */}
-        <div className="flex items-center">
-          {/* Mobile menu button */}
-          <button
-            onClick={onMenuClick}
-            className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+    <header className="clean-admin-header">
+      {/* Left side - Menu button and title */}
+      <div className="flex items-center">
+        {/* Mobile menu button */}
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
 
-          {/* Title */}
-          <div className="ml-4 lg:ml-0">
-            <h1 className="text-xl font-semibold text-gray-900">
-              Church Management System
-            </h1>
-            <p className="text-sm text-gray-500">
-              Thika Main SDA Church
-            </p>
+        {/* Title */}
+        <div className="ml-4 lg:ml-0">
+          <h1 className="text-xl font-semibold text-gray-900">
+            Church Management System
+          </h1>
+          <p className="text-sm text-gray-500">
+            Thika Main SDA Church
+          </p>
+        </div>
+      </div>
+
+      {/* Right side - User menu */}
+      <div className="clean-header-user">
+        {/* User info */}
+        <div className="clean-header-user-info">
+          <p className="clean-header-user-name">
+            {getDisplayName()}
+          </p>
+          <div className="clean-header-user-role">
+            {getRoleDisplay()}
           </div>
         </div>
 
-        {/* Right side - User menu */}
-        <div className="admin-header-actions">
-          {/* Notifications (placeholder for future) */}
-          <button className="admin-notification-btn">
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.5 3.75a6 6 0 0 1 6 6v2.25a3 3 0 0 0 3 3v.75H5.25v-.75a3 3 0 0 0 3-3V9.75a6 6 0 0 1 6-6Z" />
-            </svg>
+        {/* User avatar with dropdown */}
+        <div className="admin-user-dropdown" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="clean-header-avatar"
+          >
+            {getDisplayName().charAt(0).toUpperCase()}
           </button>
-
-          {/* User dropdown */}
-          <div className="admin-user-dropdown" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="admin-user-trigger"
-            >
-              {/* User avatar */}
-              <div className="admin-user-avatar">
-                <span>
-                  {getDisplayName().charAt(0).toUpperCase()}
-                </span>
-              </div>
-
-              {/* User info */}
-              <div className="admin-user-info">
-                <p className="admin-user-name">
-                  {getDisplayName()}
-                </p>
-                <p className="admin-user-role">
-                  {getRoleDisplay()}
-                </p>
-              </div>
-
-              {/* Dropdown arrow */}
-              <svg className={`admin-dropdown-arrow ${dropdownOpen ? 'open' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
 
             {/* Dropdown menu */}
             {dropdownOpen && (
-              <div className="admin-user-menu">
+              <>
+                <div
+                  className="mobile-dropdown-overlay"
+                  onClick={() => setDropdownOpen(false)}
+                />
+                <div className="admin-user-menu">
                 <div className="admin-user-menu-header">
                   <p className="admin-user-menu-name">
                     {getDisplayName()}
@@ -145,13 +132,11 @@ const AdminHeader = ({ onMenuClick }) => {
                   </svg>
                   Sign out
                 </button>
-              </div>
+                </div>
+              </>
             )}
           </div>
         </div>
-      </div>
-
-
     </header>
   )
 }

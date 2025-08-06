@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { sendContactEmail, validateEmailConfig } from '../services/emailService'
+import { submitMessage, isEmailConfigured } from '../services/centralizedMessagingService'
 
 const SubmissionForm = ({ submissionType, onClose }) => {
   const [formData, setFormData] = useState({
@@ -47,7 +47,7 @@ const SubmissionForm = ({ submissionType, onClose }) => {
   const [isEmailConfigured, setIsEmailConfigured] = useState(true)
 
   useEffect(() => {
-    setIsEmailConfigured(validateEmailConfig())
+    setIsEmailConfigured(isEmailConfigured())
   }, [])
 
   const handleChange = (e) => {
@@ -101,7 +101,12 @@ const SubmissionForm = ({ submissionType, onClose }) => {
         timestamp: new Date().toISOString()
       }
 
-      await sendContactEmail(submissionData)
+      const result = await submitMessage(submissionData)
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to submit request')
+      }
+
       setSubmitStatus('success')
       setTimeout(() => onClose(), 2500)
     } catch (error) {

@@ -133,7 +133,22 @@ export const db = {
   getAttendance: () => supabase.from('attendance').select('*, events(title), members(first_name, last_name)').order('attendance_date', { ascending: false }),
   addAttendance: (data) => supabase.from('attendance').insert([data]),
   updateAttendance: (id, data) => supabase.from('attendance').update(data).eq('id', id),
-  deleteAttendance: (id) => supabase.from('attendance').delete().eq('id', id)
+  deleteAttendance: (id) => supabase.from('attendance').delete().eq('id', id),
+
+  // Messages (Centralized Messaging System)
+  getMessages: (filters = {}) => {
+    let query = supabase.from('messages').select('*').order('created_at', { ascending: false })
+    if (filters.status) query = query.eq('status', filters.status)
+    if (filters.department) query = query.eq('department', filters.department)
+    if (filters.recipient) query = query.eq('recipient_name', filters.recipient)
+    if (filters.limit) query = query.limit(filters.limit)
+    return query
+  },
+  getMessageById: (id) => supabase.from('messages').select('*').eq('id', id).single(),
+  createMessage: (data) => supabase.from('messages').insert([data]),
+  updateMessage: (id, data) => supabase.from('messages').update(data).eq('id', id),
+  deleteMessage: (id) => supabase.from('messages').delete().eq('id', id),
+  getMessageStats: () => supabase.from('message_stats').select('*').single()
 }
 
 // Real-time subscriptions

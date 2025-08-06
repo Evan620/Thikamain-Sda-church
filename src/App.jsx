@@ -22,43 +22,47 @@ import AuthGuard from './components/admin/AuthGuard'
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          {/* 🆕 ADMIN SYSTEM ROUTES - COMPLETELY SEPARATE */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/*" element={
+    <Router>
+      <ScrollToTop />
+      <Routes>
+        {/* 🆕 ADMIN SYSTEM ROUTES - WITH AUTH PROVIDER */}
+        <Route path="/admin/login" element={
+          <AuthProvider>
+            <AdminLogin />
+          </AuthProvider>
+        } />
+        <Route path="/admin/*" element={
+          <AuthProvider>
             <AuthGuard requiredRole="MEMBER">
               <AdminLayout>
                 <AdminRoutes />
               </AdminLayout>
             </AuthGuard>
-          } />
+          </AuthProvider>
+        } />
 
-          {/* ✅ EXISTING PUBLIC WEBSITE ROUTES - UNCHANGED */}
-          <Route path="/*" element={
-            <div className="min-h-screen bg-gray-50">
-              <Navbar />
-              <main className="flex-1">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/sermons" element={<Sermons />} />
-                  <Route path="/events" element={<Events />} />
-                  <Route path="/ministries" element={<Ministries />} />
-                  <Route path="/departments" element={<Departments />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/giving" element={<Giving />} />
-                  <Route path="/submissions" element={<Submissions />} />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
-          } />
-        </Routes>
-      </Router>
-    </AuthProvider>
+        {/* ✅ PUBLIC WEBSITE ROUTES - NO AUTH PROVIDER */}
+        <Route path="/*" element={
+          <div className="min-h-screen bg-gray-50">
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/sermons" element={<Sermons />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/ministries" element={<Ministries />} />
+                <Route path="/departments" element={<Departments />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/giving" element={<Giving />} />
+                <Route path="/submissions" element={<Submissions />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        } />
+      </Routes>
+    </Router>
   )
 }
 

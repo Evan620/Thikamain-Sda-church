@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import AdminSidebar from './AdminSidebar'
 import AdminHeader from './AdminHeader'
 import { useAuth } from '../../hooks/useAuth'
 
 const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { user } = useAuth()
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false)
+  const { user, signOut } = useAuth()
+  const mobileDropdownRef = useRef(null)
 
   const getUserInitials = (user) => {
     if (user?.full_name) {
@@ -31,8 +33,30 @@ const AdminLayout = ({ children }) => {
     return roleMap[role] || role
   }
 
+  const handleMobileSignOut = async () => {
+    await signOut()
+    setMobileDropdownOpen(false)
+  }
+
+  // Close mobile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target)) {
+        setMobileDropdownOpen(false)
+      }
+    }
+
+    if (mobileDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [mobileDropdownOpen])
+
   return (
-    <div className="admin-layout">
+    <div className="clean-admin-layout">
       {/* Mobile Header */}
       <div className="mobile-admin-header">
         <div className="mobile-header-left">
@@ -53,8 +77,43 @@ const AdminLayout = ({ children }) => {
           </div>
         </div>
         <div className="mobile-header-right">
-          <div className="mobile-user-avatar">
-            {getUserInitials(user)}
+          <div className="mobile-user-dropdown" ref={mobileDropdownRef}>
+            <button
+              className="mobile-user-avatar"
+              onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
+              aria-label="User menu"
+            >
+              {getUserInitials(user)}
+            </button>
+
+            {/* Mobile Dropdown Menu */}
+            {mobileDropdownOpen && (
+              <div className="mobile-user-menu">
+                <div className="mobile-user-menu-header">
+                  <p className="mobile-user-menu-name">
+                    {user?.full_name || user?.email?.split('@')[0] || 'User'}
+                  </p>
+                  <p className="mobile-user-menu-email">
+                    {user?.email}
+                  </p>
+                  <p className="mobile-user-menu-role">
+                    {getRoleDisplayName(user?.role)}
+                  </p>
+                </div>
+
+                <div className="mobile-user-menu-divider"></div>
+
+                <button
+                  onClick={handleMobileSignOut}
+                  className="mobile-user-menu-item logout"
+                >
+                  <svg className="mobile-menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -66,13 +125,13 @@ const AdminLayout = ({ children }) => {
       />
 
       {/* Main content area */}
-      <div className="admin-main-content">
+      <div className="clean-admin-main">
         {/* Desktop Header */}
         <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Main content */}
-        <main className="admin-content-area">
-          <div className="admin-content-container">
+        <main className="clean-admin-content">
+          <div className="clean-admin-container">
             {children}
           </div>
         </main>
@@ -83,6 +142,14 @@ const AdminLayout = ({ children }) => {
         <div
           className="admin-sidebar-overlay"
           onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Mobile dropdown overlay */}
+      {mobileDropdownOpen && (
+        <div
+          className="mobile-dropdown-overlay"
+          onClick={() => setMobileDropdownOpen(false)}
         />
       )}
     </div>

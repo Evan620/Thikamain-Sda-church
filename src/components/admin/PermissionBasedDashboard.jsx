@@ -204,28 +204,31 @@ const PermissionBasedDashboard = () => {
       </div>
 
       {/* Permission-Based Dashboard Cards */}
-      <div className="admin-dashboard-grid">
+      <div className="clean-grid clean-grid-3">
         {/* Member Management Card */}
         {hasAnyPermission(['manage_members', 'view_member_details']) && (
-          <div className="admin-dashboard-card members">
-            <div className="admin-card-header">
-              <div className="admin-card-icon">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3>Members</h3>
-                <p className="admin-card-value">{dashboardData.members?.total || 0}</p>
+          <div className="clean-card"
+               style={{background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', color: 'white'}}>
+            <div className="clean-card-header">
+              <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                <div style={{width: '48px', height: '48px', background: 'rgba(255,255,255,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: '600'}}>Members</h3>
+                  <p style={{margin: '0', fontSize: '2rem', fontWeight: '800'}}>{dashboardData.members?.total || 0}</p>
+                </div>
               </div>
             </div>
-            <div className="admin-card-content">
-              <p className="admin-card-subtitle">Total church members</p>
+            <div className="clean-card-body">
+              <p style={{margin: '0 0 1rem 0', opacity: '0.9', fontSize: '0.875rem'}}>Total church members</p>
               {dashboardData.members?.recent?.length > 0 && (
-                <div className="admin-recent-items">
-                  <p className="admin-recent-title">Recent additions:</p>
+                <div style={{marginTop: '1rem'}}>
+                  <p style={{margin: '0 0 0.5rem 0', fontSize: '0.75rem', fontWeight: '600', opacity: '0.8'}}>Recent additions:</p>
                   {dashboardData.members.recent.slice(0, 3).map(member => (
-                    <div key={member.id} className="admin-recent-item">
+                    <div key={member.id} style={{padding: '0.25rem 0', fontSize: '0.875rem', opacity: '0.9'}}>
                       {member.full_name}
                     </div>
                   ))}
@@ -237,7 +240,8 @@ const PermissionBasedDashboard = () => {
 
         {/* Content Management Card */}
         {hasAnyPermission(['manage_sermons', 'manage_events', 'manage_announcements']) && (
-          <div className="admin-dashboard-card content">
+          <div className="clean-card"
+               style={{background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white'}}>
             <div className="admin-card-header">
               <div className="admin-card-icon">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -280,7 +284,8 @@ const PermissionBasedDashboard = () => {
 
         {/* Financial Management Card */}
         {hasAnyPermission(['manage_finances', 'view_financial_reports', 'manage_donations']) && (
-          <div className="admin-dashboard-card financial">
+          <div className="clean-card"
+               style={{background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: 'white'}}>
             <div className="admin-card-header">
               <div className="admin-card-icon">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
