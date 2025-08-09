@@ -69,8 +69,14 @@ export const submitMessage = async (messageData) => {
 
     console.log('Message stored in database:', insertedMessage)
 
-    // Messages are stored and ready for admin to send manually
-    console.log('Message stored successfully. Admin can send email from Communication Hub.')
+    // Trigger Vercel function to send email via Gmail SMTP (non-blocking)
+    try {
+      fetch('/api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageId: insertedMessage.id })
+      }).catch(() => {})
+    } catch (_) {}
 
     return {
       success: true,
@@ -85,6 +91,15 @@ export const submitMessage = async (messageData) => {
       error: error.message
     }
   }
+      // Trigger server-side email sending (non-blocking)
+      try {
+        fetch('/api/send-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messageId: insertedMessage.id })
+        }).catch(() => {})
+      } catch (_) {}
+
 }
 
 /**
@@ -191,40 +206,40 @@ const generateEmailHTML = (messageData) => {
             <h2>🏛️ New Contact Form Message</h2>
             <p>Thika Main Seventh-Day Adventist Church</p>
         </div>
-        
+
         <div class="content">
             <p>Hello <strong>${messageData.recipient_name}</strong>,</p>
-            
+
             <p>You have received a new message through the church website contact form.</p>
-            
+
             <div class="info-section">
                 <h3>📧 Message Details</h3>
                 <p><span class="label">Subject:</span> <span class="value">${messageData.subject}</span></p>
                 <p><span class="label">Date:</span> <span class="value">${timestamp}</span></p>
                 <p><span class="label">Department:</span> <span class="value">${messageData.department || 'General'}</span></p>
             </div>
-            
+
             <div class="info-section">
                 <h3>👤 Sender Information</h3>
                 <p><span class="label">Name:</span> <span class="value">${messageData.sender_name}</span></p>
                 <p><span class="label">Email:</span> <span class="value">${messageData.sender_email}</span></p>
                 <p><span class="label">Phone:</span> <span class="value">${messageData.sender_phone || 'Not provided'}</span></p>
             </div>
-            
+
             <div class="message-content">
                 <h3>💬 Message</h3>
                 <p>${messageData.message.replace(/\n/g, '<br>')}</p>
             </div>
-            
+
             <div class="reply-section">
                 <p style="margin: 0; font-size: 0.9em; color: #0277bd;">
-                    <strong>📝 How to Reply:</strong> Please respond directly to 
-                    <a href="mailto:${messageData.sender_email}" style="color: #2d5a27;">${messageData.sender_email}</a> 
+                    <strong>📝 How to Reply:</strong> Please respond directly to
+                    <a href="mailto:${messageData.sender_email}" style="color: #2d5a27;">${messageData.sender_email}</a>
                     to reply to this message.
                 </p>
             </div>
         </div>
-        
+
         <div class="footer">
             <p>This message was sent through the secure contact form on the church website</p>
             <p>Thika Main Seventh-Day Adventist Church - Spreading Hope and Love in Thika and Beyond</p>
@@ -322,9 +337,9 @@ export const markMessageAsRead = async (messageId) => {
   try {
     const { error } = await supabase
       .from('messages')
-      .update({ 
-        status: 'read', 
-        read_at: new Date().toISOString() 
+      .update({
+        status: 'read',
+        read_at: new Date().toISOString()
       })
       .eq('id', messageId)
 

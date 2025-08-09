@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { submitMessage, isEmailConfigured } from '../services/centralizedMessagingService'
+import { submitMessage, isEmailConfigured as isEmailConfiguredFn } from '../services/centralizedMessagingService'
 
-const ContactForm = ({ 
-  recipientName, 
-  recipientRole, 
+const ContactForm = ({
+  recipientName,
+  recipientRole,
   department = null,
   onSubmit,
   onClose 
@@ -18,10 +18,10 @@ const ContactForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
-  const [isEmailConfigured, setIsEmailConfigured] = useState(true)
+  const [emailReady, setEmailReady] = useState(true)
 
   useEffect(() => {
-    setIsEmailConfigured(isEmailConfigured())
+    setEmailReady(isEmailConfiguredFn())
   }, [])
 
   const handleChange = (e) => {
@@ -185,7 +185,7 @@ const ContactForm = ({
         </p>
       </div>
 
-      {!isEmailConfigured && (
+      {!emailReady && (
         <div style={{
           marginBottom: '1.5rem',
           padding: '1rem',

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import InfoModal from '../components/InfoModal'
+import { supabase } from '../services/supabaseClient'
+
 
 // Church images for hero background (from public folder)
 const image1 = '/assets/image1.png'
@@ -22,6 +24,39 @@ const Home = () => {
 
   // Modal state for Learn More functionality
   const [modalOpen, setModalOpen] = useState(false)
+  // Feature flag for dynamic content
+  const dynamic = import.meta.env.VITE_DYNAMIC_CONTENT_ENABLED === 'true'
+
+  // Dynamic announcement for Featured section
+  const [featuredAnnouncement, setFeaturedAnnouncement] = React.useState(null)
+
+  // Adapter for announcements -> hero content
+  const mapAnnouncementToHero = (a) => ({
+    title: a.title,
+    content: a.content,
+    startDate: a.start_date,
+    endDate: a.end_date,
+    priority: a.priority
+  })
+
+  React.useEffect(() => {
+    if (!dynamic) return
+    let active = true
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('id,title,content,priority,start_date,end_date,is_published')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+      if (!error && active && Array.isArray(data) && data[0]) {
+        setFeaturedAnnouncement(mapAnnouncementToHero(data[0]))
+      }
+    }
+    load()
+    return () => { active = false }
+  }, [dynamic])
+
   const [modalType, setModalType] = useState('')
   const [modalData, setModalData] = useState({})
 
@@ -702,7 +737,7 @@ const Home = () => {
                   marginBottom: '1rem',
                   lineHeight: '1.2'
                 }}>
-                  Special Sabbath Service
+                  {featuredAnnouncement?.title || 'Special Sabbath Service'}
                 </h2>
 
                 <p style={{
@@ -711,7 +746,7 @@ const Home = () => {
                   marginBottom: '2rem',
                   opacity: '0.9'
                 }}>
-                  Join us for a special communion service this Sabbath. Experience the blessing of fellowship and spiritual renewal as we come together in worship.
+                  {featuredAnnouncement?.content || 'Join us for a special communion service this Sabbath. Experience the blessing of fellowship and spiritual renewal as we come together in worship.'}
                 </p>
 
                 <div style={{

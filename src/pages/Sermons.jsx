@@ -1,7 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { supabase } from '../services/supabaseClient'
 
 const Sermons = () => {
   const [selectedVideo, setSelectedVideo] = useState(null)
+
+  // Feature flag to enable dynamic content without UI changes
+  const dynamic = import.meta.env.VITE_DYNAMIC_CONTENT_ENABLED === 'true'
 
   // Function to extract YouTube video ID from URL
   const getYouTubeVideoId = (url) => {
@@ -31,8 +35,8 @@ const Sermons = () => {
     return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1` : null
   }
 
-  // Real sermon data from YouTube
-  const sermons = [
+  // Real sermon data from YouTube (used as initial state/fallback)
+  const [sermons, setSermons] = useState([
     {
       id: 1,
       title: "ARE YOUR FEET BLESSED",
@@ -165,7 +169,41 @@ const Sermons = () => {
       description: "Strengthening family relationships and building Christ-centered homes.",
       color: '#f59e0b'
     }
-  ]
+  ])
+
+  // Map DB rows to the exact shape used by the UI
+  const mapSermon = (r) => ({
+    id: r.id,
+    title: r.title,
+    speaker: r.speaker || 'Guest Speaker',
+    date: r.sermon_date ? new Date(r.sermon_date).toLocaleDateString() : '',
+    url: r.video_url || r.audio_url || '',
+    category: r.series || 'Sermon',
+    series: r.series || '',
+    description: r.description || '',
+    color: '#2d5a27'
+  })
+
+  // Feature-flagged fetch to override with dynamic content
+  useEffect(() => {
+    if (!dynamic) return
+    let active = true
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('sermons')
+        .select('id,title,description,speaker,sermon_date,audio_url,video_url,notes_url,series,tags,is_published')
+        .eq('is_published', true)
+        .order('sermon_date', { ascending: false })
+      if (!error && active && Array.isArray(data)) {
+        const mapped = data.map(mapSermon)
+        if (mapped.length) setSermons(mapped)
+      }
+    }
+    load()
+    return () => { active = false }
+  }, [dynamic])
+
+  
 
   return (
     <div className="min-h-screen">

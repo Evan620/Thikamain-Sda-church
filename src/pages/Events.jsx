@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import InfoModal from '../components/InfoModal'
+import { supabase } from '../services/supabaseClient'
 
 const Events = () => {
   const [selectedQuarter, setSelectedQuarter] = useState('Q1') // Q1, Q2, Q3, Q4
+
+  // Feature flag for dynamic content
+  const dynamic = import.meta.env.VITE_DYNAMIC_CONTENT_ENABLED === 'true'
 
   // Modal state for Learn More functionality
   const [modalOpen, setModalOpen] = useState(false)
@@ -12,6 +16,43 @@ const Events = () => {
   // Check if we're on mobile
   const isMobile = window.innerWidth < 768
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+  // Dynamic events loaded from Supabase (keeps UI shape via adapter)
+  const [dynamicEvents, setDynamicEvents] = useState(null)
+
+  // Adapter to map DB rows -> existing UI event shape
+  const mapEvent = (r) => ({
+    id: r.id,
+    title: r.title,
+    date: new Date(r.start_date).toLocaleDateString(),
+    time: r.end_date ? `${new Date(r.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(r.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'All Day',
+    location: r.location || 'Thika Main SDA Church',
+    category: r.event_type || 'ministry',
+    type: r.event_type || 'Event',
+    description: r.description || '',
+    attendees: 'All members welcome',
+    color: '#2d5a27',
+    icon: '📅',
+    department: r.event_type || 'Church',
+    recurring: false
+  })
+
+  useEffect(() => {
+    if (!dynamic) return
+    let active = true
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('id,title,description,start_date,end_date,location,event_type,is_published')
+        .eq('is_published', true)
+        .order('start_date', { ascending: false })
+      if (!error && active && Array.isArray(data)) {
+        const mapped = data.map(mapEvent)
+        if (mapped.length) setDynamicEvents(mapped)
+      }
+    }
+    load()
+    return () => { active = false }
+  }, [dynamic])
 
   // Helper function to open modals with specific content
   const openModal = (type, data) => {
@@ -225,7 +266,9 @@ const Events = () => {
         }}>
           {/* List View - Enhanced Event Cards - 2025 Calendar */}
           {(() => {
-              const allEvents = [
+              const allEvents = (dynamic && Array.isArray(dynamicEvents) && dynamicEvents.length)
+                ? dynamicEvents
+                : [
               // JANUARY 2025
               {
                 id: 1,
