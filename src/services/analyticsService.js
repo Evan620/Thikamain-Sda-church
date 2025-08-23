@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import cacheService, { CACHE_TTL, CACHE_KEYS } from './cacheService'
 
 /**
  * Analytics Service - Fetches real data for Reports & Analytics
@@ -10,58 +11,64 @@ import { supabase } from './supabaseClient'
  * @returns {Promise<Object>} Financial analytics data
  */
 export const getFinancialAnalytics = async (dateRange = 'month') => {
-  try {
-    const dateFilter = getDateFilter(dateRange)
-    
-    // Get total income by type
-    const { data: givingData, error: givingError } = await supabase
-      .from('giving_records')
-      .select('amount, giving_type, created_at')
-      .gte('created_at', dateFilter.start)
-      .lte('created_at', dateFilter.end)
-      .eq('is_verified', true)
+  const cacheKey = cacheService.generateKey('financial_analytics', { dateRange })
 
-    if (givingError) throw givingError
+  return cacheService.cachedFetch(cacheKey, async () => {
+    try {
+      const dateFilter = getDateFilter(dateRange)
 
-    // Calculate totals
-    const totalIncome = givingData.reduce((sum, record) => sum + parseFloat(record.amount), 0)
-    
-    // Group by giving type
-    const categoryBreakdown = givingData.reduce((acc, record) => {
-      const type = record.giving_type
-      if (!acc[type]) acc[type] = 0
-      acc[type] += parseFloat(record.amount)
-      return acc
-    }, {})
+      // Parallel fetch all financial data
+      const [givingResult, monthlyTrendResult] = await Promise.all([
+        supabase
+          .from('giving_records')
+          .select('amount, giving_type, giving_date')
+          .gte('giving_date', dateFilter.start)
+          .lte('giving_date', dateFilter.end)
+          .eq('is_verified', true),
+        getMonthlyFinancialTrend()
+      ])
 
-    // Convert to percentage breakdown
-    const categoryBreakdownArray = Object.entries(categoryBreakdown).map(([category, amount]) => ({
-      category: formatGivingType(category),
-      amount,
-      percentage: totalIncome > 0 ? (amount / totalIncome * 100) : 0
-    }))
+      if (givingResult.error) throw givingResult.error
 
-    // Get monthly trend (last 6 months)
-    const monthlyTrend = await getMonthlyFinancialTrend()
+      const givingData = givingResult.data || []
 
-    return {
-      totalIncome,
-      totalExpenses: 0, // TODO: Add expenses table
-      netIncome: totalIncome, // TODO: Calculate actual net income
-      monthlyTrend,
-      categoryBreakdown: categoryBreakdownArray
+      // Calculate totals
+      const totalIncome = givingData.reduce((sum, record) => sum + parseFloat(record.amount || 0), 0)
+
+      // Group by giving type
+      const categoryBreakdown = givingData.reduce((acc, record) => {
+        const type = record.giving_type || 'other'
+        if (!acc[type]) acc[type] = 0
+        acc[type] += parseFloat(record.amount || 0)
+        return acc
+      }, {})
+
+      // Convert to percentage breakdown
+      const categoryBreakdownArray = Object.entries(categoryBreakdown).map(([category, amount]) => ({
+        category: formatGivingType(category),
+        amount,
+        percentage: totalIncome > 0 ? (amount / totalIncome * 100) : 0
+      }))
+
+      return {
+        totalIncome,
+        totalExpenses: 0, // Will be 0 until expenses table is created
+        netIncome: totalIncome,
+        monthlyTrend: monthlyTrendResult,
+        categoryBreakdown: categoryBreakdownArray
+      }
+
+    } catch (error) {
+      console.error('Error fetching financial analytics:', error)
+      return {
+        totalIncome: 0,
+        totalExpenses: 0,
+        netIncome: 0,
+        monthlyTrend: [],
+        categoryBreakdown: []
+      }
     }
-
-  } catch (error) {
-    console.error('Error fetching financial analytics:', error)
-    return {
-      totalIncome: 0,
-      totalExpenses: 0,
-      netIncome: 0,
-      monthlyTrend: [],
-      categoryBreakdown: []
-    }
-  }
+  }, CACHE_TTL.FINANCIAL)
 }
 
 /**
@@ -70,52 +77,56 @@ export const getFinancialAnalytics = async (dateRange = 'month') => {
  * @returns {Promise<Object>} Membership analytics data
  */
 export const getMembershipAnalytics = async (dateRange = 'month') => {
-  try {
-    const dateFilter = getDateFilter(dateRange)
+  const cacheKey = cacheService.generateKey('membership_analytics', { dateRange })
 
-    // Get total members
-    const { data: allMembers, error: membersError } = await supabase
-      .from('members')
-      .select('id, created_at, date_of_birth, is_active')
-      .eq('is_active', true)
+  return cacheService.cachedFetch(cacheKey, async () => {
+    try {
+      const dateFilter = getDateFilter(dateRange)
 
-    if (membersError) throw membersError
+      // Parallel fetch membership data
+      const [membersResult, ministryResult, growthResult] = await Promise.all([
+        supabase
+          .from('members')
+          .select('id, created_at, date_of_birth, is_active')
+          .eq('is_active', true),
+        getMinistryParticipation().catch(() => []), // Graceful fallback
+        getMembershipGrowthTrend().catch(() => [])  // Graceful fallback
+      ])
 
-    // Get new members in date range
-    const newMembers = allMembers.filter(member => 
-      new Date(member.created_at) >= new Date(dateFilter.start) &&
-      new Date(member.created_at) <= new Date(dateFilter.end)
-    )
+      if (membersResult.error) throw membersResult.error
 
-    // Calculate age distribution
-    const ageDistribution = calculateAgeDistribution(allMembers)
+      const allMembers = membersResult.data || []
 
-    // Get ministry participation
-    const ministryParticipation = await getMinistryParticipation()
+      // Get new members in date range
+      const newMembers = allMembers.filter(member =>
+        new Date(member.created_at) >= new Date(dateFilter.start) &&
+        new Date(member.created_at) <= new Date(dateFilter.end)
+      )
 
-    // Get membership growth trend
-    const membershipGrowth = await getMembershipGrowthTrend()
+      // Calculate age distribution
+      const ageDistribution = calculateAgeDistribution(allMembers)
 
-    return {
-      totalMembers: allMembers.length,
-      newMembers: newMembers.length,
-      activeMembers: allMembers.length, // All are active due to filter
-      membershipGrowth,
-      ageDistribution,
-      ministryParticipation
+      return {
+        totalMembers: allMembers.length,
+        newMembers: newMembers.length,
+        activeMembers: allMembers.length, // All are active due to filter
+        membershipGrowth: growthResult,
+        ageDistribution,
+        ministryParticipation: ministryResult
+      }
+
+    } catch (error) {
+      console.error('Error fetching membership analytics:', error)
+      return {
+        totalMembers: 0,
+        newMembers: 0,
+        activeMembers: 0,
+        membershipGrowth: [],
+        ageDistribution: [],
+        ministryParticipation: []
+      }
     }
-
-  } catch (error) {
-    console.error('Error fetching membership analytics:', error)
-    return {
-      totalMembers: 0,
-      newMembers: 0,
-      activeMembers: 0,
-      membershipGrowth: [],
-      ageDistribution: [],
-      ministryParticipation: []
-    }
-  }
+  }, CACHE_TTL.MEMBERS)
 }
 
 /**
@@ -124,56 +135,71 @@ export const getMembershipAnalytics = async (dateRange = 'month') => {
  * @returns {Promise<Object>} Attendance analytics data
  */
 export const getAttendanceAnalytics = async (dateRange = 'month') => {
-  try {
-    const dateFilter = getDateFilter(dateRange)
+  const cacheKey = cacheService.generateKey('attendance_analytics', { dateRange })
 
-    // Get attendance records
-    const { data: attendanceData, error: attendanceError } = await supabase
-      .from('attendance')
-      .select('attendance_date, service_type, member_id')
-      .gte('attendance_date', dateFilter.start.split('T')[0])
-      .lte('attendance_date', dateFilter.end.split('T')[0])
+  return cacheService.cachedFetch(cacheKey, async () => {
+    try {
+      const dateFilter = getDateFilter(dateRange)
 
-    if (attendanceError) throw attendanceError
+      // Get attendance records with error handling
+      const attendanceResult = await supabase
+        .from('attendance')
+        .select('attendance_date, service_type, member_id')
+        .gte('attendance_date', dateFilter.start.split('T')[0])
+        .lte('attendance_date', dateFilter.end.split('T')[0])
 
-    // Calculate average attendance
-    const attendanceByDate = attendanceData.reduce((acc, record) => {
-      const date = record.attendance_date
-      if (!acc[date]) acc[date] = new Set()
-      acc[date].add(record.member_id)
-      return acc
-    }, {})
+      // Handle case where attendance table might not exist
+      if (attendanceResult.error) {
+        console.warn('Attendance table not found, returning default values')
+        return {
+          averageAttendance: 0,
+          attendanceTrend: [],
+          serviceComparison: [],
+          seasonalTrends: []
+        }
+      }
 
-    const attendanceCounts = Object.values(attendanceByDate).map(set => set.size)
-    const averageAttendance = attendanceCounts.length > 0 
-      ? Math.round(attendanceCounts.reduce((sum, count) => sum + count, 0) / attendanceCounts.length)
-      : 0
+      const attendanceData = attendanceResult.data || []
 
-    // Get service comparison
-    const serviceComparison = getServiceComparison(attendanceData)
+      // Calculate average attendance
+      const attendanceByDate = attendanceData.reduce((acc, record) => {
+        const date = record.attendance_date
+        if (!acc[date]) acc[date] = new Set()
+        acc[date].add(record.member_id)
+        return acc
+      }, {})
 
-    // Get recent attendance trend
-    const attendanceTrend = getAttendanceTrend(attendanceByDate)
+      const attendanceCounts = Object.values(attendanceByDate).map(set => set.size)
+      const averageAttendance = attendanceCounts.length > 0
+        ? Math.round(attendanceCounts.reduce((sum, count) => sum + count, 0) / attendanceCounts.length)
+        : 0
 
-    // Get seasonal trends (quarterly)
-    const seasonalTrends = await getSeasonalTrends()
+      // Get service comparison
+      const serviceComparison = getServiceComparison(attendanceData)
 
-    return {
-      averageAttendance,
-      attendanceTrend,
-      serviceComparison,
-      seasonalTrends
+      // Get recent attendance trend
+      const attendanceTrend = getAttendanceTrend(attendanceByDate)
+
+      // Get seasonal trends (quarterly) with fallback
+      const seasonalTrends = await getSeasonalTrends().catch(() => [])
+
+      return {
+        averageAttendance,
+        attendanceTrend,
+        serviceComparison,
+        seasonalTrends
+      }
+
+    } catch (error) {
+      console.error('Error fetching attendance analytics:', error)
+      return {
+        averageAttendance: 0,
+        attendanceTrend: [],
+        serviceComparison: [],
+        seasonalTrends: []
+      }
     }
-
-  } catch (error) {
-    console.error('Error fetching attendance analytics:', error)
-    return {
-      averageAttendance: 0,
-      attendanceTrend: [],
-      serviceComparison: [],
-      seasonalTrends: []
-    }
-  }
+  }, CACHE_TTL.DASHBOARD)
 }
 
 /**
@@ -182,57 +208,71 @@ export const getAttendanceAnalytics = async (dateRange = 'month') => {
  * @returns {Promise<Object>} Communication analytics data
  */
 export const getCommunicationAnalytics = async (dateRange = 'month') => {
-  try {
-    const dateFilter = getDateFilter(dateRange)
+  const cacheKey = cacheService.generateKey('communication_analytics', { dateRange })
 
-    // Get messages data
-    const { data: messagesData, error: messagesError } = await supabase
-      .from('messages')
-      .select('id, status, source, created_at, email_sent_at, read_at')
-      .gte('created_at', dateFilter.start)
-      .lte('created_at', dateFilter.end)
+  return cacheService.cachedFetch(cacheKey, async () => {
+    try {
+      const dateFilter = getDateFilter(dateRange)
 
-    if (messagesError) throw messagesError
+      // Get messages data with error handling
+      const messagesResult = await supabase
+        .from('messages')
+        .select('id, status, source, created_at, email_sent_at, read_at')
+        .gte('created_at', dateFilter.start)
+        .lte('created_at', dateFilter.end)
 
-    const totalMessages = messagesData.length
-    const sentMessages = messagesData.filter(msg => msg.status === 'sent' || msg.status === 'read').length
-    const readMessages = messagesData.filter(msg => msg.status === 'read').length
-
-    const deliveryRate = totalMessages > 0 ? (sentMessages / totalMessages * 100) : 0
-    const engagementRate = sentMessages > 0 ? (readMessages / sentMessages * 100) : 0
-
-    // Channel performance (simplified - based on source)
-    const channelPerformance = [
-      {
-        channel: 'Website Forms',
-        sent: messagesData.filter(msg => msg.source === 'website').length,
-        delivered: messagesData.filter(msg => msg.source === 'website' && (msg.status === 'sent' || msg.status === 'read')).length,
-        opened: messagesData.filter(msg => msg.source === 'website' && msg.status === 'read').length
-      },
-      {
-        channel: 'Admin Panel',
-        sent: messagesData.filter(msg => msg.source === 'admin').length,
-        delivered: messagesData.filter(msg => msg.source === 'admin' && (msg.status === 'sent' || msg.status === 'read')).length,
-        opened: messagesData.filter(msg => msg.source === 'admin' && msg.status === 'read').length
+      if (messagesResult.error) {
+        console.warn('Messages table query failed, returning default values')
+        return {
+          totalMessages: 0,
+          deliveryRate: 0,
+          engagementRate: 0,
+          channelPerformance: []
+        }
       }
-    ]
 
-    return {
-      totalMessages,
-      deliveryRate: Math.round(deliveryRate * 10) / 10,
-      engagementRate: Math.round(engagementRate * 10) / 10,
-      channelPerformance
-    }
+      const messagesData = messagesResult.data || []
 
-  } catch (error) {
-    console.error('Error fetching communication analytics:', error)
-    return {
-      totalMessages: 0,
-      deliveryRate: 0,
-      engagementRate: 0,
-      channelPerformance: []
+      const totalMessages = messagesData.length
+      const sentMessages = messagesData.filter(msg => msg.status === 'sent' || msg.status === 'read').length
+      const readMessages = messagesData.filter(msg => msg.status === 'read').length
+
+      const deliveryRate = totalMessages > 0 ? (sentMessages / totalMessages * 100) : 0
+      const engagementRate = sentMessages > 0 ? (readMessages / sentMessages * 100) : 0
+
+      // Channel performance (simplified - based on source)
+      const channelPerformance = [
+        {
+          channel: 'Website Forms',
+          sent: messagesData.filter(msg => msg.source === 'website').length,
+          delivered: messagesData.filter(msg => msg.source === 'website' && (msg.status === 'sent' || msg.status === 'read')).length,
+          opened: messagesData.filter(msg => msg.source === 'website' && msg.status === 'read').length
+        },
+        {
+          channel: 'Admin Panel',
+          sent: messagesData.filter(msg => msg.source === 'admin').length,
+          delivered: messagesData.filter(msg => msg.source === 'admin' && (msg.status === 'sent' || msg.status === 'read')).length,
+          opened: messagesData.filter(msg => msg.source === 'admin' && msg.status === 'read').length
+        }
+      ]
+
+      return {
+        totalMessages,
+        deliveryRate: Math.round(deliveryRate * 10) / 10,
+        engagementRate: Math.round(engagementRate * 10) / 10,
+        channelPerformance
+      }
+
+    } catch (error) {
+      console.error('Error fetching communication analytics:', error)
+      return {
+        totalMessages: 0,
+        deliveryRate: 0,
+        engagementRate: 0,
+        channelPerformance: []
+      }
     }
-  }
+  }, CACHE_TTL.DASHBOARD)
 }
 
 /**

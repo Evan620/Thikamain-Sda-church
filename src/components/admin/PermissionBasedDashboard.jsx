@@ -34,7 +34,7 @@ const PermissionBasedDashboard = () => {
             () => Promise.all([
               supabase
                 .from('members')
-                .select('id, full_name, created_at')
+                .select('id, first_name, last_name, created_at')
                 .order('created_at', { ascending: false })
                 .limit(5),
               supabase
@@ -99,27 +99,50 @@ const PermissionBasedDashboard = () => {
         promises.push(
           cacheService.cachedFetch(
             cacheService.generateKey(CACHE_KEYS.FINANCIAL_SUMMARY, { month: currentMonth, year: currentYear }),
-            () => Promise.all([
-              supabase
-                .from('giving_records')
-                .select('amount')
-                .eq('is_verified', true),
-              supabase
-                .from('giving_records')
-                .select('amount')
-                .gte('giving_date', `${currentMonth}-01`)
-                .lt('giving_date', `${currentMonth}-32`)
-                .eq('is_verified', true),
-              supabase
-                .from('budgets')
-                .select('allocated_amount')
-                .eq('year', currentYear),
-              supabase
-                .from('expenses')
-                .select('amount')
-                .gte('expense_date', `${currentYear}-01-01`)
-                .eq('is_approved', true)
-            ]),
+            async () => {
+              try {
+                const [donationsResult, monthlyResult] = await Promise.all([
+                  supabase
+                    .from('giving_records')
+                    .select('amount')
+                    .eq('is_verified', true),
+                  supabase
+                    .from('giving_records')
+                    .select('amount')
+                    .gte('giving_date', `${currentMonth}-01`)
+                    .lte('giving_date', `${currentMonth}-31`)
+                    .eq('is_verified', true)
+                ])
+
+                // Try to fetch budget and expense data, but handle gracefully if tables don't exist
+                let budgetResult = { data: [] }
+                let expensesResult = { data: [] }
+
+                try {
+                  budgetResult = await supabase
+                    .from('budgets')
+                    .select('allocated_amount')
+                    .eq('year', currentYear)
+                } catch (budgetError) {
+                  console.warn('Budgets table not found, using default values')
+                }
+
+                try {
+                  expensesResult = await supabase
+                    .from('expenses')
+                    .select('amount')
+                    .gte('expense_date', `${currentYear}-01-01`)
+                    .eq('is_approved', true)
+                } catch (expenseError) {
+                  console.warn('Expenses table not found, using default values')
+                }
+
+                return [donationsResult, monthlyResult, budgetResult, expensesResult]
+              } catch (error) {
+                console.warn('Error fetching financial data:', error)
+                return [{ data: [] }, { data: [] }, { data: [] }, { data: [] }]
+              }
+            },
             CACHE_TTL.FINANCIAL
           ).then(([donationsResult, monthlyResult, budgetResult, expensesResult]) => {
             const totalDonations = donationsResult.data?.reduce((sum, record) => sum + (record.amount || 0), 0) || 0
