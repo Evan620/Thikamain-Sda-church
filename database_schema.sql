@@ -159,6 +159,35 @@ CREATE TABLE IF NOT EXISTS attendance (
     UNIQUE(event_id, member_id, attendance_date)
 );
 
+-- Budget Management
+CREATE TABLE IF NOT EXISTS budgets (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    category VARCHAR(255) NOT NULL,
+    allocated_amount DECIMAL(10,2) NOT NULL,
+    year INTEGER NOT NULL,
+    description TEXT,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(category, year)
+);
+
+-- Expense Tracking
+CREATE TABLE IF NOT EXISTS expenses (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    budget_id UUID REFERENCES budgets(id) ON DELETE SET NULL,
+    category VARCHAR(255) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    description TEXT NOT NULL,
+    expense_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    receipt_url VARCHAR(500),
+    approved_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    is_approved BOOLEAN DEFAULT false,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Church Leaders Management
 CREATE TABLE IF NOT EXISTS church_leaders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -198,6 +227,13 @@ CREATE INDEX IF NOT EXISTS idx_messages_sender_email ON messages(sender_email);
 CREATE INDEX IF NOT EXISTS idx_church_leaders_category ON church_leaders(category);
 CREATE INDEX IF NOT EXISTS idx_church_leaders_active ON church_leaders(is_active);
 CREATE INDEX IF NOT EXISTS idx_church_leaders_order ON church_leaders(display_order);
+-- Budget and expense indexes
+CREATE INDEX IF NOT EXISTS idx_budgets_year ON budgets(year);
+CREATE INDEX IF NOT EXISTS idx_budgets_category ON budgets(category);
+CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(expense_date DESC);
+CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category);
+CREATE INDEX IF NOT EXISTS idx_expenses_budget_id ON expenses(budget_id);
+CREATE INDEX IF NOT EXISTS idx_expenses_approved ON expenses(is_approved);
 
 -- Admin Activity Logs Table
 CREATE TABLE admin_activity_logs (
@@ -313,6 +349,8 @@ ALTER TABLE giving_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE prayer_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE budgets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_activity_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
@@ -409,6 +447,24 @@ CREATE POLICY "Admin can update message status" ON messages FOR UPDATE USING (
 -- Allow public insert for contact forms
 CREATE POLICY "Allow public message creation" ON messages FOR INSERT WITH CHECK (true);
 
+-- Budget policies
+CREATE POLICY "Admins can manage budgets" ON budgets FOR ALL USING (
+    EXISTS (
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN')
+    )
+);
+
+-- Expense policies
+CREATE POLICY "Admins can manage expenses" ON expenses FOR ALL USING (
+    EXISTS (
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN')
+    )
+);
+
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -428,6 +484,8 @@ CREATE TRIGGER update_departments_updated_at BEFORE UPDATE ON departments FOR EA
 CREATE TRIGGER update_prayer_requests_updated_at BEFORE UPDATE ON prayer_requests FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_announcements_updated_at BEFORE UPDATE ON announcements FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_messages_updated_at BEFORE UPDATE ON messages FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_budgets_updated_at BEFORE UPDATE ON budgets FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_expenses_updated_at BEFORE UPDATE ON expenses FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert sample admin user (you'll need to create this user in Supabase Auth first)
 -- This is just a placeholder - you'll need to replace with actual user ID after creating in Supabase Auth

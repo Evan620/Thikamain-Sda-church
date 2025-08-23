@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../services/supabaseClient'
+import SkeletonLoader from '../common/SkeletonLoader'
+import cacheService, { CACHE_TTL, CACHE_KEYS } from '../../services/cacheService'
 
 const PermissionBasedDashboard = () => {
   const { userProfile, hasPermission, hasAnyPermission, getUserPermissions } = useAuth()
@@ -22,109 +24,148 @@ const PermissionBasedDashboard = () => {
     try {
       setLoading(true)
       const data = {}
+      const promises = []
 
       // Fetch member data if user has member permissions
       if (hasAnyPermission(['manage_members', 'view_member_details'])) {
-        const { data: membersData } = await supabase
-          .from('members')
-          .select('id, full_name, created_at')
-          .order('created_at', { ascending: false })
-          .limit(5)
-        
-        const { count: totalMembers } = await supabase
-          .from('members')
-          .select('*', { count: 'exact', head: true })
-
-        data.members = {
-          total: totalMembers || 0,
-          recent: membersData || []
-        }
+        promises.push(
+          cacheService.cachedFetch(
+            cacheService.generateKey(CACHE_KEYS.MEMBERS_COUNT),
+            () => Promise.all([
+              supabase
+                .from('members')
+                .select('id, full_name, created_at')
+                .order('created_at', { ascending: false })
+                .limit(5),
+              supabase
+                .from('members')
+                .select('*', { count: 'exact', head: true })
+            ]),
+            CACHE_TTL.MEMBERS
+          ).then(([membersResult, countResult]) => {
+            data.members = {
+              total: countResult.count || 0,
+              recent: membersResult.data || []
+            }
+          })
+        )
       }
 
       // Fetch content data if user has content permissions
       if (hasAnyPermission(['manage_sermons', 'manage_events', 'manage_announcements'])) {
-        const contentData = {}
-        
+        const contentPromises = []
+
         if (hasPermission('manage_sermons')) {
-          const { count: sermonsCount } = await supabase
-            .from('sermons')
-            .select('*', { count: 'exact', head: true })
-          contentData.sermons = sermonsCount || 0
+          contentPromises.push(
+            supabase
+              .from('sermons')
+              .select('*', { count: 'exact', head: true })
+              .then(result => ({ sermons: result.count || 0 }))
+          )
         }
 
         if (hasPermission('manage_events')) {
-          const { count: eventsCount } = await supabase
-            .from('events')
-            .select('*', { count: 'exact', head: true })
-          contentData.events = eventsCount || 0
+          contentPromises.push(
+            supabase
+              .from('events')
+              .select('*', { count: 'exact', head: true })
+              .then(result => ({ events: result.count || 0 }))
+          )
         }
 
         if (hasPermission('manage_announcements')) {
-          const { count: announcementsCount } = await supabase
-            .from('announcements')
-            .select('*', { count: 'exact', head: true })
-          contentData.announcements = announcementsCount || 0
+          contentPromises.push(
+            supabase
+              .from('announcements')
+              .select('*', { count: 'exact', head: true })
+              .then(result => ({ announcements: result.count || 0 }))
+          )
         }
 
-        data.content = contentData
+        if (contentPromises.length > 0) {
+          promises.push(
+            Promise.all(contentPromises).then(results => {
+              data.content = results.reduce((acc, result) => ({ ...acc, ...result }), {})
+            })
+          )
+        }
       }
 
       // Fetch financial data if user has financial permissions
       if (hasAnyPermission(['manage_finances', 'view_financial_reports', 'manage_donations'])) {
         const currentMonth = new Date().toISOString().slice(0, 7)
-        
-        const { data: donationsData } = await supabase
-          .from('giving_records')
-          .select('amount')
-        
-        const { data: monthlyDonationsData } = await supabase
-          .from('giving_records')
-          .select('amount')
-          .gte('date', `${currentMonth}-01`)
-          .lt('date', `${currentMonth}-32`)
+        const currentYear = new Date().getFullYear()
 
-        const totalDonations = donationsData?.reduce((sum, record) => sum + (record.amount || 0), 0) || 0
-        const monthlyDonations = monthlyDonationsData?.reduce((sum, record) => sum + (record.amount || 0), 0) || 0
+        promises.push(
+          cacheService.cachedFetch(
+            cacheService.generateKey(CACHE_KEYS.FINANCIAL_SUMMARY, { month: currentMonth, year: currentYear }),
+            () => Promise.all([
+              supabase
+                .from('giving_records')
+                .select('amount')
+                .eq('is_verified', true),
+              supabase
+                .from('giving_records')
+                .select('amount')
+                .gte('giving_date', `${currentMonth}-01`)
+                .lt('giving_date', `${currentMonth}-32`)
+                .eq('is_verified', true),
+              supabase
+                .from('budgets')
+                .select('allocated_amount')
+                .eq('year', currentYear),
+              supabase
+                .from('expenses')
+                .select('amount')
+                .gte('expense_date', `${currentYear}-01-01`)
+                .eq('is_approved', true)
+            ]),
+            CACHE_TTL.FINANCIAL
+          ).then(([donationsResult, monthlyResult, budgetResult, expensesResult]) => {
+            const totalDonations = donationsResult.data?.reduce((sum, record) => sum + (record.amount || 0), 0) || 0
+            const monthlyDonations = monthlyResult.data?.reduce((sum, record) => sum + (record.amount || 0), 0) || 0
+            const totalBudget = budgetResult.data?.reduce((sum, budget) => sum + (budget.allocated_amount || 0), 0) || 1
+            const totalExpenses = expensesResult.data?.reduce((sum, expense) => sum + (expense.amount || 0), 0) || 0
+            const budgetUtilization = Math.round((totalExpenses / totalBudget) * 100)
 
-        // Calculate budget utilization
-        const { data: budgetData } = await supabase
-          .from('budgets')
-          .select('allocated_amount')
-          .eq('year', new Date().getFullYear())
-
-        const { data: expensesData } = await supabase
-          .from('expenses')
-          .select('amount')
-          .gte('date', `${new Date().getFullYear()}-01-01`)
-
-        const totalBudget = budgetData?.reduce((sum, budget) => sum + (budget.allocated_amount || 0), 0) || 1
-        const totalExpenses = expensesData?.reduce((sum, expense) => sum + (expense.amount || 0), 0) || 0
-        const budgetUtilization = Math.round((totalExpenses / totalBudget) * 100)
-
-        data.financial = {
-          totalDonations,
-          monthlyDonations,
-          budgetUtilization
-        }
+            data.financial = {
+              totalDonations,
+              monthlyDonations,
+              budgetUtilization
+            }
+          }).catch(error => {
+            console.warn('Financial data fetch failed:', error)
+            data.financial = {
+              totalDonations: 0,
+              monthlyDonations: 0,
+              budgetUtilization: 0
+            }
+          })
+        )
       }
 
       // Fetch prayer requests if user has permission
       if (hasPermission('manage_prayer_requests')) {
-        const { count: totalPrayers } = await supabase
-          .from('prayer_requests')
-          .select('*', { count: 'exact', head: true })
-
-        const { count: pendingPrayers } = await supabase
-          .from('prayer_requests')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'pending')
-
-        data.prayers = {
-          total: totalPrayers || 0,
-          pending: pendingPrayers || 0
-        }
+        promises.push(
+          Promise.all([
+            supabase
+              .from('prayer_requests')
+              .select('*', { count: 'exact', head: true }),
+            supabase
+              .from('prayer_requests')
+              .select('*', { count: 'exact', head: true })
+              .eq('status', 'pending')
+          ]).then(([totalResult, pendingResult]) => {
+            data.prayers = {
+              total: totalResult.count || 0,
+              pending: pendingResult.count || 0
+            }
+          })
+        )
       }
 
+      // Wait for all promises to complete
+      await Promise.all(promises)
       setDashboardData(data)
     } catch (error) {
       console.error('Error fetching dashboard data:', error)

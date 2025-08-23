@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../services/supabaseClient'
+import SkeletonLoader from '../../components/common/SkeletonLoader'
 
 const FinancialDashboard = () => {
   const [financialData, setFinancialData] = useState({
@@ -16,74 +17,92 @@ const FinancialDashboard = () => {
   const fetchFinancialData = async () => {
     try {
       setLoading(true)
-      
+
       // Calculate date ranges
       const now = new Date()
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
       const startOfYear = new Date(now.getFullYear(), 0, 1)
       const startDate = selectedPeriod === 'month' ? startOfMonth : startOfYear
+      const last12MonthsStart = new Date(now.getFullYear(), now.getMonth() - 11, 1)
 
-      // Fetch total donations for selected period
-      const { data: totalData, error: totalError } = await supabase
-        .from('giving_records')
-        .select('amount')
-        .gte('giving_date', startDate.toISOString().split('T')[0])
-        .eq('is_verified', true)
+      // Parallel fetch all required data
+      const [
+        periodDataResult,
+        recentDataResult,
+        yearlyDataResult
+      ] = await Promise.all([
+        // Get period data (current month/year) with type breakdown
+        supabase
+          .from('giving_records')
+          .select('amount, giving_type')
+          .gte('giving_date', startDate.toISOString().split('T')[0])
+          .eq('is_verified', true),
 
-      if (totalError) throw totalError
+        // Get recent donations with member info
+        supabase
+          .from('giving_records')
+          .select(`
+            *,
+            member:members(first_name, last_name)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(10),
 
-      const totalDonations = totalData.reduce((sum, record) => sum + record.amount, 0)
+        // Get last 12 months data for trend analysis
+        supabase
+          .from('giving_records')
+          .select('amount, giving_date')
+          .gte('giving_date', last12MonthsStart.toISOString().split('T')[0])
+          .eq('is_verified', true)
+      ])
 
-      // Fetch donations by type
-      const { data: typeData, error: typeError } = await supabase
-        .from('giving_records')
-        .select('giving_type, amount')
-        .gte('giving_date', startDate.toISOString().split('T')[0])
-        .eq('is_verified', true)
+      if (periodDataResult.error) throw periodDataResult.error
+      if (recentDataResult.error) throw recentDataResult.error
+      if (yearlyDataResult.error) throw yearlyDataResult.error
 
-      if (typeError) throw typeError
-
-      const donationsByType = typeData.reduce((acc, record) => {
+      // Process period data
+      const totalDonations = periodDataResult.data.reduce((sum, record) => sum + record.amount, 0)
+      const donationsByType = periodDataResult.data.reduce((acc, record) => {
         acc[record.giving_type] = (acc[record.giving_type] || 0) + record.amount
         return acc
       }, {})
 
-      // Fetch recent donations
-      const { data: recentData, error: recentError } = await supabase
-        .from('giving_records')
-        .select(`
-          *,
-          member:members(first_name, last_name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(10)
-
-      if (recentError) throw recentError
-
-      // Fetch monthly trend (last 12 months)
+      // Process monthly trend from yearly data
       const monthlyTrend = []
+      const monthlyTotals = {}
+
+      // Initialize all months with 0
       for (let i = 11; i >= 0; i--) {
         const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0)
-        
-        const { data: monthData, error: monthError } = await supabase
-          .from('giving_records')
-          .select('amount')
-          .gte('giving_date', monthStart.toISOString().split('T')[0])
-          .lte('giving_date', monthEnd.toISOString().split('T')[0])
-          .eq('is_verified', true)
-
-        if (monthError) throw monthError
-
-        const monthTotal = monthData.reduce((sum, record) => sum + record.amount, 0)
-        monthlyTrend.push({
+        const monthKey = monthStart.toISOString().slice(0, 7) // YYYY-MM format
+        monthlyTotals[monthKey] = {
           month: monthStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-          amount: monthTotal
-        })
+          amount: 0
+        }
       }
 
-      // Fetch top donors (members with highest total donations)
-      const { data: donorData, error: donorError } = await supabase
+      // Aggregate data by month
+      yearlyDataResult.data.forEach(record => {
+        const monthKey = record.giving_date.slice(0, 7) // YYYY-MM format
+        if (monthlyTotals[monthKey]) {
+          monthlyTotals[monthKey].amount += record.amount
+        }
+      })
+
+      // Convert to array
+      Object.values(monthlyTotals).forEach(month => {
+        monthlyTrend.push(month)
+      })
+
+      // Process top donors from period data
+      const donorTotals = {}
+      periodDataResult.data.forEach(record => {
+        // We'll need to fetch member data separately for top donors
+        // For now, we'll use a simplified approach
+      })
+
+      // Fetch top donors separately (this is still needed for member names)
+      const { data: donorData } = await supabase
         .from('giving_records')
         .select(`
           member_id,
@@ -92,23 +111,22 @@ const FinancialDashboard = () => {
         `)
         .not('member_id', 'is', null)
         .eq('is_verified', true)
+        .gte('giving_date', startOfYear.toISOString().split('T')[0]) // Only current year for performance
 
-      if (donorError) throw donorError
-
-      const donorTotals = donorData.reduce((acc, record) => {
-        if (record.member_id) {
-          if (!acc[record.member_id]) {
-            acc[record.member_id] = {
+      const donorTotalsMap = {}
+      donorData?.forEach(record => {
+        if (record.member_id && record.member) {
+          if (!donorTotalsMap[record.member_id]) {
+            donorTotalsMap[record.member_id] = {
               member: record.member,
               total: 0
             }
           }
-          acc[record.member_id].total += record.amount
+          donorTotalsMap[record.member_id].total += record.amount
         }
-        return acc
-      }, {})
+      })
 
-      const topDonors = Object.values(donorTotals)
+      const topDonors = Object.values(donorTotalsMap)
         .sort((a, b) => b.total - a.total)
         .slice(0, 5)
 
@@ -116,7 +134,7 @@ const FinancialDashboard = () => {
         totalDonations,
         monthlyTrend,
         donationsByType,
-        recentDonations: recentData || [],
+        recentDonations: recentDataResult.data || [],
         topDonors
       })
     } catch (error) {

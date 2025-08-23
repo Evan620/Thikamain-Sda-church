@@ -602,7 +602,7 @@ const ReportsAnalytics = () => {
                     </td>
                   </tr>
                 )
-              })}}
+              })}
             </tbody>
           </table>
         </div>
