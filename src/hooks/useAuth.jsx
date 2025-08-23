@@ -70,7 +70,14 @@ export const AuthProvider = ({ children }) => {
           }
         }, 3000) // 3 second timeout
 
-        const { data: { session }, error } = await auth.getSession()
+        const response = await auth.getSession()
+
+        if (!response) {
+          console.error('❌ Auth getSession returned undefined - check Supabase configuration')
+          throw new Error('Supabase client not properly initialized')
+        }
+
+        const { data: { session }, error } = response
 
         if (error) {
           console.error('Auth initialization error:', error)

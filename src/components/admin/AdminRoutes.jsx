@@ -15,6 +15,7 @@ import ActivityLogs from '../../pages/admin/ActivityLogs'
 import SystemSettings from '../../pages/admin/SystemSettings'
 import CommunicationHub from '../../pages/admin/CommunicationHub'
 import ReportsAnalytics from '../../pages/admin/ReportsAnalytics'
+import LeadersManagement from '../../pages/admin/LeadersManagement'
 
 const FinancialManagement = () => (
   <div className="bg-white rounded-lg shadow p-6">
@@ -79,6 +80,15 @@ const AdminRoutes = () => {
         element={
           <AuthGuard requiredRole="ADMIN">
             <AnnouncementsManagement />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/leaders"
+        element={
+          <AuthGuard requiredRole="ADMIN">
+            <LeadersManagement />
           </AuthGuard>
         }
       />

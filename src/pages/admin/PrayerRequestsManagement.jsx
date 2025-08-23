@@ -18,7 +18,7 @@ const PrayerRequestsManagement = () => {
         .from('prayer_requests')
         .select(`
           *,
-          requester:users(full_name, email),
+          requester:users!prayer_requests_requester_id_fkey(full_name, email),
           assigned_user:users!prayer_requests_assigned_to_fkey(full_name, email)
         `)
         .order('created_at', { ascending: false })
@@ -177,7 +177,7 @@ const PrayerRequestsManagement = () => {
                   <div className="admin-prayer-requester">
                     <span className="admin-prayer-label">Requested by:</span>
                     <span className="admin-prayer-name">
-                      {request.requester?.full_name || 'Anonymous'}
+                      {request.submitter_name || request.requester?.full_name || 'Anonymous'}
                     </span>
                   </div>
 
@@ -281,12 +281,12 @@ const PrayerRequestsManagement = () => {
                 <div className="admin-prayer-details-info">
                   <div className="admin-prayer-info-item">
                     <span className="admin-prayer-label">Submitted by:</span>
-                    <span>{selectedRequest.requester?.full_name || 'Anonymous'}</span>
+                    <span>{selectedRequest.submitter_name || selectedRequest.requester?.full_name || 'Anonymous'}</span>
                   </div>
-                  
+
                   <div className="admin-prayer-info-item">
                     <span className="admin-prayer-label">Email:</span>
-                    <span>{selectedRequest.requester?.email || 'Not provided'}</span>
+                    <span>{selectedRequest.submitter_email || selectedRequest.requester?.email || 'Not provided'}</span>
                   </div>
 
                   <div className="admin-prayer-info-item">

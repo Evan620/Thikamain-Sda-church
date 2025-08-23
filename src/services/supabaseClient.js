@@ -4,9 +4,29 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables')
+// Enhanced error checking with helpful messages
+if (!supabaseUrl) {
+  console.error('❌ VITE_SUPABASE_URL is missing from environment variables')
+  console.error('📝 Add this to your .env file: VITE_SUPABASE_URL=https://abdrxjlsplcikuvkbucq.supabase.co')
+  throw new Error('Missing VITE_SUPABASE_URL environment variable')
 }
+
+if (!supabaseKey) {
+  console.error('❌ VITE_SUPABASE_ANON_KEY is missing from environment variables')
+  console.error('📝 Get your anon key from: https://supabase.com/dashboard/project/abdrxjlsplcikuvkbucq/settings/api')
+  console.error('📝 Add this to your .env file: VITE_SUPABASE_ANON_KEY=your_actual_anon_key_here')
+  throw new Error('Missing VITE_SUPABASE_ANON_KEY environment variable')
+}
+
+if (supabaseKey === 'your_supabase_anon_key_here') {
+  console.error('❌ VITE_SUPABASE_ANON_KEY is still set to placeholder value')
+  console.error('📝 Replace "your_supabase_anon_key_here" with your actual anon key from Supabase dashboard')
+  throw new Error('VITE_SUPABASE_ANON_KEY is set to placeholder value')
+}
+
+console.log('✅ Supabase configuration loaded successfully')
+console.log('🔗 URL:', supabaseUrl)
+console.log('🔑 Key:', supabaseKey.substring(0, 20) + '...')
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseKey)

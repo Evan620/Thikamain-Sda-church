@@ -1,8 +1,27 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import ContactButton from '../components/ContactButton'
+import leadersService from '../services/leadersService'
 
 const About = () => {
+  const [leaders, setLeaders] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch leaders from database
+  useEffect(() => {
+    const fetchLeaders = async () => {
+      try {
+        const leadersData = await leadersService.getAllLeaders()
+        setLeaders(leadersData)
+      } catch (error) {
+        console.error('Error fetching leaders:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchLeaders()
+  }, [])
+
   // Check if we're on mobile
   const isMobile = window.innerWidth < 768
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
@@ -1105,72 +1124,28 @@ const About = () => {
             gap: '2rem',
             marginBottom: '3rem'
           }}>
-            {[
-              {
-                name: "Pst. Charles Muritu",
-                position: "Senior Pastor",
-                description: "Leading our congregation with wisdom and dedication, Pastor Charles guides our church family in spiritual growth and community service.",
-                education: "Phone: +254 729 071 755 | Email: muritunganga77@gmail.com",
-                specialties: ["Pastoral Care", "Biblical Teaching", "Church Leadership"],
-                color: '#2d5a27'
-              },
-              {
-                name: "Elder Methucellah Mokua",
-                position: "First Elder",
-                description: "Serving as our First Elder, Elder Methucellah provides spiritual guidance and oversight to our church board and congregation.",
-                education: "Phone: +254 726 028 004 | Email: mokuamariera@gmail.com",
-                specialties: ["Church Governance", "Spiritual Guidance", "Leadership"],
-                color: '#f59e0b'
-              },
-              {
-                name: "Kefa Nyakundi",
-                position: "Head Deacon",
-                description: "Coordinating our deacon board and ensuring smooth church operations, Deacon Kefa serves with dedication and commitment.",
-                education: "Phone: +254 724 357 783",
-                specialties: ["Church Administration", "Facilities Management", "Stewardship"],
-                color: '#2d5a27'
-              },
-              {
-                name: "Joseph Kimilu",
-                position: "Church Treasurer",
-                description: "Managing church finances with integrity and transparency, ensuring proper stewardship of God's resources.",
-                education: "Phone: +254 720 930 703 | Email: jkimilu963@gmail.com",
-                specialties: ["Financial Management", "Stewardship", "Budget Planning"],
-                color: '#f59e0b'
-              },
-              {
-                name: "Effie Muthoni",
-                position: "Church Clerk",
-                description: "Maintaining accurate church records and facilitating effective communication within our church family.",
-                education: "Phone: +254 723 379 186 | Email: effiemuthoni3@gmail.com",
-                specialties: ["Record Keeping", "Communication", "Administration"],
-                color: '#2d5a27'
-              },
-              {
-                name: "Edwina Odongo",
-                position: "Head Deaconess",
-                description: "Leading our deaconess team in caring for church members and coordinating women's service activities.",
-                education: "Phone: +254 723 506 923",
-                specialties: ["Member Care", "Women's Leadership", "Service Coordination"],
-                color: '#f59e0b'
-              },
-              {
-                name: "Charles Owiti",
-                position: "Sabbath School Superintendent",
-                description: "Leading our Sabbath School programs and educational ministries, fostering spiritual growth through biblical education.",
-                education: "Christian Education",
-                specialties: ["Sabbath School", "Christian Education", "Teaching"],
-                color: '#f59e0b'
-              },
-              {
-                name: "Charles Kyalo Simon",
-                position: "Communication Leader",
-                description: "Managing church communications and ensuring effective information flow within our congregation and community outreach.",
-                education: "Communication Management",
-                specialties: ["Church Communication", "Media Management", "Information Systems"],
-                color: '#2d5a27'
-              }
-            ].map((leader, index) => (
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p>Loading church leadership...</p>
+              </div>
+            ) : (
+              leaders
+                .filter(leader => ['pastoral', 'elder', 'officer'].includes(leader.category))
+                .map((leader, index) => {
+                  const contactInfo = []
+                  if (leader.phone) contactInfo.push(`Phone: ${leader.phone}`)
+                  if (leader.email) contactInfo.push(`Email: ${leader.email}`)
+
+                  return {
+                    name: leader.name,
+                    position: leader.position,
+                    description: leader.bio || `Serving as ${leader.position} with dedication and commitment to our church family.`,
+                    education: contactInfo.join(' | ') || 'Contact information available upon request',
+                    specialties: leader.specialties || ['Church Leadership', 'Service'],
+                    color: index % 2 === 0 ? '#2d5a27' : '#f59e0b'
+                  }
+                })
+            ).map((leader, index) => (
               <div
                 key={index}
                 style={{

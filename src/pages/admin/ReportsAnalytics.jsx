@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import analyticsService from '../../services/analyticsService'
 
 const ReportsAnalytics = () => {
   const { hasPermission } = useAuth()
@@ -36,85 +37,67 @@ const ReportsAnalytics = () => {
     }
   })
 
-  // Mock data for demonstration
+  // Fetch real analytics data
   useEffect(() => {
-    const mockData = {
-      financial: {
-        totalIncome: 2450000,
-        totalExpenses: 1890000,
-        netIncome: 560000,
-        monthlyTrend: [
-          { month: 'Jan', income: 180000, expenses: 150000 },
-          { month: 'Feb', income: 220000, expenses: 160000 },
-          { month: 'Mar', income: 195000, expenses: 155000 },
-          { month: 'Apr', income: 240000, expenses: 170000 },
-          { month: 'May', income: 210000, expenses: 165000 },
-          { month: 'Jun', income: 235000, expenses: 175000 }
-        ],
-        categoryBreakdown: [
-          { category: 'Tithes', amount: 1800000, percentage: 73.5 },
-          { category: 'Offerings', amount: 450000, percentage: 18.4 },
-          { category: 'Special Projects', amount: 150000, percentage: 6.1 },
-          { category: 'Other', amount: 50000, percentage: 2.0 }
-        ]
-      },
-      membership: {
-        totalMembers: 456,
-        newMembers: 23,
-        activeMembers: 389,
-        membershipGrowth: [
-          { month: 'Jan', total: 433, new: 5 },
-          { month: 'Feb', total: 438, new: 5 },
-          { month: 'Mar', total: 442, new: 4 },
-          { month: 'Apr', total: 448, new: 6 },
-          { month: 'May', total: 453, new: 5 },
-          { month: 'Jun', total: 456, new: 3 }
-        ],
-        ageDistribution: [
-          { range: '0-17', count: 89, percentage: 19.5 },
-          { range: '18-35', count: 156, percentage: 34.2 },
-          { range: '36-55', count: 134, percentage: 29.4 },
-          { range: '56+', count: 77, percentage: 16.9 }
-        ],
-        ministryParticipation: [
-          { ministry: 'Choir', members: 45, percentage: 9.9 },
-          { ministry: 'Youth', members: 89, percentage: 19.5 },
-          { ministry: 'Women\'s Ministry', members: 67, percentage: 14.7 },
-          { ministry: 'Men\'s Ministry', members: 54, percentage: 11.8 }
-        ]
-      },
-      attendance: {
-        averageAttendance: 312,
-        attendanceTrend: [
-          { date: '2025-01-04', attendance: 298 },
-          { date: '2025-01-11', attendance: 315 },
-          { date: '2025-01-18', attendance: 289 },
-          { date: '2025-01-25', attendance: 334 }
-        ],
-        serviceComparison: [
-          { service: 'Sabbath School', average: 245 },
-          { service: 'Divine Service', average: 312 },
-          { service: 'Prayer Meeting', average: 89 },
-          { service: 'Youth Service', average: 67 }
-        ],
-        seasonalTrends: [
-          { season: 'Q1', attendance: 295 },
-          { season: 'Q2', attendance: 318 },
-          { season: 'Q3', attendance: 287 },
-          { season: 'Q4', attendance: 342 }
-        ]
-      },
-      communication: {
-        totalMessages: 234,
-        deliveryRate: 97.8,
-        engagementRate: 84.2,
-        channelPerformance: [
-          { channel: 'SMS', sent: 156, delivered: 153, opened: 145 },
-          { channel: 'Email', sent: 78, delivered: 76, opened: 64 }
-        ]
+    const fetchAnalyticsData = async () => {
+      setLoading(true)
+      try {
+        console.log('Fetching analytics data for date range:', dateRange)
+
+        // Fetch all analytics data in parallel
+        const [financial, membership, attendance, communication] = await Promise.all([
+          analyticsService.getFinancialAnalytics(dateRange),
+          analyticsService.getMembershipAnalytics(dateRange),
+          analyticsService.getAttendanceAnalytics(dateRange),
+          analyticsService.getCommunicationAnalytics(dateRange)
+        ])
+
+        console.log('Analytics data fetched:', { financial, membership, attendance, communication })
+
+        setReportData({
+          financial,
+          membership,
+          attendance,
+          communication
+        })
+      } catch (error) {
+        console.error('Error fetching analytics data:', error)
+        // Set empty data on error
+        setReportData({
+          financial: {
+            totalIncome: 0,
+            totalExpenses: 0,
+            netIncome: 0,
+            monthlyTrend: [],
+            categoryBreakdown: []
+          },
+          membership: {
+            totalMembers: 0,
+            newMembers: 0,
+            activeMembers: 0,
+            membershipGrowth: [],
+            ageDistribution: [],
+            ministryParticipation: []
+          },
+          attendance: {
+            averageAttendance: 0,
+            attendanceTrend: [],
+            serviceComparison: [],
+            seasonalTrends: []
+          },
+          communication: {
+            totalMessages: 0,
+            deliveryRate: 0,
+            engagementRate: 0,
+            channelPerformance: []
+          }
+        })
+      } finally {
+        setLoading(false)
       }
     }
-    setReportData(mockData)
+
+    fetchAnalyticsData()
   }, [dateRange])
 
   const tabs = [
@@ -243,31 +226,143 @@ const ReportsAnalytics = () => {
       </div>
 
       {/* Quick Insights */}
-      <div className="clean-card" style={{marginTop: '2rem'}}>
-        <div className="admin-card-header">
-          <h3>Quick Insights</h3>
-          <p className="admin-card-subtitle">Key trends and highlights</p>
+      <div className="insights-section" style={{marginTop: '2rem'}}>
+        <div className="insights-header">
+          <div className="insights-title">
+            <h2>📊 Quick Insights</h2>
+            <p>Key trends and highlights from your church data</p>
+          </div>
+          <div className="insights-period">
+            <span className="period-badge">{dateRange.charAt(0).toUpperCase() + dateRange.slice(1)} Overview</span>
+          </div>
         </div>
-        <div className="admin-insights-grid">
-          <div className="admin-insight-item">
-            <div className="admin-insight-icon" style={{color: '#10b981'}}>📈</div>
-            <div className="admin-insight-content">
-              <h4>Growing Membership</h4>
-              <p>23 new members joined this month, showing healthy church growth</p>
+
+        <div className="insights-grid">
+          {/* Membership Growth Insight */}
+          <div className="insight-card membership-insight">
+            <div className="insight-header">
+              <div className="insight-icon-wrapper membership">
+                <svg className="insight-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div className="insight-trend positive">
+                <span className="trend-arrow">↗</span>
+                <span className="trend-value">+{reportData.membership.newMembers}</span>
+              </div>
+            </div>
+            <div className="insight-content">
+              <h3>Growing Membership</h3>
+              <p className="insight-description">
+                {reportData.membership.newMembers > 0
+                  ? `${reportData.membership.newMembers} new members joined this ${dateRange}, showing ${reportData.membership.newMembers > 10 ? 'excellent' : 'healthy'} church growth`
+                  : `No new members this ${dateRange}. Consider outreach programs to attract new members`
+                }
+              </p>
+              <div className="insight-stats">
+                <span className="stat-item">
+                  <strong>{reportData.membership.totalMembers}</strong> Total Members
+                </span>
+                <span className="stat-item">
+                  <strong>{Math.round((reportData.membership.activeMembers / reportData.membership.totalMembers) * 100) || 0}%</strong> Active
+                </span>
+              </div>
             </div>
           </div>
-          <div className="admin-insight-item">
-            <div className="admin-insight-icon" style={{color: '#3b82f6'}}>💰</div>
-            <div className="admin-insight-content">
-              <h4>Strong Finances</h4>
-              <p>Income exceeded expenses by {formatCurrency(reportData.financial.netIncome)} this period</p>
+
+          {/* Financial Health Insight */}
+          <div className="insight-card financial-insight">
+            <div className="insight-header">
+              <div className="insight-icon-wrapper financial">
+                <svg className="insight-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+              </div>
+              <div className={`insight-trend ${reportData.financial.netIncome >= 0 ? 'positive' : 'negative'}`}>
+                <span className="trend-arrow">{reportData.financial.netIncome >= 0 ? '↗' : '↘'}</span>
+                <span className="trend-value">{formatCurrency(Math.abs(reportData.financial.netIncome))}</span>
+              </div>
+            </div>
+            <div className="insight-content">
+              <h3>{reportData.financial.netIncome >= 0 ? 'Strong Finances' : 'Financial Attention Needed'}</h3>
+              <p className="insight-description">
+                {reportData.financial.netIncome >= 0
+                  ? `Income exceeded expenses by ${formatCurrency(reportData.financial.netIncome)} this ${dateRange}, showing excellent financial health`
+                  : `Expenses exceeded income by ${formatCurrency(Math.abs(reportData.financial.netIncome))} this ${dateRange}. Review budget and expenses`
+                }
+              </p>
+              <div className="insight-stats">
+                <span className="stat-item">
+                  <strong>{formatCurrency(reportData.financial.totalIncome)}</strong> Income
+                </span>
+                <span className="stat-item">
+                  <strong>{formatCurrency(reportData.financial.totalExpenses)}</strong> Expenses
+                </span>
+              </div>
             </div>
           </div>
-          <div className="admin-insight-item">
-            <div className="admin-insight-icon" style={{color: '#f59e0b'}}>👥</div>
-            <div className="admin-insight-content">
-              <h4>High Engagement</h4>
-              <p>85% of members actively participate in church activities</p>
+
+          {/* Attendance Engagement Insight */}
+          <div className="insight-card attendance-insight">
+            <div className="insight-header">
+              <div className="insight-icon-wrapper attendance">
+                <svg className="insight-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h10M7 15h10" />
+                </svg>
+              </div>
+              <div className="insight-trend positive">
+                <span className="trend-arrow">📊</span>
+                <span className="trend-value">{Math.round((reportData.attendance.averageAttendance / reportData.membership.totalMembers) * 100) || 0}%</span>
+              </div>
+            </div>
+            <div className="insight-content">
+              <h3>Church Engagement</h3>
+              <p className="insight-description">
+                {reportData.attendance.averageAttendance > 0
+                  ? `Average attendance of ${reportData.attendance.averageAttendance} members represents ${Math.round((reportData.attendance.averageAttendance / reportData.membership.totalMembers) * 100) || 0}% of total membership`
+                  : `No attendance data available for this ${dateRange}. Ensure attendance tracking is active`
+                }
+              </p>
+              <div className="insight-stats">
+                <span className="stat-item">
+                  <strong>{reportData.attendance.averageAttendance}</strong> Avg Attendance
+                </span>
+                <span className="stat-item">
+                  <strong>{reportData.communication.totalMessages}</strong> Messages
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Communication Effectiveness Insight */}
+          <div className="insight-card communication-insight">
+            <div className="insight-header">
+              <div className="insight-icon-wrapper communication">
+                <svg className="insight-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <div className="insight-trend positive">
+                <span className="trend-arrow">📧</span>
+                <span className="trend-value">{reportData.communication.engagementRate}%</span>
+              </div>
+            </div>
+            <div className="insight-content">
+              <h3>Communication Impact</h3>
+              <p className="insight-description">
+                {reportData.communication.totalMessages > 0
+                  ? `${reportData.communication.totalMessages} messages sent with ${reportData.communication.engagementRate}% engagement rate, showing ${reportData.communication.engagementRate > 80 ? 'excellent' : reportData.communication.engagementRate > 60 ? 'good' : 'moderate'} communication effectiveness`
+                  : `No communication data for this ${dateRange}. Encourage members to use church communication channels`
+                }
+              </p>
+              <div className="insight-stats">
+                <span className="stat-item">
+                  <strong>{reportData.communication.deliveryRate}%</strong> Delivery Rate
+                </span>
+                <span className="stat-item">
+                  <strong>{reportData.communication.totalMessages}</strong> Total Messages
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -453,21 +548,25 @@ const ReportsAnalytics = () => {
               </tr>
             </thead>
             <tbody>
-              {reportData.membership.ageDistribution.map((group, index) => (
-                <tr key={index}>
-                  <td>{group.range}</td>
-                  <td>{group.count}</td>
-                  <td>{group.percentage}%</td>
-                  <td>
-                    <div className="admin-progress-bar">
-                      <div
-                        className="admin-progress-fill"
-                        style={{width: `${group.percentage}%`}}
-                      ></div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {reportData.membership.ageDistribution.map((group, index) => {
+                const totalMembers = reportData.membership.totalMembers
+                const percentage = totalMembers > 0 ? (group.count / totalMembers * 100).toFixed(1) : 0
+                return (
+                  <tr key={index}>
+                    <td>{group.ageRange}</td>
+                    <td>{group.count}</td>
+                    <td>{percentage}%</td>
+                    <td>
+                      <div className="admin-progress-bar">
+                        <div
+                          className="admin-progress-fill"
+                          style={{width: `${percentage}%`}}
+                        ></div>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -490,16 +589,20 @@ const ReportsAnalytics = () => {
               </tr>
             </thead>
             <tbody>
-              {reportData.membership.ministryParticipation.map((ministry, index) => (
-                <tr key={index}>
-                  <td>{ministry.ministry}</td>
-                  <td>{ministry.members}</td>
-                  <td>{ministry.percentage}%</td>
-                  <td>
-                    <span className="admin-trend-up">↗ +2.1%</span>
-                  </td>
-                </tr>
-              ))}
+              {reportData.membership.ministryParticipation.map((ministry, index) => {
+                const totalMembers = reportData.membership.totalMembers
+                const percentage = totalMembers > 0 ? (ministry.members / totalMembers * 100).toFixed(1) : 0
+                return (
+                  <tr key={index}>
+                    <td>{ministry.ministry}</td>
+                    <td>{ministry.members}</td>
+                    <td>{percentage}%</td>
+                    <td>
+                      <span className="admin-trend-up">↗ Growing</span>
+                    </td>
+                  </tr>
+                )
+              })}}
             </tbody>
           </table>
         </div>
@@ -828,7 +931,14 @@ const ReportsAnalytics = () => {
 
       {/* Content */}
       <div className="admin-tab-content">
-        {renderContent()}
+        {loading ? (
+          <div className="admin-loading-state">
+            <div className="admin-loading-spinner"></div>
+            <p>Loading analytics data...</p>
+          </div>
+        ) : (
+          renderContent()
+        )}
       </div>
     </div>
   )

@@ -44,7 +44,8 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       subItems: [
         { name: 'Sermons', href: '/admin/sermons', permissions: ['manage_sermons'] },
         { name: 'Events', href: '/admin/events', permissions: ['manage_events'] },
-        { name: 'Announcements', href: '/admin/announcements', permissions: ['manage_announcements'] }
+        { name: 'Announcements', href: '/admin/announcements', permissions: ['manage_announcements'] },
+        { name: 'Leaders', href: '/admin/leaders', permissions: ['manage_content'] }
       ]
     },
     {
@@ -156,7 +157,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
   const isDropdownExpanded = (itemName) => {
     if (itemName === 'Content') {
-      return expandedDropdowns.has(itemName) || isActive('/admin/sermons') || isActive('/admin/events') || isActive('/admin/announcements')
+      return expandedDropdowns.has(itemName) || isActive('/admin/sermons') || isActive('/admin/events') || isActive('/admin/announcements') || isActive('/admin/leaders')
     }
     if (itemName === 'Financial') {
       return expandedDropdowns.has(itemName) || isActive('/admin/financial') || isActive('/admin/donations') || isActive('/admin/budget')

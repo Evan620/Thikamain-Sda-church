@@ -1,30 +1,54 @@
 import { supabase } from './supabaseClient'
+import { uploadFiles } from './fileUploadService'
+import leadersService from './leadersService'
 
 // Gmail Email Configuration (No API keys needed)
 
-// Leader email mapping - centralized configuration
-const LEADER_EMAILS = {
-  // Department Heads & Leaders (Update these with real email addresses)
-  'Paul Odhiambo': 'paul.odhiambo@thikamainsdachurch.org', // Strategic Planning Department
-  'Pastor John Mwangi': 'pastor@thikamainsdachurch.org',
-  'Elder Mary Wanjiku': 'elder.mary@thikamainsdachurch.org',
-  'Deacon Peter Kamau': 'deacon.peter@thikamainsdachurch.org',
-
-  // Ministry Leaders
-  'Youth Leader Sarah': 'youth@thikamainsdachurch.org',
-  'Sabbath School Director': 'sabbathschool@thikamainsdachurch.org',
-  'Music Director': 'music@thikamainsdachurch.org',
-  'Women\'s Ministry Leader': 'womens@thikamainsdachurch.org',
-  'Men\'s Ministry Leader': 'mens@thikamainsdachurch.org',
-  'Children\'s Ministry Leader': 'childrens@thikamainsdachurch.org',
-
-  // Add more leaders as needed
-  'Church Clerk': 'clerk@thikamainsdachurch.org',
-  'Treasurer': 'treasurer@thikamainsdachurch.org',
-  'Head Elder': 'headelder@thikamainsdachurch.org',
-
-  // Default fallback
+// Fallback email mapping for when leaders are not found in database
+const FALLBACK_EMAILS = {
+  'Pastor': 'pastor@thikamainsdachurch.org',
+  'Senior Pastor': 'pastor@thikamainsdachurch.org',
+  'Church Secretary': 'secretary@thikamainsdachurch.org',
+  'Administrative Coordinator': 'admin@thikamainsdachurch.org',
+  'Pastoral Care Coordinator': 'pastoralcare@thikamainsdachurch.org',
+  'Visitation Coordinator': 'visitation@thikamainsdachurch.org',
+  'Events Committee': 'events@thikamainsdachurch.org',
+  'Events Coordinator': 'events@thikamainsdachurch.org',
+  'Facilities Team': 'facilities@thikamainsdachurch.org',
+  'Maintenance Coordinator': 'maintenance@thikamainsdachurch.org',
   'default': 'thikamainsdachurchclerk@gmail.com'
+}
+
+/**
+ * Get leader email dynamically from database
+ * @param {string} recipientName - Name of the recipient
+ * @returns {Promise<string>} Email address
+ */
+const getLeaderEmail = async (recipientName) => {
+  try {
+    // First try to get email from leaders database
+    const leaderEmail = await leadersService.getLeaderEmail(recipientName)
+    if (leaderEmail) {
+      return leaderEmail
+    }
+
+    // If not found, try to find by position/role
+    const leaders = await leadersService.getAllLeaders()
+    const leader = leaders.find(l =>
+      l.position.toLowerCase().includes(recipientName.toLowerCase()) ||
+      recipientName.toLowerCase().includes(l.position.toLowerCase())
+    )
+
+    if (leader && leader.email) {
+      return leader.email
+    }
+
+    // Fall back to hardcoded emails
+    return FALLBACK_EMAILS[recipientName] || FALLBACK_EMAILS.default
+  } catch (error) {
+    console.error('Error getting leader email:', error)
+    return FALLBACK_EMAILS[recipientName] || FALLBACK_EMAILS.default
+  }
 }
 
 /**
@@ -36,8 +60,78 @@ export const submitMessage = async (messageData) => {
   try {
     console.log('CentralizedMessaging: Submitting message:', messageData)
 
-    // Get recipient email
-    const recipientEmail = LEADER_EMAILS[messageData.recipientName] || LEADER_EMAILS.default
+    // Handle file uploads first
+    let attachments = []
+
+    // Check for report files
+    if (messageData.reportFiles && messageData.reportFiles.length > 0) {
+      console.log('Uploading report files:', messageData.reportFiles.length)
+      const uploadResult = await uploadFiles(messageData.reportFiles, 'reports')
+      if (!uploadResult.success) {
+        throw new Error(`File upload failed: ${uploadResult.error}`)
+      }
+      attachments = [...attachments, ...uploadResult.files]
+    }
+
+    // Check for maintenance images
+    if (messageData.maintenanceImages && messageData.maintenanceImages.length > 0) {
+      console.log('Uploading maintenance images:', messageData.maintenanceImages.length)
+      const uploadResult = await uploadFiles(messageData.maintenanceImages, 'maintenance')
+      if (!uploadResult.success) {
+        throw new Error(`Image upload failed: ${uploadResult.error}`)
+      }
+      attachments = [...attachments, ...uploadResult.files]
+    }
+
+    console.log('Files uploaded successfully:', attachments.length)
+
+    // Get recipient email dynamically
+    const recipientEmail = await getLeaderEmail(messageData.recipientName)
+
+    // Prepare enhanced message content with submission details
+    let enhancedMessage = messageData.message
+
+    // Add counseling-specific details to message
+    if (messageData.counselingType || messageData.counselingUrgency || messageData.preferredCounselor) {
+      enhancedMessage += '\n\n--- COUNSELING DETAILS ---'
+      if (messageData.counselingType) enhancedMessage += `\nType: ${messageData.counselingType}`
+      if (messageData.counselingUrgency) enhancedMessage += `\nUrgency: ${messageData.counselingUrgency}`
+      if (messageData.preferredCounselor) enhancedMessage += `\nPreferred Counselor: ${messageData.preferredCounselor}`
+    }
+
+    // Add visitation-specific details to message
+    if (messageData.visitationType || messageData.visitationAddress || messageData.visitationDate) {
+      enhancedMessage += '\n\n--- VISITATION DETAILS ---'
+      if (messageData.visitationType) enhancedMessage += `\nType: ${messageData.visitationType}`
+      if (messageData.visitationAddress) enhancedMessage += `\nAddress: ${messageData.visitationAddress}`
+      if (messageData.visitationDate) enhancedMessage += `\nPreferred Date: ${messageData.visitationDate}`
+      if (messageData.visitationTime) enhancedMessage += `\nPreferred Time: ${messageData.visitationTime}`
+    }
+
+    // Add report-specific details to message
+    if (messageData.reportType || messageData.reportPeriod) {
+      enhancedMessage += '\n\n--- REPORT DETAILS ---'
+      if (messageData.reportType) enhancedMessage += `\nReport Type: ${messageData.reportType}`
+      if (messageData.reportPeriod) enhancedMessage += `\nPeriod: ${messageData.reportPeriod}`
+    }
+
+    // Add event-specific details to message
+    if (messageData.eventTitle || messageData.eventDate || messageData.eventLocation) {
+      enhancedMessage += '\n\n--- EVENT DETAILS ---'
+      if (messageData.eventTitle) enhancedMessage += `\nEvent Title: ${messageData.eventTitle}`
+      if (messageData.eventDate) enhancedMessage += `\nProposed Date: ${messageData.eventDate}`
+      if (messageData.eventTime) enhancedMessage += `\nProposed Time: ${messageData.eventTime}`
+      if (messageData.eventLocation) enhancedMessage += `\nLocation: ${messageData.eventLocation}`
+      if (messageData.eventAttendees) enhancedMessage += `\nExpected Attendees: ${messageData.eventAttendees}`
+      if (messageData.eventBudget) enhancedMessage += `\nEstimated Budget: KES ${messageData.eventBudget}`
+    }
+
+    // Add maintenance-specific details to message
+    if (messageData.maintenanceLocation || messageData.maintenancePriority) {
+      enhancedMessage += '\n\n--- MAINTENANCE DETAILS ---'
+      if (messageData.maintenanceLocation) enhancedMessage += `\nLocation: ${messageData.maintenanceLocation}`
+      if (messageData.maintenancePriority) enhancedMessage += `\nPriority: ${messageData.maintenancePriority}`
+    }
 
     // Prepare message data for database
     const dbMessage = {
@@ -45,14 +139,17 @@ export const submitMessage = async (messageData) => {
       sender_email: messageData.email,
       sender_phone: messageData.phone || null,
       subject: messageData.subject,
-      message: messageData.message,
+      message: enhancedMessage,
       recipient_name: messageData.recipientName,
       recipient_role: messageData.recipientRole,
       recipient_email: recipientEmail,
       department: messageData.department || null,
+      submission_type: messageData.submissionType || null,
+      attachments: attachments,
       status: 'pending',
       source: 'website',
-      priority: 'normal'
+      priority: messageData.counselingUrgency === 'emergency' || messageData.maintenancePriority === 'urgent' ? 'urgent' :
+                messageData.maintenancePriority === 'high' ? 'high' : 'normal'
     }
 
     // Insert message into database
@@ -136,7 +233,11 @@ Phone: ${messageData.sender_phone || 'Not provided'}
 💬 MESSAGE:
 ${messageData.message}
 
-📝 HOW TO REPLY:
+${messageData.attachments && messageData.attachments.length > 0 ?
+`📎 ATTACHMENTS (${messageData.attachments.length}):
+${messageData.attachments.map(file => `• ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - ${file.url}`).join('\n')}
+
+` : ''}📝 HOW TO REPLY:
 Please respond directly to ${messageData.sender_email} to reply to this message.
 
 ---

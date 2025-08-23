@@ -1,12 +1,59 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import InfoModal from '../components/InfoModal'
 import ContactButton from '../components/ContactButton'
+import leadersService from '../services/leadersService'
 
 const Ministries = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedMinistry, setSelectedMinistry] = useState(null)
   const [showVolunteerForm, setShowVolunteerForm] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
+  const [leaders, setLeaders] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch leaders from database
+  useEffect(() => {
+    const fetchLeaders = async () => {
+      try {
+        const leadersData = await leadersService.getAllLeaders()
+        setLeaders(leadersData)
+      } catch (error) {
+        console.error('Error fetching leaders:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchLeaders()
+  }, [])
+
+  // Helper function to get leader info for a ministry
+  const getMinistryLeader = (ministryName) => {
+    // Try to find exact match first
+    let leader = leaders.find(l =>
+      l.position.toLowerCase().includes(ministryName.toLowerCase()) ||
+      ministryName.toLowerCase().includes(l.position.toLowerCase())
+    )
+
+    // If no exact match, try to find by category
+    if (!leader) {
+      if (ministryName.toLowerCase().includes('youth')) {
+        leader = leaders.find(l => l.position.toLowerCase().includes('youth'))
+      } else if (ministryName.toLowerCase().includes('children')) {
+        leader = leaders.find(l => l.position.toLowerCase().includes('children'))
+      } else if (ministryName.toLowerCase().includes('women')) {
+        leader = leaders.find(l => l.position.toLowerCase().includes('women'))
+      } else if (ministryName.toLowerCase().includes('men')) {
+        leader = leaders.find(l => l.position.toLowerCase().includes('men'))
+      } else if (ministryName.toLowerCase().includes('music') || ministryName.toLowerCase().includes('choir')) {
+        leader = leaders.find(l =>
+          l.position.toLowerCase().includes('music') ||
+          l.position.toLowerCase().includes('choir')
+        )
+      }
+    }
+
+    return leader || null
+  }
 
   // Modal state for Learn More functionality
   const [modalOpen, setModalOpen] = useState(false)
@@ -17,7 +64,9 @@ const Ministries = () => {
   const isMobile = window.innerWidth < 768
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
 
-  const ministries = [
+  // Get ministries with dynamic leader information
+  const getMinistries = () => {
+    const staticMinistries = [
     // Age Groups
     {
       id: 1,
@@ -276,7 +325,24 @@ const Ministries = () => {
       color: "#2d5a27",
       image: "/api/placeholder/400/250"
     }
-  ]
+    ]
+
+    // Merge static ministry data with dynamic leader information
+    return staticMinistries.map(ministry => {
+      const leader = getMinistryLeader(ministry.name)
+      if (leader) {
+        return {
+          ...ministry,
+          leader: leader.name,
+          contact: leader.email || ministry.contact,
+          phone: leader.phone || ministry.phone
+        }
+      }
+      return ministry
+    })
+  }
+
+  const ministries = getMinistries()
 
   // Helper function to open modals with specific content
   const openModal = (type, data) => {
@@ -657,71 +723,24 @@ const Ministries = () => {
             gap: isMobile ? '1.5rem' : '2rem',
             maxWidth: '100%'
           }}>
-            {[
-              {
-                name: "Pst. Charles Muritu",
-                role: "Senior Pastor",
-                email: "muritunganga77@gmail.com",
-                phone: "+254 729 071 755",
-                ministries: ["Pastoral Care"],
-                bio: "Leading our church family with wisdom and dedication.",
-                color: "#2d5a27"
-              },
-              {
-                name: "Joan Ouma",
-                role: "Women's Ministry (AWM) Leader",
-                email: "AWM/Dorcas Ministry",
-                phone: "+254 726 385 813",
-                ministries: ["Women's Ministry", "AWM Programs"],
-                bio: "Passionate about empowering women in their spiritual journey.",
-                color: "#f59e0b"
-              },
-              {
-                name: "Duncan Mageto",
-                role: "Youth Ministry Leader",
-                email: "duncanmageto76@gmail.com",
-                phone: "704385185",
-                ministries: ["Youth Ministry", "Community Outreach"],
-                bio: "Dedicated to mentoring young people and building future leaders.",
-                color: "#2d5a27"
-              },
-              {
-                name: "Erick Yonni",
-                role: "Children's Ministry Leader",
-                email: "erickyonni@gmail.com",
-                phone: "723522933",
-                ministries: ["Children's Ministry", "Sabbath School"],
-                bio: "Nurturing the next generation with love and biblical foundation.",
-                color: "#f59e0b"
-              },
-              {
-                name: "Paul Odongo",
-                role: "Music & Worship Ministry",
-                email: "paulodongo43@gmail.com",
-                phone: "720051277",
-                ministries: ["Music Ministry", "Worship Team"],
-                bio: "Leading hearts to worship through the gift of music and praise.",
-                color: "#2d5a27"
-              },
-              {
-                name: "Elizabeth Sapato",
-                role: "Health & Wellness Ministry",
-                email: "Contact information pending",
-                phone: "724590844",
-                ministries: ["Health Ministry", "Community Wellness"],
-                bio: "Promoting wholistic health and wellness in our community.",
-                color: "#f59e0b"
-              },
-              {
-                name: "Charles Kyalo",
-                role: "Communication Leader",
-                email: "charleskyalo77@gmail.com",
-                phone: "722937200",
-                ministries: ["Church Communication", "Media Management"],
-                bio: "Managing church communications and information systems.",
-                color: "#2d5a27"
-              }
-            ].map((leader, index) => (
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p>Loading ministry leaders...</p>
+              </div>
+            ) : (
+              leaders
+                .filter(leader => ['pastoral', 'ministry', 'department'].includes(leader.category))
+                .slice(0, 8) // Limit to 8 leaders for display
+                .map((leader, index) => ({
+                  name: leader.name,
+                  role: leader.position,
+                  email: leader.email || 'Contact information pending',
+                  phone: leader.phone || '',
+                  ministries: leader.specialties || [leader.position],
+                  bio: leader.bio || `Serving as ${leader.position} with dedication and commitment.`,
+                  color: index % 2 === 0 ? "#2d5a27" : "#f59e0b"
+                }))
+            ).map((leader, index) => (
               <div
                 key={index}
                 style={{

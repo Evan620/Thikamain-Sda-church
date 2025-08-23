@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { submitMessage, isEmailConfigured } from '../services/centralizedMessagingService'
+import { submitMessage, isEmailConfigured as isEmailConfiguredFn } from '../services/centralizedMessagingService'
+import { supabase } from '../services/supabaseClient'
 
 const SubmissionForm = ({ submissionType, onClose }) => {
   const [formData, setFormData] = useState({
@@ -44,10 +45,10 @@ const SubmissionForm = ({ submissionType, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
-  const [isEmailConfigured, setIsEmailConfigured] = useState(true)
+  const [emailReady, setEmailReady] = useState(true)
 
   useEffect(() => {
-    setIsEmailConfigured(isEmailConfigured())
+    setEmailReady(isEmailConfiguredFn())
   }, [])
 
   const handleChange = (e) => {
@@ -92,19 +93,35 @@ const SubmissionForm = ({ submissionType, onClose }) => {
     setErrorMessage('')
 
     try {
-      const recipient = getRecipientInfo()
-      const submissionData = {
-        ...formData,
-        recipientName: recipient.name,
-        recipientRole: recipient.role,
-        submissionType: submissionType?.title || 'General Request',
-        timestamp: new Date().toISOString()
-      }
-
-      const result = await submitMessage(submissionData)
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to submit request')
+      if (submissionType?.id === 'prayer') {
+        // Store directly into prayer_requests (no emails)
+        const privacy = formData.prayerPrivacy === 'leadership' ? 'leadership_only' : formData.prayerPrivacy
+        const { error: prError } = await supabase
+          .from('prayer_requests')
+          .insert([{
+            requester_id: null, // Always null for public submissions
+            title: formData.subject || `Prayer Request - ${formData.prayerType || 'General'}`,
+            description: formData.message,
+            urgency: formData.urgency,
+            privacy_level: privacy,
+            // Store submitter info from form (respecting anonymous toggle)
+            submitter_name: formData.anonymous ? null : formData.name,
+            submitter_email: formData.anonymous ? null : formData.email,
+            submitter_phone: formData.anonymous ? null : formData.phone
+          }])
+        if (prError) throw prError
+      } else {
+        // Non-prayer flows use the messaging pipeline
+        const recipient = getRecipientInfo()
+        const submissionData = {
+          ...formData,
+          recipientName: recipient.name,
+          recipientRole: recipient.role,
+          submissionType: submissionType?.title || 'General Request',
+          timestamp: new Date().toISOString()
+        }
+        const result = await submitMessage(submissionData)
+        if (!result.success) throw new Error(result.error || 'Failed to submit request')
       }
 
       setSubmitStatus('success')
@@ -493,7 +510,7 @@ const SubmissionForm = ({ submissionType, onClose }) => {
       </div>
 
       {/* Email Configuration Warning */}
-      {!isEmailConfigured && (
+      {!emailReady && (
         <div style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
           <p style={{ color: '#92400e', fontSize: '0.9rem', margin: 0, fontWeight: '600' }}>
             ⚠️ Demo Mode: Email service not configured. Submissions will be logged but not sent.

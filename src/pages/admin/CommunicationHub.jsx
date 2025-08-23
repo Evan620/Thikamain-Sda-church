@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useSMS } from '../../hooks/useSMS'
 import { getMessages, getMessageStats, markMessageAsRead, sendMessageToLeader, copyEmailToClipboard, isEmailConfigured } from '../../services/centralizedMessagingService'
+import '../../styles/CommunicationHub.css'
 
 const CommunicationHub = () => {
   const { hasPermission } = useAuth()
@@ -42,82 +43,46 @@ const CommunicationHub = () => {
     recipient: 'all'
   })
 
-  // Mock data for demonstration
+  // Modal and selection state
+  const [selectedMessage, setSelectedMessage] = useState(null)
+  const [showMessageModal, setShowMessageModal] = useState(false)
+  const [messagesByType, setMessagesByType] = useState({
+    visitation: [],
+    counseling: [],
+    reports: [],
+    events: [],
+    maintenance: [],
+    general: []
+  })
+
+  // Load real data from database
   useEffect(() => {
     // Get SMS service status
     const smsStatus = getServiceStatus()
 
-    const mockData = {
+    // Initialize with empty data - will be populated from database
+    const initialData = {
       smsStats: {
-        totalSent: 1247,
-        thisMonth: 89,
-        deliveryRate: 98.5,
-        balance: 2500
+        totalSent: 0,
+        thisMonth: 0,
+        deliveryRate: 0,
+        balance: 0
       },
       emailStats: {
-        totalSent: 456,
-        thisMonth: 34,
-        openRate: 85.2,
-        clickRate: 12.8
+        totalSent: 0,
+        thisMonth: 0,
+        openRate: 0,
+        clickRate: 0
       },
-      recentMessages: [
-        {
-          id: 1,
-          type: 'SMS',
-          subject: 'Service Reminder',
-          recipients: 156,
-          status: 'Delivered',
-          timestamp: '2025-01-15 14:30',
-          deliveryRate: 98
-        },
-        {
-          id: 2,
-          type: 'Email',
-          subject: 'Weekly Newsletter',
-          recipients: 89,
-          status: 'Sent',
-          timestamp: '2025-01-14 09:00',
-          openRate: 87
-        },
-        {
-          id: 3,
-          type: 'SMS',
-          subject: 'Event Reminder - Youth Meeting',
-          recipients: 45,
-          status: 'Delivered',
-          timestamp: '2025-01-13 16:45',
-          deliveryRate: 100
-        }
-      ],
-      templates: [
-        {
-          id: 1,
-          name: 'Service Reminder',
-          type: 'SMS',
-          content: 'Dear {name}, this is a reminder about tomorrow\'s service at 9:00 AM. God bless!',
-          lastUsed: '2025-01-15'
-        },
-        {
-          id: 2,
-          name: 'Event Invitation',
-          type: 'Email',
-          content: 'You are invited to our upcoming {event_name} on {date}. Join us for fellowship!',
-          lastUsed: '2025-01-12'
-        },
-        {
-          id: 3,
-          name: 'Birthday Wishes',
-          type: 'SMS',
-          content: 'Happy Birthday {name}! May God bless you abundantly on your special day. 🎉',
-          lastUsed: '2025-01-10'
-        }
-      ]
+      recentMessages: [],
+      templates: []
     }
-    setCommunicationData(mockData)
+    setCommunicationData(initialData)
 
-    // Load messages data
+    // Load real data from database
     loadMessages()
     loadMessageStats()
+    loadRecentMessages()
   }, [])
 
   // Load messages from database
@@ -130,10 +95,63 @@ const CommunicationHub = () => {
 
       const messagesData = await getMessages(filters)
       setMessages(messagesData)
+
+      // Categorize messages by type based on recipient, department, and subject content
+      const categorized = {
+        visitation: [],
+        counseling: [],
+        reports: [],
+        events: [],
+        maintenance: [],
+        general: []
+      }
+
+      messagesData.forEach(msg => {
+        const subject = msg.subject.toLowerCase()
+        const recipient = msg.recipient_name?.toLowerCase() || ''
+        const department = msg.department || ''
+
+        // Department Reports: Check for department field or Church Secretary recipient
+        if (department || recipient.includes('church secretary') || recipient.includes('administrative coordinator')) {
+          categorized.reports.push(msg)
+        }
+        // Visitation Requests: Check recipient and subject keywords
+        else if (recipient.includes('pastoral care') || recipient.includes('visitation coordinator') ||
+                 subject.includes('visit') || subject.includes('hospital') || subject.includes('home')) {
+          categorized.visitation.push(msg)
+        }
+        // Counseling Requests: Check recipient and subject keywords
+        else if (recipient.includes('pastor') || recipient.includes('senior pastor') ||
+                 subject.includes('counsel') || subject.includes('guidance') || subject.includes('therapy')) {
+          categorized.counseling.push(msg)
+        }
+        // Event Proposals: Check recipient and subject keywords
+        else if (recipient.includes('events committee') || recipient.includes('events coordinator') ||
+                 subject.includes('event') || subject.includes('proposal') || subject.includes('program')) {
+          categorized.events.push(msg)
+        }
+        // Maintenance Requests: Check recipient and subject keywords
+        else if (recipient.includes('facilities team') || recipient.includes('maintenance coordinator') ||
+                 subject.includes('maintenance') || subject.includes('facility') || subject.includes('repair') ||
+                 subject.includes('broken') || subject.includes('issue')) {
+          categorized.maintenance.push(msg)
+        }
+        // General Inquiries: Everything else
+        else {
+          categorized.general.push(msg)
+        }
+      })
+
+      setMessagesByType(categorized)
     } catch (error) {
       console.error('Error loading messages:', error)
     }
   }
+
+  // Reload messages when filters change
+  useEffect(() => {
+    loadMessages()
+  }, [messageFilters])
 
   // Load message statistics
   const loadMessageStats = async () => {
@@ -142,6 +160,37 @@ const CommunicationHub = () => {
       setMessageStats(stats)
     } catch (error) {
       console.error('Error loading message stats:', error)
+    }
+  }
+
+  // Load recent messages for overview
+  const loadRecentMessages = async () => {
+    try {
+      const recentMessagesData = await getMessages({ limit: 5 })
+
+      // Transform database messages to match the expected format
+      const transformedMessages = recentMessagesData.map(msg => ({
+        id: msg.id,
+        type: 'Email', // All submissions are currently email-based
+        subject: msg.subject,
+        recipients: 1, // Each message has one recipient
+        status: msg.status === 'sent' ? 'Sent' : msg.status === 'pending' ? 'Pending' : 'Failed',
+        timestamp: new Date(msg.created_at).toLocaleString('en-KE', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        openRate: msg.status === 'sent' ? 85 : 0 // Default open rate for sent messages
+      }))
+
+      setCommunicationData(prev => ({
+        ...prev,
+        recentMessages: transformedMessages
+      }))
+    } catch (error) {
+      console.error('Error loading recent messages:', error)
     }
   }
 
@@ -192,21 +241,779 @@ const CommunicationHub = () => {
     }
   }
 
+  // Handle filter changes
+  const handleFilterChange = (filterType, value) => {
+    setMessageFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }))
+  }
+
+  // Handle viewing message details
+  const handleViewMessage = (message) => {
+    setSelectedMessage(message)
+    setShowMessageModal(true)
+  }
+
+  // Handle updating message status
+  const handleUpdateStatus = async (messageId, newStatus) => {
+    try {
+      await markMessageAsRead(messageId)
+      loadMessages() // Refresh data
+      loadMessageStats()
+    } catch (error) {
+      console.error('Error updating message status:', error)
+    }
+  }
+
+  // Handle assigning message
+  const handleAssignMessage = async (messageId) => {
+    try {
+      // For now, just mark as read - can be expanded later
+      await handleUpdateStatus(messageId, 'read')
+    } catch (error) {
+      console.error('Error assigning message:', error)
+    }
+  }
+
+
+
+  // Render message detail modal
+  const renderMessageModal = () => {
+    if (!selectedMessage || !showMessageModal) return null
+
+    return (
+      <div className="admin-modal-overlay" onClick={() => setShowMessageModal(false)}>
+        <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-modal-header">
+            <h3>{selectedMessage.subject}</h3>
+            <button
+              className="admin-modal-close"
+              onClick={() => setShowMessageModal(false)}
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="admin-modal-body">
+            <div className="message-details">
+              <div className="message-meta">
+                <div className="message-meta-item">
+                  <strong>From:</strong> {selectedMessage.sender_name}
+                </div>
+                {selectedMessage.sender_email && (
+                  <div className="message-meta-item">
+                    <strong>Email:</strong> {selectedMessage.sender_email}
+                  </div>
+                )}
+                {selectedMessage.sender_phone && (
+                  <div className="message-meta-item">
+                    <strong>Phone:</strong> {selectedMessage.sender_phone}
+                  </div>
+                )}
+                <div className="message-meta-item">
+                  <strong>Date:</strong> {new Date(selectedMessage.created_at).toLocaleString()}
+                </div>
+                <div className="message-meta-item">
+                  <strong>Status:</strong>
+                  <span className={`status-badge status-${selectedMessage.status}`}>
+                    {selectedMessage.status}
+                  </span>
+                </div>
+              </div>
+
+              <div className="message-content">
+                <h4>Message:</h4>
+                <div className="message-text">
+                  {selectedMessage.message}
+                </div>
+              </div>
+
+              {selectedMessage.attachments && selectedMessage.attachments.length > 0 && (
+                <div className="message-attachments">
+                  <h4>Attachments ({selectedMessage.attachments.length}):</h4>
+                  <div className="attachments-list">
+                    {selectedMessage.attachments.map((file, index) => (
+                      <div key={index} className="attachment-item">
+                        <div className="attachment-info">
+                          <span className="attachment-icon">
+                            {file.type?.startsWith('image/') ? '🖼️' : '📄'}
+                          </span>
+                          <div className="attachment-details">
+                            <div className="attachment-name">{file.name}</div>
+                            <div className="attachment-meta">
+                              {(file.size / 1024 / 1024).toFixed(2)} MB
+                            </div>
+                          </div>
+                        </div>
+                        <a
+                          href={file.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="attachment-download"
+                          title="Download file"
+                        >
+                          ⬇️ Download
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="admin-modal-footer">
+            <button
+              onClick={() => handleSendToLeader(selectedMessage.id)}
+              className="admin-btn admin-btn-primary"
+            >
+              Copy Email to Respond
+            </button>
+            {selectedMessage.status === 'pending' && (
+              <button
+                onClick={() => {
+                  handleUpdateStatus(selectedMessage.id, 'read')
+                  setShowMessageModal(false)
+                }}
+                className="admin-btn admin-btn-success"
+              >
+                Mark as Complete
+              </button>
+            )}
+            <button
+              onClick={() => setShowMessageModal(false)}
+              className="admin-btn admin-btn-secondary"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const tabs = [
     { id: 'overview', name: 'Overview', icon: '📊' },
-    { id: 'messages', name: 'Messages', icon: '💬' },
-    { id: 'send-message', name: 'Send Message', icon: '✉️' },
-    { id: 'templates', name: 'Templates', icon: '📝' },
-    { id: 'history', name: 'Message History', icon: '📋' },
-    { id: 'settings', name: 'Settings', icon: '⚙️' }
+    { id: 'visitation', name: 'Visitation Requests', icon: '🏠' },
+    { id: 'counseling', name: 'Counseling Requests', icon: '💬' },
+    { id: 'reports', name: 'Department Reports', icon: '📊' },
+    { id: 'events', name: 'Event Proposals', icon: '📅' },
+    { id: 'maintenance', name: 'Facility Issues', icon: '🔧' },
+    { id: 'general', name: 'General Inquiries', icon: '❓' },
+    { id: 'templates', name: 'Templates', icon: '📝' }
   ]
+
+  // Render visitation requests
+  const renderVisitationRequests = () => (
+    <div className="submission-requests-container">
+      <div className="admin-content-header">
+        <div>
+          <h2>Visitation Requests</h2>
+          <p>Manage pastoral visits, hospital visits, and home visits</p>
+        </div>
+        <div className="admin-stats-mini">
+          <span className="admin-badge admin-badge-info">
+            {messagesByType.visitation.length} requests
+          </span>
+        </div>
+      </div>
+
+      <div className="requests-grid">
+        {messagesByType.visitation.length === 0 ? (
+          <div className="admin-empty-state">
+            <svg className="admin-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4" />
+            </svg>
+            <h3>No visitation requests</h3>
+            <p>Visitation requests will appear here when submitted</p>
+          </div>
+        ) : (
+          messagesByType.visitation.map((request) => (
+            <div key={request.id} className="request-card">
+              <div className="request-card-header">
+                <div className="request-meta">
+                  <h4>{request.subject}</h4>
+                  <span className={`status-badge status-${request.status}`}>
+                    {request.status}
+                  </span>
+                </div>
+                <div className="request-timestamp">
+                  {new Date(request.created_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              <div className="request-card-body">
+                <div className="request-sender">
+                  <strong>From:</strong> {request.sender_name}
+                  {request.sender_email && <span> ({request.sender_email})</span>}
+                </div>
+
+                {/* Extract and display visitation details */}
+                {request.message.includes('--- VISITATION DETAILS ---') && (
+                  <div className="submission-details">
+                    {request.message.match(/Type:\s*([^\n]+)/)?.[1] && (
+                      <span className="detail-badge detail-type">
+                        {request.message.match(/Type:\s*([^\n]+)/)[1].trim()}
+                      </span>
+                    )}
+                    {request.message.match(/Preferred Date:\s*([^\n]+)/)?.[1] && (
+                      <span className="detail-badge detail-date">
+                        📅 {request.message.match(/Preferred Date:\s*([^\n]+)/)[1].trim()}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div className="request-preview">
+                  {/* Show only the main message, not the technical details */}
+                  {(() => {
+                    const mainMessage = request.message.split('--- COUNSELING DETAILS ---')[0].trim()
+                    return mainMessage.length > 100
+                      ? mainMessage.substring(0, 100) + '...'
+                      : mainMessage
+                  })()}
+                </div>
+                {request.attachments && request.attachments.length > 0 && (
+                  <div className="request-attachments-indicator">
+                    📎 {request.attachments.length} attachment{request.attachments.length > 1 ? 's' : ''}
+                  </div>
+                )}
+              </div>
+
+              <div className="request-card-actions">
+                <button
+                  onClick={() => handleViewMessage(request)}
+                  className="admin-btn-sm admin-btn-secondary"
+                >
+                  View Details
+                </button>
+                <button
+                  onClick={() => handleSendToLeader(request.id)}
+                  className="admin-btn-sm admin-btn-primary"
+                >
+                  Respond
+                </button>
+                {request.status === 'pending' && (
+                  <button
+                    onClick={() => handleUpdateStatus(request.id, 'read')}
+                    className="admin-btn-sm admin-btn-success"
+                  >
+                    Mark Complete
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+
+  // Render counseling requests
+  const renderCounselingRequests = () => (
+    <div className="submission-requests-container">
+      <div className="admin-content-header">
+        <div>
+          <h2>Counseling Requests</h2>
+          <p>Manage pastoral counseling and spiritual guidance requests</p>
+        </div>
+        <div className="admin-stats-mini">
+          <span className="admin-badge admin-badge-warning">
+            {messagesByType.counseling.length} requests
+          </span>
+        </div>
+      </div>
+
+      <div className="requests-grid">
+        {messagesByType.counseling.length === 0 ? (
+          <div className="admin-empty-state">
+            <svg className="admin-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <h3>No counseling requests</h3>
+            <p>Counseling requests will appear here when submitted</p>
+          </div>
+        ) : (
+          messagesByType.counseling.map((request) => (
+            <div key={request.id} className="request-card">
+              <div className="request-card-header">
+                <div className="request-meta">
+                  <h4>{request.subject}</h4>
+                  <span className={`status-badge status-${request.status}`}>
+                    {request.status}
+                  </span>
+                </div>
+                <div className="request-timestamp">
+                  {new Date(request.created_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              <div className="request-card-body">
+                <div className="request-sender">
+                  <strong>From:</strong> {request.sender_name}
+                  {request.sender_email && <span> ({request.sender_email})</span>}
+                </div>
+                <div className="request-preview">
+                  {request.message.length > 100
+                    ? request.message.substring(0, 100) + '...'
+                    : request.message
+                  }
+                </div>
+              </div>
+
+              <div className="request-card-actions">
+                <button
+                  onClick={() => handleViewMessage(request)}
+                  className="admin-btn-sm admin-btn-secondary"
+                >
+                  View Details
+                </button>
+                <button
+                  onClick={() => handleSendToLeader(request.id)}
+                  className="admin-btn-sm admin-btn-primary"
+                >
+                  Respond
+                </button>
+                {request.status === 'pending' && (
+                  <button
+                    onClick={() => handleUpdateStatus(request.id, 'read')}
+                    className="admin-btn-sm admin-btn-success"
+                  >
+                    Mark Complete
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+
+  // Render department reports
+  const renderDepartmentReports = () => (
+    <div className="submission-requests-container">
+      <div className="admin-content-header">
+        <div>
+          <h2>Department Reports</h2>
+          <p>Manage ministry reports and department submissions</p>
+        </div>
+        <div className="admin-stats-mini">
+          <span className="admin-badge admin-badge-success">
+            {messagesByType.reports.length} reports
+          </span>
+        </div>
+      </div>
+
+      <div className="requests-grid">
+        {messagesByType.reports.length === 0 ? (
+          <div className="admin-empty-state">
+            <svg className="admin-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3>No department reports</h3>
+            <p>Department reports will appear here when submitted</p>
+          </div>
+        ) : (
+          messagesByType.reports.map((request) => (
+            <div key={request.id} className="request-card">
+              <div className="request-card-header">
+                <div className="request-meta">
+                  <h4>{request.subject}</h4>
+                  <span className={`status-badge status-${request.status}`}>
+                    {request.status}
+                  </span>
+                </div>
+                <div className="request-timestamp">
+                  {new Date(request.created_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              <div className="request-card-body">
+                <div className="request-sender">
+                  <strong>From:</strong> {request.sender_name}
+                  {request.sender_email && <span> ({request.sender_email})</span>}
+                </div>
+                <div className="request-preview">
+                  {request.message.length > 100
+                    ? request.message.substring(0, 100) + '...'
+                    : request.message
+                  }
+                </div>
+              </div>
+
+              <div className="request-card-actions">
+                <button
+                  onClick={() => handleViewMessage(request)}
+                  className="admin-btn-sm admin-btn-secondary"
+                >
+                  View Details
+                </button>
+                <button
+                  onClick={() => handleSendToLeader(request.id)}
+                  className="admin-btn-sm admin-btn-primary"
+                >
+                  Respond
+                </button>
+                {request.status === 'pending' && (
+                  <button
+                    onClick={() => handleUpdateStatus(request.id, 'read')}
+                    className="admin-btn-sm admin-btn-success"
+                  >
+                    Mark Complete
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+
+  // Render event proposals
+  const renderEventProposals = () => (
+    <div className="submission-requests-container">
+      <div className="admin-content-header">
+        <div>
+          <h2>Event Proposals</h2>
+          <p>Manage event proposals and program suggestions</p>
+        </div>
+        <div className="admin-stats-mini">
+          <span className="admin-badge admin-badge-info">
+            {messagesByType.events.length} proposals
+          </span>
+        </div>
+      </div>
+
+      <div className="requests-grid">
+        {messagesByType.events.length === 0 ? (
+          <div className="admin-empty-state">
+            <svg className="admin-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-4 12H8m0 0V9a2 2 0 012-2h4a2 2 0 012 2v3" />
+            </svg>
+            <h3>No event proposals</h3>
+            <p>Event proposals will appear here when submitted</p>
+          </div>
+        ) : (
+          messagesByType.events.map((request) => (
+            <div key={request.id} className="request-card">
+              <div className="request-card-header">
+                <div className="request-meta">
+                  <h4>{request.subject}</h4>
+                  <span className={`status-badge status-${request.status}`}>
+                    {request.status}
+                  </span>
+                </div>
+                <div className="request-timestamp">
+                  {new Date(request.created_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              <div className="request-card-body">
+                <div className="request-sender">
+                  <strong>From:</strong> {request.sender_name}
+                  {request.sender_email && <span> ({request.sender_email})</span>}
+                </div>
+
+                {/* Extract and display event details */}
+                {request.message.includes('--- EVENT DETAILS ---') && (
+                  <div className="submission-details">
+                    {request.message.match(/Event Title:\s*([^\n]+)/)?.[1] && (
+                      <span className="detail-badge detail-title">
+                        📅 {request.message.match(/Event Title:\s*([^\n]+)/)[1].trim()}
+                      </span>
+                    )}
+                    {request.message.match(/Proposed Date:\s*([^\n]+)/)?.[1] && (
+                      <span className="detail-badge detail-date">
+                        📅 {request.message.match(/Proposed Date:\s*([^\n]+)/)[1].trim()}
+                      </span>
+                    )}
+                    {request.message.match(/Estimated Budget:\s*([^\n]+)/)?.[1] && (
+                      <span className="detail-badge detail-budget">
+                        💰 {request.message.match(/Estimated Budget:\s*([^\n]+)/)[1].trim()}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div className="request-preview">
+                  {/* Show only the main message, not the technical details */}
+                  {(() => {
+                    const mainMessage = request.message.split('--- EVENT DETAILS ---')[0].trim()
+                    return mainMessage.length > 100
+                      ? mainMessage.substring(0, 100) + '...'
+                      : mainMessage
+                  })()}
+                </div>
+                {request.attachments && request.attachments.length > 0 && (
+                  <div className="request-attachments-indicator">
+                    📎 {request.attachments.length} attachment{request.attachments.length > 1 ? 's' : ''}
+                  </div>
+                )}
+              </div>
+
+              <div className="request-card-actions">
+                <button
+                  onClick={() => handleViewMessage(request)}
+                  className="admin-btn-sm admin-btn-secondary"
+                >
+                  View Details
+                </button>
+                <button
+                  onClick={() => handleSendToLeader(request.id)}
+                  className="admin-btn-sm admin-btn-primary"
+                >
+                  Respond
+                </button>
+                {request.status === 'pending' && (
+                  <button
+                    onClick={() => handleUpdateStatus(request.id, 'read')}
+                    className="admin-btn-sm admin-btn-success"
+                  >
+                    Mark Complete
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+
+  // Render maintenance requests
+  const renderMaintenanceRequests = () => (
+    <div className="submission-requests-container">
+      <div className="admin-content-header">
+        <div>
+          <h2>Facility Issues</h2>
+          <p>Manage facility maintenance and infrastructure issues</p>
+        </div>
+        <div className="admin-stats-mini">
+          <span className="admin-badge admin-badge-info">
+            {messagesByType.maintenance.length} issues
+          </span>
+        </div>
+      </div>
+
+      <div className="requests-grid">
+        {messagesByType.maintenance.length === 0 ? (
+          <div className="admin-empty-state">
+            <svg className="admin-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <h3>No facility issues</h3>
+            <p>Facility maintenance requests will appear here when submitted</p>
+          </div>
+        ) : (
+          messagesByType.maintenance.map((request) => (
+            <div key={request.id} className="request-card">
+              <div className="request-card-header">
+                <div className="request-meta">
+                  <h4>{request.subject}</h4>
+                  <span className={`status-badge status-${request.status}`}>
+                    {request.status}
+                  </span>
+                </div>
+                <div className="request-timestamp">
+                  {new Date(request.created_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              <div className="request-card-body">
+                <div className="request-sender">
+                  <strong>From:</strong> {request.sender_name}
+                  {request.sender_email && <span> ({request.sender_email})</span>}
+                </div>
+
+                {/* Extract and display maintenance details */}
+                {request.message.includes('--- MAINTENANCE DETAILS ---') && (
+                  <div className="submission-details">
+                    {request.message.match(/Location:\s*([^\n]+)/)?.[1] && (
+                      <span className="detail-badge detail-location">
+                        📍 {request.message.match(/Location:\s*([^\n]+)/)[1].trim()}
+                      </span>
+                    )}
+                    {request.message.match(/Priority:\s*([^\n]+)/)?.[1] && (
+                      <span className={`detail-badge detail-priority priority-${request.message.match(/Priority:\s*([^\n]+)/)[1].trim().toLowerCase()}`}>
+                        {request.message.match(/Priority:\s*([^\n]+)/)[1].trim()}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div className="request-preview">
+                  {/* Show only the main message, not the technical details */}
+                  {(() => {
+                    const mainMessage = request.message.split('--- MAINTENANCE DETAILS ---')[0].trim()
+                    return mainMessage.length > 100
+                      ? mainMessage.substring(0, 100) + '...'
+                      : mainMessage
+                  })()}
+                </div>
+                {request.attachments && request.attachments.length > 0 && (
+                  <div className="request-attachments-indicator">
+                    📎 {request.attachments.length} attachment{request.attachments.length > 1 ? 's' : ''} (photos)
+                  </div>
+                )}
+              </div>
+
+              <div className="request-card-actions">
+                <button
+                  onClick={() => handleViewMessage(request)}
+                  className="admin-btn-sm admin-btn-secondary"
+                >
+                  View Details
+                </button>
+                <button
+                  onClick={() => handleSendToLeader(request.id)}
+                  className="admin-btn-sm admin-btn-primary"
+                >
+                  Respond
+                </button>
+                {request.status === 'pending' && (
+                  <button
+                    onClick={() => handleUpdateStatus(request.id, 'read')}
+                    className="admin-btn-sm admin-btn-success"
+                  >
+                    Mark Complete
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+
+  // Render general inquiries
+  const renderGeneralInquiries = () => (
+    <div className="submission-requests-container">
+      <div className="admin-content-header">
+        <div>
+          <h2>General Inquiries</h2>
+          <p>Manage general questions and other communications</p>
+        </div>
+        <div className="admin-stats-mini">
+          <span className="admin-badge admin-badge-gray">
+            {messagesByType.general.length} inquiries
+          </span>
+        </div>
+      </div>
+
+      <div className="requests-grid">
+        {messagesByType.general.length === 0 ? (
+          <div className="admin-empty-state">
+            <svg className="admin-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3>No general inquiries</h3>
+            <p>General inquiries will appear here when submitted</p>
+          </div>
+        ) : (
+          messagesByType.general.map((request) => (
+            <div key={request.id} className="request-card">
+              <div className="request-card-header">
+                <div className="request-meta">
+                  <h4>{request.subject}</h4>
+                  <span className={`status-badge status-${request.status}`}>
+                    {request.status}
+                  </span>
+                </div>
+                <div className="request-timestamp">
+                  {new Date(request.created_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              <div className="request-card-body">
+                <div className="request-sender">
+                  <strong>From:</strong> {request.sender_name}
+                  {request.sender_email && <span> ({request.sender_email})</span>}
+                </div>
+                <div className="request-preview">
+                  {request.message.length > 100
+                    ? request.message.substring(0, 100) + '...'
+                    : request.message
+                  }
+                </div>
+              </div>
+
+              <div className="request-card-actions">
+                <button
+                  onClick={() => handleViewMessage(request)}
+                  className="admin-btn-sm admin-btn-secondary"
+                >
+                  View Details
+                </button>
+                <button
+                  onClick={() => handleSendToLeader(request.id)}
+                  className="admin-btn-sm admin-btn-primary"
+                >
+                  Respond
+                </button>
+                {request.status === 'pending' && (
+                  <button
+                    onClick={() => handleUpdateStatus(request.id, 'read')}
+                    className="admin-btn-sm admin-btn-success"
+                  >
+                    Mark Complete
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
 
   const renderOverview = () => (
     <div className="communication-overview">
-      {/* Stats Cards */}
+      <div className="admin-content-header">
+        <div>
+          <h2>Communication Hub Overview</h2>
+          <p>Manage all church communications and submissions</p>
+        </div>
+      </div>
+
+      {/* Submission Type Cards */}
       <div className="admin-stats-grid">
-        {/* SMS Stats */}
-        <div className="clean-card" style={{background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white'}}>
+        {/* Visitation Requests */}
+        <div
+          className="clean-card submission-overview-card"
+          style={{background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', cursor: 'pointer'}}
+          onClick={() => setActiveTab('visitation')}
+        >
+          <div className="admin-card-header">
+            <div className="admin-card-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4" />
+              </svg>
+            </div>
+            <div>
+              <h3>Visitation Requests</h3>
+              <p className="admin-card-value">{messagesByType.visitation.length}</p>
+            </div>
+          </div>
+          <div className="admin-card-content">
+            <p style={{opacity: 0.9, fontSize: '0.9rem'}}>
+              Hospital visits, home visits, and pastoral care requests
+            </p>
+          </div>
+        </div>
+
+        {/* Counseling Requests */}
+        <div
+          className="clean-card submission-overview-card"
+          style={{background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: 'white', cursor: 'pointer'}}
+          onClick={() => setActiveTab('counseling')}
+        >
           <div className="admin-card-header">
             <div className="admin-card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -214,56 +1021,111 @@ const CommunicationHub = () => {
               </svg>
             </div>
             <div>
-              <h3>SMS Messages</h3>
-              <p className="admin-card-value">{communicationData.smsStats.totalSent}</p>
+              <h3>Counseling Requests</h3>
+              <p className="admin-card-value">{messagesByType.counseling.length}</p>
             </div>
           </div>
           <div className="admin-card-content">
-            <div className="admin-content-breakdown">
-              <div className="admin-breakdown-item">
-                <span>This Month:</span>
-                <span>{communicationData.smsStats.thisMonth}</span>
-              </div>
-              <div className="admin-breakdown-item">
-                <span>Delivery Rate:</span>
-                <span>{communicationData.smsStats.deliveryRate}%</span>
-              </div>
-              <div className="admin-breakdown-item">
-                <span>Balance:</span>
-                <span>KES {communicationData.smsStats.balance}</span>
-              </div>
-            </div>
+            <p style={{opacity: 0.9, fontSize: '0.9rem'}}>
+              Pastoral counseling and spiritual guidance requests
+            </p>
           </div>
         </div>
 
-        {/* Email Stats */}
-        <div className="clean-card" style={{background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', color: 'white'}}>
+        {/* Department Reports */}
+        <div
+          className="clean-card submission-overview-card"
+          style={{background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', color: 'white', cursor: 'pointer'}}
+          onClick={() => setActiveTab('reports')}
+        >
           <div className="admin-card-header">
             <div className="admin-card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div>
-              <h3>Email Messages</h3>
-              <p className="admin-card-value">{communicationData.emailStats.totalSent}</p>
+              <h3>Department Reports</h3>
+              <p className="admin-card-value">{messagesByType.reports.length}</p>
             </div>
           </div>
           <div className="admin-card-content">
-            <div className="admin-content-breakdown">
-              <div className="admin-breakdown-item">
-                <span>This Month:</span>
-                <span>{communicationData.emailStats.thisMonth}</span>
-              </div>
-              <div className="admin-breakdown-item">
-                <span>Open Rate:</span>
-                <span>{communicationData.emailStats.openRate}%</span>
-              </div>
-              <div className="admin-breakdown-item">
-                <span>Click Rate:</span>
-                <span>{communicationData.emailStats.clickRate}%</span>
-              </div>
+            <p style={{opacity: 0.9, fontSize: '0.9rem'}}>
+              Ministry reports and department submissions
+            </p>
+          </div>
+        </div>
+
+        {/* Event Proposals */}
+        <div
+          className="clean-card submission-overview-card"
+          style={{background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)', color: 'white', cursor: 'pointer'}}
+          onClick={() => setActiveTab('events')}
+        >
+          <div className="admin-card-header">
+            <div className="admin-card-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-4 12H8m0 0V9a2 2 0 012-2h4a2 2 0 012 2v3" />
+              </svg>
             </div>
+            <div>
+              <h3>Event Proposals</h3>
+              <p className="admin-card-value">{messagesByType.events.length}</p>
+            </div>
+          </div>
+          <div className="admin-card-content">
+            <p style={{opacity: 0.9, fontSize: '0.9rem'}}>
+              Event proposals and program suggestions
+            </p>
+          </div>
+        </div>
+
+        {/* Facility Issues */}
+        <div
+          className="clean-card submission-overview-card"
+          style={{background: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)', color: 'white', cursor: 'pointer'}}
+          onClick={() => setActiveTab('maintenance')}
+        >
+          <div className="admin-card-header">
+            <div className="admin-card-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3>Facility Issues</h3>
+              <p className="admin-card-value">{messagesByType.maintenance.length}</p>
+            </div>
+          </div>
+          <div className="admin-card-content">
+            <p style={{opacity: 0.9, fontSize: '0.9rem'}}>
+              Maintenance requests and facility issues
+            </p>
+          </div>
+        </div>
+
+        {/* General Inquiries */}
+        <div
+          className="clean-card submission-overview-card"
+          style={{background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)', color: 'white', cursor: 'pointer'}}
+          onClick={() => setActiveTab('general')}
+        >
+          <div className="admin-card-header">
+            <div className="admin-card-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3>General Inquiries</h3>
+              <p className="admin-card-value">{messagesByType.general.length}</p>
+            </div>
+          </div>
+          <div className="admin-card-content">
+            <p style={{opacity: 0.9, fontSize: '0.9rem'}}>
+              General questions and other communications
+            </p>
           </div>
         </div>
 
@@ -1096,51 +1958,17 @@ const CommunicationHub = () => {
                 </tr>
               </thead>
               <tbody>
-                {communicationData.templates.map(template => (
-                  <tr key={template.id}>
-                    <td>
-                      <div className="admin-template-name">
-                        {template.name}
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`admin-badge ${template.type === 'SMS' ? 'admin-badge-success' : 'admin-badge-info'}`}>
-                        {template.type}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="admin-template-preview">
-                        {template.content.length > 50
-                          ? template.content.substring(0, 50) + '...'
-                          : template.content
-                        }
-                      </div>
-                    </td>
-                    <td>{template.lastUsed}</td>
-                    <td>
-                      <div className="admin-action-buttons">
-                        <button
-                          className="admin-btn-icon admin-btn-edit"
-                          onClick={() => handleEditTemplate(template)}
-                          title="Edit template"
-                        >
-                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                        <button
-                          className="admin-btn-icon admin-btn-delete"
-                          onClick={() => handleDeleteTemplate(template.id)}
-                          title="Delete template"
-                        >
-                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
+                    <div>
+                      <svg style={{ width: '3rem', height: '3rem', margin: '0 auto 1rem', opacity: 0.5 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem', fontWeight: '600' }}>Message Templates</h3>
+                      <p style={{ margin: 0, fontSize: '0.9rem' }}>Template management will be available in a future update</p>
+                    </div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -1154,41 +1982,30 @@ const CommunicationHub = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [dateRange, setDateRange] = useState('all')
 
-    // Extended mock data for history
-    const allMessages = [
-      ...communicationData.recentMessages,
-      {
-        id: 4,
-        type: 'SMS',
-        subject: 'Birthday Wishes - Mary Johnson',
-        recipients: 1,
-        status: 'Delivered',
-        timestamp: '2025-01-12 10:15',
-        deliveryRate: 100
-      },
-      {
-        id: 5,
-        type: 'Email',
-        subject: 'Monthly Newsletter - January',
-        recipients: 234,
-        status: 'Sent',
-        timestamp: '2025-01-01 08:00',
-        openRate: 92
-      },
-      {
-        id: 6,
-        type: 'SMS',
-        subject: 'Prayer Meeting Reminder',
-        recipients: 67,
-        status: 'Delivered',
-        timestamp: '2024-12-28 15:30',
-        deliveryRate: 97
-      }
-    ]
+    // Use real messages from database
+    const allMessages = messages.map(msg => ({
+      id: msg.id,
+      type: 'Email', // All submissions are currently email-based
+      subject: msg.subject,
+      recipients: 1,
+      status: msg.status === 'sent' ? 'Sent' : msg.status === 'pending' ? 'Pending' : 'Failed',
+      timestamp: new Date(msg.created_at).toLocaleString('en-KE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      sender: msg.sender_name,
+      recipient: msg.recipient_name,
+      department: msg.department
+    }))
 
     const filteredMessages = allMessages.filter(message => {
       const matchesType = historyFilter === 'all' || message.type === historyFilter
-      const matchesSearch = message.subject.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesSearch = message.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           message.sender?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           message.recipient?.toLowerCase().includes(searchTerm.toLowerCase())
       return matchesType && matchesSearch
     })
 
@@ -1664,16 +2481,20 @@ const CommunicationHub = () => {
     switch (activeTab) {
       case 'overview':
         return renderOverview()
-      case 'messages':
-        return renderMessages()
-      case 'send-message':
-        return renderSendMessage()
+      case 'visitation':
+        return renderVisitationRequests()
+      case 'counseling':
+        return renderCounselingRequests()
+      case 'reports':
+        return renderDepartmentReports()
+      case 'events':
+        return renderEventProposals()
+      case 'maintenance':
+        return renderMaintenanceRequests()
+      case 'general':
+        return renderGeneralInquiries()
       case 'templates':
         return renderTemplates()
-      case 'history':
-        return renderHistory()
-      case 'settings':
-        return renderSettings()
       default:
         return renderOverview()
     }
@@ -1716,6 +2537,9 @@ const CommunicationHub = () => {
       <div className="admin-tab-content">
         {renderContent()}
       </div>
+
+      {/* Message Detail Modal */}
+      {renderMessageModal()}
     </div>
   )
 }

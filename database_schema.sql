@@ -124,6 +124,10 @@ CREATE TABLE IF NOT EXISTS prayer_requests (
     privacy_level VARCHAR(20) DEFAULT 'private' CHECK (privacy_level IN ('public', 'private', 'leadership_only')),
     status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'answered', 'closed')),
     assigned_to UUID REFERENCES users(id) ON DELETE SET NULL,
+    -- Public submission fields (for non-authenticated users)
+    submitter_name VARCHAR(255),
+    submitter_email VARCHAR(255),
+    submitter_phone VARCHAR(20),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -155,6 +159,24 @@ CREATE TABLE IF NOT EXISTS attendance (
     UNIQUE(event_id, member_id, attendance_date)
 );
 
+-- Church Leaders Management
+CREATE TABLE IF NOT EXISTS church_leaders (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255) NOT NULL,
+    category VARCHAR(100) NOT NULL CHECK (category IN ('pastoral', 'elder', 'officer', 'ministry', 'department')),
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    bio TEXT,
+    years_of_service INTEGER,
+    specialties TEXT[],
+    is_active BOOLEAN DEFAULT true,
+    display_order INTEGER DEFAULT 0,
+    photo_url VARCHAR(500),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_members_user_id ON members(user_id);
 CREATE INDEX IF NOT EXISTS idx_members_active ON members(is_active);
@@ -167,6 +189,15 @@ CREATE INDEX IF NOT EXISTS idx_giving_member ON giving_records(member_id);
 CREATE INDEX IF NOT EXISTS idx_prayer_requests_status ON prayer_requests(status);
 CREATE INDEX IF NOT EXISTS idx_announcements_published ON announcements(is_published);
 CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(attendance_date DESC);
+-- Messages table indexes
+CREATE INDEX IF NOT EXISTS idx_messages_status ON messages(status);
+CREATE INDEX IF NOT EXISTS idx_messages_recipient ON messages(recipient_name, recipient_role);
+CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_department ON messages(department);
+CREATE INDEX IF NOT EXISTS idx_messages_sender_email ON messages(sender_email);
+CREATE INDEX IF NOT EXISTS idx_church_leaders_category ON church_leaders(category);
+CREATE INDEX IF NOT EXISTS idx_church_leaders_active ON church_leaders(is_active);
+CREATE INDEX IF NOT EXISTS idx_church_leaders_order ON church_leaders(display_order);
 
 -- Admin Activity Logs Table
 CREATE TABLE admin_activity_logs (
@@ -188,6 +219,44 @@ CREATE TABLE system_settings (
     updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Messages table for centralized messaging system
+CREATE TABLE IF NOT EXISTS messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    -- Sender Information
+    sender_name VARCHAR(255) NOT NULL,
+    sender_email VARCHAR(255) NOT NULL,
+    sender_phone VARCHAR(50),
+
+    -- Message Content
+    subject VARCHAR(500) NOT NULL,
+    message TEXT NOT NULL,
+
+    -- Recipient Information
+    recipient_name VARCHAR(255) NOT NULL,
+    recipient_role VARCHAR(255) NOT NULL,
+    recipient_email VARCHAR(255),
+    department VARCHAR(255),
+
+    -- Status Tracking
+    status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'failed', 'read')),
+    email_sent_at TIMESTAMP WITH TIME ZONE,
+    email_error TEXT,
+    read_at TIMESTAMP WITH TIME ZONE,
+
+    -- Metadata
+    source VARCHAR(100) DEFAULT 'website' CHECK (source IN ('website', 'admin', 'api')),
+    priority VARCHAR(20) DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+    submission_type VARCHAR(100), -- Type of submission (Department Reports, Visitation Requests, etc.)
+
+    -- File Attachments
+    attachments JSONB DEFAULT '[]'::jsonb, -- Array of file objects with name, url, size, type
+
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Add permissions column to users table
@@ -246,6 +315,7 @@ ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_activity_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 
@@ -313,11 +383,31 @@ CREATE POLICY "Leadership can view leadership-only requests" ON prayer_requests 
 CREATE POLICY "Public can view published announcements" ON announcements FOR SELECT USING (is_published = true);
 CREATE POLICY "Admins can manage announcements" ON announcements FOR ALL USING (
     EXISTS (
-        SELECT 1 FROM users 
-        WHERE users.id = auth.uid() 
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
         AND users.role IN ('SUPER_ADMIN', 'ADMIN')
     )
 );
+
+-- Messages policies
+CREATE POLICY "Admin can view all messages" ON messages FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN', 'ELDER')
+    )
+);
+
+CREATE POLICY "Admin can update message status" ON messages FOR UPDATE USING (
+    EXISTS (
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
+        AND users.role IN ('SUPER_ADMIN', 'ADMIN', 'ELDER')
+    )
+);
+
+-- Allow public insert for contact forms
+CREATE POLICY "Allow public message creation" ON messages FOR INSERT WITH CHECK (true);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -337,11 +427,47 @@ CREATE TRIGGER update_ministries_updated_at BEFORE UPDATE ON ministries FOR EACH
 CREATE TRIGGER update_departments_updated_at BEFORE UPDATE ON departments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_prayer_requests_updated_at BEFORE UPDATE ON prayer_requests FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_announcements_updated_at BEFORE UPDATE ON announcements FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_messages_updated_at BEFORE UPDATE ON messages FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert sample admin user (you'll need to create this user in Supabase Auth first)
 -- This is just a placeholder - you'll need to replace with actual user ID after creating in Supabase Auth
 -- INSERT INTO users (id, email, full_name, role) VALUES 
 -- ('your-user-id-here', 'admin@thikamainsdachurch.org', 'Church Administrator', 'SUPER_ADMIN');
 
+-- Insert initial church leaders data
+INSERT INTO church_leaders (name, position, category, email, phone, bio, display_order, specialties) VALUES
+-- Pastoral Team
+('Pst. Charles Muritu', 'Senior Pastor', 'pastoral', 'muritunganga77@gmail.com', '+254 729 071 755', 'Leading our congregation with wisdom and dedication, Pastor Charles guides our church family in spiritual growth and community service.', 1, ARRAY['Pastoral Care', 'Biblical Teaching', 'Church Leadership']),
+
+-- Church Elders
+('Elder Methucellah Mokua', 'First Elder', 'elder', 'mokuamariera@gmail.com', '+254 726 028 004', 'Serving as our First Elder, Elder Methucellah provides spiritual guidance and oversight to our church board and congregation.', 2, ARRAY['Church Governance', 'Spiritual Guidance', 'Leadership']),
+('Elder Abraham Sayah', 'Church Elder', 'elder', 'sayahabraham22@gmail.com', '+254 705 476 095', 'Dedicated elder serving the church with wisdom and commitment.', 3, ARRAY['Spiritual Guidance', 'Church Administration']),
+('Elder Reuben Lusasi', 'Church Elder & Family Life Ministry', 'elder', 'rlusasi@yahoo.com', '+254 721 885 849', 'Elder focused on family life ministry and spiritual guidance.', 4, ARRAY['Family Life Ministry', 'Counseling', 'Spiritual Guidance']),
+('Elder James Mauti', 'Church Elder', 'elder', 'jamesmogere530@gmail.com', '+254 711 617 542', 'Committed elder serving the church community.', 5, ARRAY['Spiritual Guidance', 'Church Administration']),
+('Elder David Juma', 'Church Elder', 'elder', 'davyjumah@gmail.com', '+254 724 322 889', 'Faithful elder dedicated to church service.', 6, ARRAY['Spiritual Guidance', 'Church Administration']),
+
+-- Church Officers
+('Kefa Nyakundi', 'Head Deacon', 'officer', NULL, '+254 724 357 783', 'Coordinating our deacon board and ensuring smooth church operations, Deacon Kefa serves with dedication and commitment.', 7, ARRAY['Church Administration', 'Facilities Management', 'Stewardship']),
+('Edwina Odongo', 'Head Deaconess', 'officer', NULL, '+254 723 506 923', 'Leading the deaconess ministry with grace and dedication.', 8, ARRAY['Deaconess Ministry', 'Church Service', 'Community Care']),
+('Effie Muthoni', 'Church Clerk', 'officer', 'effiemuthoni3@gmail.com', '+254 723 379 186', 'Managing church records and administrative duties with precision and care.', 9, ARRAY['Church Administration', 'Record Keeping', 'Communication']),
+('Joseph Kimilu', 'Church Treasurer', 'officer', 'jkimilu963@gmail.com', '+254 720 930 703', 'Overseeing church finances with integrity and transparency.', 10, ARRAY['Financial Management', 'Stewardship', 'Church Administration']),
+
+-- Ministry Leaders
+('Duncan Mageto', 'Youth Ministry Leader', 'ministry', 'duncanmageto76@gmail.com', '+254 704 385 185', 'Empowering young people to grow in faith and serve their community.', 11, ARRAY['Youth Ministry', 'Community Service', 'Leadership Development']),
+('Erick Yonni', 'Children''s Ministry Leader', 'ministry', 'erickyonni@gmail.com', '+254 723 522 933', 'Nurturing children in their relationship with Jesus Christ.', 12, ARRAY['Children''s Ministry', 'Education', 'Child Development']),
+('Joan Ouma', 'Women''s Ministry (AWM) Leader', 'ministry', NULL, '+254 726 385 813', 'Supporting and encouraging women in their spiritual journey.', 13, ARRAY['Women''s Ministry', 'AWM Programs', 'Community Service']),
+('Benard Mogere', 'Men''s Ministry (AMM) Leader', 'ministry', NULL, '+254 721 785 862', 'Building strong Christian men and fathers through fellowship and service.', 14, ARRAY['Men''s Ministry', 'Mentorship', 'Community Projects']),
+('Paul Odongo', 'Music Coordinator', 'ministry', 'paulodongo43@gmail.com', '+254 720 051 277', 'Coordinating music ministry and worship services.', 15, ARRAY['Music Ministry', 'Worship Leading', 'Music Training']),
+('Justus Arita', 'Choir Director', 'ministry', 'justusarita@gmail.com', '+254 721 880 818', 'Leading our choir ministry with beautiful harmonies and spiritual songs.', 16, ARRAY['Choir Ministry', 'Music Training', 'Worship Leading']),
+
+-- Department Leaders
+('Paul Odhiambo', 'Strategic Planning Department Head', 'department', 'odhiambop57@gmail.com', '+254 721 153 152', 'Leading strategic planning and church development initiatives.', 17, ARRAY['Strategic Planning', 'Church Development', 'Leadership']),
+('Charles Kyalo', 'Communication Department Head', 'department', 'charleskyalo77@gmail.com', '+254 722 937 200', 'Managing church communication and outreach efforts.', 18, ARRAY['Communication', 'Media', 'Outreach']),
+('Margaret Nyambati', 'Development Department Head', 'department', 'margymoraa@gmail.com', '+254 717 688 343', 'Overseeing church development and infrastructure projects.', 19, ARRAY['Development', 'Project Management', 'Infrastructure']),
+('Elizabeth Sapato', 'Health Ministry Leader', 'ministry', NULL, '+254 724 590 844', 'Promoting health and wellness in our church community.', 20, ARRAY['Health Ministry', 'Community Health', 'Wellness Programs']),
+('Rael Karimi', 'Prayer Ministry Leader', 'ministry', NULL, '+254 720 671 289', 'Coordinating prayer ministry and spiritual intercession.', 21, ARRAY['Prayer Ministry', 'Spiritual Intercession', 'Prayer Coordination'])
+
+;
+
 -- Success message
-SELECT 'Database schema created successfully! 🎉' as message;
+SELECT 'Database schema created successfully! All tables, indexes, policies, and initial leader data are in place. 🎉' as message;
