@@ -546,10 +546,10 @@ const Home = () => {
               ...titleStyle,
               textShadow: '0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3)'
             }}>
-              THIKA MAIN <span style={{
+              SEVENTH-DAY ADVENTIST CHURCH - <span style={{
                 color: '#fbbf24',
                 textShadow: '0 0 30px rgba(251, 191, 36, 0.5), 0 4px 8px rgba(0, 0, 0, 0.5)'
-              }}>SDA</span> CHURCH
+              }}>THIKA MAIN</span>
             </h1>
 
             {/* Scripture Verse */}
