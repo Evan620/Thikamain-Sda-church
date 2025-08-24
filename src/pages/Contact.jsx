@@ -769,7 +769,7 @@ const Contact = () => {
                     margin: 0,
                     fontSize: '0.9rem'
                   }}>
-                    SDA Thika Main Church, Makongeni, Thika
+                    Seventh-day Adventist Church - Thika Main, Makongeni, Thika
                   </p>
                 </div>
               </div>
@@ -795,7 +795,7 @@ const Contact = () => {
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="SDA Thika Main Church Location"
+                  title="Seventh-day Adventist Church - Thika Main Location"
                 ></iframe>
               </div>
 

@@ -863,7 +863,7 @@ const Home = () => {
                   lineHeight: '1.6',
                   marginBottom: '1rem'
                 }}>
-                  Discover the rich history and mission of Thika Main SDA Church in our community.
+                  Discover the rich history and mission of Seventh-day Adventist Church - Thika Main in our community.
                 </p>
                 <Link
                   to="/about"

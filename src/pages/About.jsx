@@ -393,7 +393,7 @@ const About = () => {
                         color: '#6b7280',
                         lineHeight: '1.6'
                       }}>
-                        Thika Main SDA Church was established in 1980 by a small group of dedicated believers who
+                        Seventh-day Adventist Church - Thika Main was established in 1980 by a small group of dedicated believers who
                         felt called to share the Adventist message in the rapidly growing town of Thika. Starting
                         with just 25 members, they met in a simple structure in Makongeni, laying the foundation
                         for what would become a mother church to many congregations across the region.
@@ -1596,7 +1596,7 @@ const About = () => {
                 opacity: '0.9'
               }}>
                 Whether you're seeking spiritual growth, community fellowship, or simply curious about our faith,
-                you're always welcome at Thika Main SDA Church. Join us this Sabbath!
+                you're always welcome at Seventh-day Adventist Church - Thika Main. Join us this Sabbath!
               </p>
 
               <div style={{

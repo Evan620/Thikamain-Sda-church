@@ -300,7 +300,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '[]'::jsonb
 
 -- Insert default system settings
 INSERT INTO system_settings (key, value, description) VALUES
-('church_name', 'Thikamain SDA Church', 'Official church name'),
+('church_name', 'Seventh-day Adventist Church - Thika Main', 'Official church name'),
 ('church_address', '', 'Church physical address'),
 ('church_phone', '', 'Church contact phone number'),
 ('church_email', '', 'Church contact email address'),

@@ -26,9 +26,9 @@ const Footer = () => {
               />
               <div>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white', margin: 0 }}>
-                  Thika Main SDA
+                  Seventh-day Adventist Church
                 </h3>
-                <p style={{ fontSize: '0.875rem', color: '#d1d5db', margin: 0 }}>Church</p>
+                <p style={{ fontSize: '0.875rem', color: '#d1d5db', margin: 0 }}>Thika Main</p>
               </div>
             </div>
 
@@ -291,7 +291,7 @@ const Footer = () => {
               width: '100%'
             }}>
               <p style={{ color: '#9ca3af', fontSize: '0.875rem', margin: 0 }}>
-                © 2025 Thika Main Seventh-Day Adventist Church. All rights reserved.
+                © 2025 Seventh-day Adventist Church - Thika Main. All rights reserved.
               </p>
               <p style={{ color: '#6b7280', fontSize: '0.75rem', margin: '0.5rem 0 0 0' }}>
                 Built with ❤️ for God's glory | Spreading hope and love in Thika and beyond

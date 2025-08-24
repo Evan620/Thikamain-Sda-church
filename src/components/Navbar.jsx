@@ -285,14 +285,14 @@ const Navbar = () => {
             justifyContent: 'center'
           }}>
             <div style={{
-              fontSize: isMobile ? '15px' : '17px',
+              fontSize: isMobile ? '13px' : '15px',
               fontWeight: '700',
               color: '#2d5a27',
               letterSpacing: '-0.2px',
               lineHeight: '1.2',
               marginBottom: '1px'
             }}>
-              Thika Main SDA
+              Seventh-day Adventist Church
             </div>
             <div style={{
               fontSize: isMobile ? '10px' : '11px',
@@ -301,7 +301,7 @@ const Navbar = () => {
               letterSpacing: '0.5px',
               textTransform: 'uppercase'
             }}>
-              Church
+              Thika Main
             </div>
           </div>
         </Link>
