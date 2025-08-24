@@ -171,6 +171,19 @@ const Sermons = () => {
     }
   ])
 
+  // Featured sermon (stays fixed)
+  const featuredSermon = {
+    id: 'featured',
+    title: "ARE YOUR FEET BLESSED",
+    speaker: "Pastor Charles Muritu",
+    date: "June 21, 2025",
+    url: "https://www.youtube.com/live/WPIfcmn6RE0?si=MEw4iMufQZJpbSor",
+    category: "Sabbath Service",
+    series: "Blessings",
+    description: "A powerful message about walking in God's blessings and being a blessing to others.",
+    color: '#2d5a27'
+  }
+
   // Map DB rows to the exact shape used by the UI
   const mapSermon = (r) => ({
     id: r.id,
@@ -316,16 +329,16 @@ const Sermons = () => {
             <div style={{
               position: 'relative',
               minHeight: '300px',
-              background: getThumbnailWithFallback(sermons[0]).fallback
-                ? `linear-gradient(135deg, ${sermons[0].color}, ${sermons[0].color}dd)`
-                : `url(${getThumbnailWithFallback(sermons[0]).url})`,
+              background: getThumbnailWithFallback(featuredSermon).fallback
+                ? `linear-gradient(135deg, ${featuredSermon.color}, ${featuredSermon.color}dd)`
+                : `url(${getThumbnailWithFallback(featuredSermon).url})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              {getThumbnailWithFallback(sermons[0]).fallback && (
+              {getThumbnailWithFallback(featuredSermon).fallback && (
                 <div style={{
                   textAlign: 'center',
                   color: 'white',
@@ -344,7 +357,7 @@ const Sermons = () => {
                     fontWeight: '700',
                     border: '3px solid rgba(255, 255, 255, 0.3)'
                   }}>
-                    {sermons[0].speaker.split(' ').map(n => n[0]).join('')}
+                    {featuredSermon.speaker.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.15)',
@@ -357,7 +370,7 @@ const Sermons = () => {
                     marginBottom: '1rem',
                     display: 'inline-block'
                   }}>
-                    {sermons[0].category}
+                    {featuredSermon.category}
                   </div>
                   <h3 style={{
                     fontSize: '1.8rem',
@@ -366,7 +379,7 @@ const Sermons = () => {
                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
                     lineHeight: '1.2'
                   }}>
-                    {sermons[0].title}
+                    {featuredSermon.title}
                   </h3>
                   <p style={{
                     fontSize: '1.1rem',
@@ -374,14 +387,14 @@ const Sermons = () => {
                     textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
                     marginBottom: '1rem'
                   }}>
-                    by {sermons[0].speaker}
+                    by {featuredSermon.speaker}
                   </p>
                   <div style={{
                     fontSize: '0.95rem',
                     opacity: 0.8,
                     fontWeight: '500'
                   }}>
-                    {sermons[0].date}
+                    {featuredSermon.date}
                   </div>
                 </div>
               )}
@@ -411,7 +424,7 @@ const Sermons = () => {
                   position: 'relative',
                   zIndex: 2
                 }}
-                onClick={() => setSelectedVideo(sermons[0])}
+                onClick={() => setSelectedVideo(featuredSermon)}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'scale(1.1)'
                   e.currentTarget.style.background = 'white'
@@ -476,7 +489,7 @@ const Sermons = () => {
                     fontSize: '0.8rem',
                     fontWeight: '600'
                   }}>
-                    {sermons[0].date}
+                    {featuredSermon.date}
                   </span>
                   <span style={{
                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
@@ -486,7 +499,7 @@ const Sermons = () => {
                     fontSize: '0.8rem',
                     fontWeight: '600'
                   }}>
-                    {sermons[0].category}
+                    {featuredSermon.category}
                   </span>
                 </div>
 
@@ -498,7 +511,7 @@ const Sermons = () => {
                   marginBottom: '1rem',
                   lineHeight: '1.3'
                 }}>
-                  {sermons[0].title}
+                  {featuredSermon.title}
                 </h3>
 
                 {/* Speaker */}
@@ -520,7 +533,7 @@ const Sermons = () => {
                     fontWeight: '600',
                     fontSize: '0.9rem'
                   }}>
-                    {sermons[0].speaker.split(' ').map(n => n[0]).join('')}
+                    {featuredSermon.speaker.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div>
                     <div style={{
@@ -528,7 +541,7 @@ const Sermons = () => {
                       color: '#374151',
                       fontSize: '1rem'
                     }}>
-                      {sermons[0].speaker}
+                      {featuredSermon.speaker}
                     </div>
                     <div style={{
                       fontSize: '0.85rem',
@@ -546,7 +559,7 @@ const Sermons = () => {
                   marginBottom: '2rem',
                   fontSize: '1rem'
                 }}>
-                  {sermons[0].description}
+                  {featuredSermon.description}
                 </p>
 
                 {/* Action Buttons */}
@@ -556,7 +569,7 @@ const Sermons = () => {
                   flexWrap: 'wrap'
                 }}>
                   <button
-                    onClick={() => setSelectedVideo(sermons[0])}
+                    onClick={() => setSelectedVideo(featuredSermon)}
                     style={{
                       backgroundColor: '#2d5a27',
                       color: 'white',
@@ -587,7 +600,7 @@ const Sermons = () => {
                     Watch Now
                   </button>
                   <button
-                    onClick={() => window.open(sermons[0].url, '_blank')}
+                    onClick={() => window.open(featuredSermon.url, '_blank')}
                     style={{
                       backgroundColor: 'transparent',
                       color: '#2d5a27',
@@ -620,12 +633,12 @@ const Sermons = () => {
                   </button>
                   <button
                     onClick={() => {
-                      const shareText = `Check out this sermon: ${sermons[0].title} by ${sermons[0].speaker} - ${sermons[0].url}`
+                      const shareText = `Check out this sermon: ${featuredSermon.title} by ${featuredSermon.speaker} - ${featuredSermon.url}`
                       if (navigator.share) {
                         navigator.share({
-                          title: sermons[0].title,
+                          title: featuredSermon.title,
                           text: shareText,
-                          url: sermons[0].url
+                          url: featuredSermon.url
                         })
                       } else {
                         navigator.clipboard.writeText(shareText)
@@ -704,7 +717,7 @@ const Sermons = () => {
           gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
           gap: '2rem'
         }}>
-          {sermons.slice(1).map((sermon, index) => (
+          {sermons.map((sermon, index) => (
             <div
               key={sermon.id}
               style={{
@@ -840,7 +853,7 @@ const Sermons = () => {
                   border: '4px solid rgba(255, 255, 255, 0.9)',
                   backdropFilter: 'blur(10px)'
                 }}
-                onClick={() => setSelectedVideo(sermons[0])}
+                onClick={() => setSelectedVideo(featuredSermon)}
                 onMouseEnter={(e) => {
                   e.target.style.transform = 'translate(-50%, -50%) scale(1.1)'
                   e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
