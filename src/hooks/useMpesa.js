@@ -92,6 +92,24 @@ export const useMpesa = () => {
         if (status.ResponseCode === '0') {
           // Payment successful
           setPaymentStatus('completed')
+
+          // Save payment record to database
+          try {
+            const paymentData = {
+              amount: status.Amount || 0,
+              givingType: 'offering', // Default, should be passed from context
+              phoneNumber: status.PhoneNumber || '',
+              transactionId: status.MpesaReceiptNumber || '',
+              checkoutRequestId: requestID
+            }
+
+            await mpesaService.savePaymentRecord(paymentData)
+            console.log('Payment record saved successfully')
+          } catch (saveError) {
+            console.error('Failed to save payment record:', saveError)
+            // Don't fail the payment flow for database save errors
+          }
+
           return {
             success: true,
             message: 'Payment completed successfully!',

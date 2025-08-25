@@ -22,8 +22,8 @@ class MpesaService {
       passkey: import.meta.env.VITE_MPESA_PASSKEY || 'your_passkey',
 
       // Callback URLs (these should be your backend endpoints)
-      callbackURL: import.meta.env.VITE_MPESA_CALLBACK_URL || 'https://your-backend.com/mpesa/callback',
-      resultURL: import.meta.env.VITE_MPESA_RESULT_URL || 'https://your-backend.com/mpesa/result',
+      callbackURL: import.meta.env.VITE_MPESA_CALLBACK_URL || `${window.location.origin}/api/mpesa/callback`,
+      resultURL: import.meta.env.VITE_MPESA_RESULT_URL || `${window.location.origin}/api/mpesa/result`,
 
       // Account reference
       accountReference: '436520#' // Your church account
@@ -300,6 +300,32 @@ class MpesaService {
 
     } catch (error) {
       console.error('Payment Simulation Error:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Save payment record to database
+   */
+  async savePaymentRecord(paymentData) {
+    try {
+      const response = await fetch('/api/mpesa/save-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(paymentData)
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to save payment record')
+      }
+
+      return result
+    } catch (error) {
+      console.error('Save payment record error:', error)
       throw error
     }
   }

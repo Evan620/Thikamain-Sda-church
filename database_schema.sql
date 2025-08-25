@@ -114,6 +114,25 @@ CREATE TABLE IF NOT EXISTS giving_records (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- M-PESA Payment Logs
+CREATE TABLE IF NOT EXISTS payment_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    checkout_request_id VARCHAR(255),
+    merchant_request_id VARCHAR(255),
+    conversation_id VARCHAR(255),
+    originator_conversation_id VARCHAR(255),
+    transaction_id VARCHAR(255),
+    result_type INTEGER,
+    result_code INTEGER,
+    result_desc TEXT,
+    result_parameters JSONB DEFAULT '[]'::jsonb,
+    status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'success', 'failed', 'timeout', 'cancelled')),
+    amount DECIMAL(10,2),
+    phone_number VARCHAR(20),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Prayer Requests
 CREATE TABLE IF NOT EXISTS prayer_requests (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
