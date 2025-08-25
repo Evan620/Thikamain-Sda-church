@@ -4045,6 +4045,38 @@ body {
   background: rgba(255, 255, 255, 0.5);
 }
 
+/* Custom scrollbar for admin modals */
+.admin-modal::-webkit-scrollbar,
+.admin-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-modal::-webkit-scrollbar-track,
+.admin-modal-body::-webkit-scrollbar-track {
+  background: rgba(45, 90, 39, 0.05);
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}
+
+.admin-modal::-webkit-scrollbar-thumb,
+.admin-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(45, 90, 39, 0.2);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.admin-modal::-webkit-scrollbar-thumb:hover,
+.admin-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 90, 39, 0.3);
+}
+
+/* Firefox scrollbar for admin modals */
+.admin-modal,
+.admin-modal-body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(45, 90, 39, 0.2) rgba(45, 90, 39, 0.05);
+}
+
 /* Firefox scrollbar */
 .admin-sidebar-nav {
   scrollbar-width: thin;
