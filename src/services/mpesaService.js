@@ -119,13 +119,12 @@ class MpesaService {
       // Format phone number
       const formattedPhone = this.formatPhoneNumber(phoneNumber)
 
-      // Check if we're in demo mode OR localhost development
-      if (this.config.consumerKey === 'your_consumer_key' ||
-          this.config.consumerSecret === 'your_consumer_secret' ||
-          this.config.consumerKey === 'demo_consumer_key' ||
-          this.config.consumerSecret === 'demo_consumer_secret' ||
-          window.location.hostname === 'localhost' ||
-          window.location.hostname === '127.0.0.1') {
+      // Check if we're in demo mode (only for localhost development)
+      if ((this.config.consumerKey === 'your_consumer_key' ||
+           this.config.consumerSecret === 'your_consumer_secret' ||
+           this.config.consumerKey === 'demo_consumer_key' ||
+           this.config.consumerSecret === 'demo_consumer_secret') ||
+          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
 
         // Demo mode - simulate STK Push for testing
         console.log('Demo Mode: Simulating STK Push...')
