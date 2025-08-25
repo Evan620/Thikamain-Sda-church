@@ -10,23 +10,28 @@ class MpesaService {
   constructor() {
     // M-PESA API Configuration
     this.config = {
-      // Sandbox URLs (replace with production URLs when going live)
-      baseURL: 'https://sandbox.safaricom.co.ke',
+      // API URLs - sandbox vs production
+      baseURL: import.meta.env.VITE_MPESA_ENVIRONMENT === 'production' 
+        ? 'https://api.safaricom.co.ke' 
+        : 'https://sandbox.safaricom.co.ke',
 
-      // Your M-PESA credentials (these should be in environment variables)
-      consumerKey: import.meta.env.VITE_MPESA_CONSUMER_KEY || 'your_consumer_key',
-      consumerSecret: import.meta.env.VITE_MPESA_CONSUMER_SECRET || 'your_consumer_secret',
+      // Your M-PESA credentials from environment variables
+      consumerKey: import.meta.env.VITE_MPESA_CONSUMER_KEY,
+      consumerSecret: import.meta.env.VITE_MPESA_CONSUMER_SECRET,
 
       // Business details
-      businessShortCode: '247247', // Your church paybill
-      passkey: import.meta.env.VITE_MPESA_PASSKEY || 'your_passkey',
+      businessShortCode: import.meta.env.VITE_MPESA_BUSINESS_SHORTCODE || '247247',
+      passkey: import.meta.env.VITE_MPESA_PASSKEY,
 
       // Callback URLs (these should be your backend endpoints)
-      callbackURL: import.meta.env.VITE_MPESA_CALLBACK_URL || `${window.location.origin}/api/mpesa/callback`,
-      resultURL: import.meta.env.VITE_MPESA_RESULT_URL || `${window.location.origin}/api/mpesa/result`,
+      callbackURL: import.meta.env.VITE_MPESA_CALLBACK_URL,
+      resultURL: import.meta.env.VITE_MPESA_RESULT_URL,
 
       // Account reference
-      accountReference: '436520#' // Your church account
+      accountReference: import.meta.env.VITE_MPESA_ACCOUNT_REFERENCE || '436520#',
+
+      // Environment
+      environment: import.meta.env.VITE_MPESA_ENVIRONMENT || 'sandbox'
     }
   }
 
@@ -114,11 +119,13 @@ class MpesaService {
       // Format phone number
       const formattedPhone = this.formatPhoneNumber(phoneNumber)
 
-      // Check if we're in demo mode
+      // Check if we're in demo mode OR localhost development
       if (this.config.consumerKey === 'your_consumer_key' ||
           this.config.consumerSecret === 'your_consumer_secret' ||
           this.config.consumerKey === 'demo_consumer_key' ||
-          this.config.consumerSecret === 'demo_consumer_secret') {
+          this.config.consumerSecret === 'demo_consumer_secret' ||
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1') {
 
         // Demo mode - simulate STK Push for testing
         console.log('Demo Mode: Simulating STK Push...')
@@ -207,21 +214,26 @@ class MpesaService {
    */
   async querySTKPushStatus(checkoutRequestID) {
     try {
-      // Check if this is a demo checkout request ID
+      // Check if this is a demo checkout request ID OR localhost
       if (checkoutRequestID.startsWith('ws_CO_') &&
           (this.config.consumerKey === 'your_consumer_key' ||
            this.config.consumerSecret === 'your_consumer_secret' ||
            this.config.consumerKey === 'demo_consumer_key' ||
-           this.config.consumerSecret === 'demo_consumer_secret')) {
+           this.config.consumerSecret === 'demo_consumer_secret' ||
+           window.location.hostname === 'localhost' ||
+           window.location.hostname === '127.0.0.1')) {
 
         // Demo mode - simulate payment completion after 10 seconds
         console.log('Demo Mode: Simulating payment status check...')
 
         // Extract timestamp from checkout request ID
-        const timestamp = parseInt(checkoutRequestID.split('_')[2])
+        const timestampPart = checkoutRequestID.split('_')[2] // Gets "17561305144758v01vp2ca"
+        const timestamp = parseInt(timestampPart) // Gets 17561305144758
         const elapsed = Date.now() - timestamp
 
-        if (elapsed > 10000) { // 10 seconds
+        console.log('Demo timing check:', { timestamp, elapsed, shouldComplete: elapsed > 15000 })
+
+        if (elapsed > 15000) { // 15 seconds to be safe
           // Simulate successful payment
           return {
             ResponseCode: '0',
@@ -305,25 +317,74 @@ class MpesaService {
   }
 
   /**
-   * Save payment record to database
+   * Save payment record to database using existing tables
    */
   async savePaymentRecord(paymentData) {
     try {
-      const response = await fetch('/api/mpesa/save-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(paymentData)
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to save payment record')
+      // Import supabase client
+      const { supabase } = await import('./supabaseClient')
+      
+      // Prepare payment log record for existing payment_logs table
+      const paymentLogData = {
+        checkout_request_id: paymentData.checkoutRequestId,
+        merchant_request_id: paymentData.merchantRequestId,
+        transaction_id: paymentData.transactionId,
+        amount: parseFloat(paymentData.amount),
+        phone_number: paymentData.phoneNumber,
+        status: paymentData.status || 'pending',
+        result_code: paymentData.resultCode,
+        result_desc: paymentData.resultDescription,
+        result_parameters: paymentData.resultParameters || []
       }
 
-      return result
+      // Save to payment_logs table
+      const { data: paymentLog, error: paymentError } = await supabase
+        .from('payment_logs')
+        .insert([paymentLogData])
+        .select()
+
+      if (paymentError) {
+        console.error('Payment log error:', paymentError)
+        throw paymentError
+      }
+
+      console.log('Payment log saved:', paymentLog)
+
+      // If payment is successful, also save to giving_records table
+      if (paymentData.status === 'success' && paymentData.transactionId) {
+        try {
+          const givingRecord = {
+            amount: parseFloat(paymentData.amount),
+            giving_type: paymentData.givingType || 'offering',
+            payment_method: 'mpesa',
+            transaction_id: paymentData.transactionId,
+            giving_date: new Date().toISOString().split('T')[0],
+            notes: `M-PESA payment from ${paymentData.phoneNumber}`,
+            is_verified: true
+          }
+
+          const { data: givingData, error: givingError } = await supabase
+            .from('giving_records')
+            .insert([givingRecord])
+            .select()
+
+          if (givingError) {
+            console.error('Error saving to giving_records:', givingError)
+            // Don't fail the main request for this error
+          } else {
+            console.log('Giving record saved successfully:', givingData)
+          }
+        } catch (givingError) {
+          console.error('Error processing giving record:', givingError)
+        }
+      }
+
+      return {
+        success: true,
+        message: 'Payment record saved successfully',
+        data: paymentLog[0]
+      }
+
     } catch (error) {
       console.error('Save payment record error:', error)
       throw error

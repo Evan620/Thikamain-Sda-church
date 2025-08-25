@@ -1,178 +1,124 @@
-import { createClient } from '@supabase/supabase-js'
+// M-PESA STK Push Callback Handler
+// This handles the callback from Safaricom after payment processing
+// Updated to work with existing database schema
 
-/**
- * M-PESA STK Push Callback Handler
- * Receives payment confirmations from Safaricom
- * Thika Main SDA Church - Payment Processing
- */
+import { supabase } from '../../src/services/supabaseClient.js'
+
 export default async function handler(req, res) {
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
   try {
-    // Only accept POST requests
-    if (req.method !== 'POST') {
-      return res.status(405).json({ 
-        ResultCode: 1, 
-        ResultDesc: 'Method not allowed' 
-      })
+    console.log('M-PESA Callback received:', JSON.stringify(req.body, null, 2))
+
+    const { Body } = req.body
+
+    if (!Body || !Body.stkCallback) {
+      return res.status(400).json({ error: 'Invalid callback data' })
     }
 
-    // Initialize Supabase client
-    const SUPABASE_URL = process.env.SUPABASE_URL
-    const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_SERVICE_ROLE_KEY
-    
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
-      console.error('Missing Supabase environment variables')
-      return res.status(500).json({ 
-        ResultCode: 1, 
-        ResultDesc: 'Server configuration error' 
-      })
-    }
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
-
-    // Extract callback data
-    const callbackData = req.body
-    console.log('M-PESA Callback received:', JSON.stringify(callbackData, null, 2))
-
-    // Extract STK Push callback data
-    const stkCallback = callbackData?.Body?.stkCallback
-    if (!stkCallback) {
-      console.error('Invalid callback format - missing stkCallback')
-      return res.status(400).json({ 
-        ResultCode: 1, 
-        ResultDesc: 'Invalid callback format' 
-      })
-    }
-
+    const { stkCallback } = Body
     const {
       MerchantRequestID,
       CheckoutRequestID,
       ResultCode,
-      ResultDesc
+      ResultDesc,
+      CallbackMetadata
     } = stkCallback
 
-    // Check if payment was successful
-    if (ResultCode === 0) {
-      // Payment successful - extract transaction details
-      const callbackMetadata = stkCallback.CallbackMetadata?.Item || []
-      
-      // Parse metadata items
-      const metadata = {}
-      callbackMetadata.forEach(item => {
-        if (item.Name && item.Value !== undefined) {
-          metadata[item.Name] = item.Value
-        }
-      })
-
-      const {
-        Amount,
-        MpesaReceiptNumber,
-        TransactionDate,
-        PhoneNumber
-      } = metadata
-
-      // Parse transaction date (format: 20231215143045)
-      let transactionDate = new Date()
-      if (TransactionDate) {
-        const year = TransactionDate.toString().substring(0, 4)
-        const month = TransactionDate.toString().substring(4, 6)
-        const day = TransactionDate.toString().substring(6, 8)
-        const hour = TransactionDate.toString().substring(8, 10)
-        const minute = TransactionDate.toString().substring(10, 12)
-        const second = TransactionDate.toString().substring(12, 14)
-        
-        transactionDate = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`)
-      }
-
-      // Extract giving type from transaction description (if available)
-      let givingType = 'offering' // default
-      const transactionDesc = metadata.TransactionDesc || ''
-      if (transactionDesc.toLowerCase().includes('tithe')) {
-        givingType = 'tithe'
-      } else if (transactionDesc.toLowerCase().includes('building')) {
-        givingType = 'building_fund'
-      } else if (transactionDesc.toLowerCase().includes('mission')) {
-        givingType = 'missions'
-      } else if (transactionDesc.toLowerCase().includes('special')) {
-        givingType = 'special_project'
-      }
-
-      try {
-        // Save payment record to database
-        const { data: givingRecord, error: insertError } = await supabase
-          .from('giving_records')
-          .insert({
-            amount: parseFloat(Amount),
-            giving_type: givingType,
-            payment_method: 'mpesa',
-            transaction_id: MpesaReceiptNumber,
-            giving_date: transactionDate.toISOString().split('T')[0],
-            notes: `M-PESA payment from ${PhoneNumber}. Receipt: ${MpesaReceiptNumber}`,
-            is_verified: true,
-            created_at: new Date().toISOString()
-          })
-          .select()
-          .single()
-
-        if (insertError) {
-          console.error('Database insert error:', insertError)
-          // Still return success to M-PESA to avoid duplicate callbacks
-          return res.status(200).json({ 
-            ResultCode: 0, 
-            ResultDesc: 'Payment processed but database error occurred' 
-          })
-        }
-
-        console.log('Payment record saved successfully:', givingRecord)
-
-        // TODO: Send SMS confirmation to donor (optional)
-        // TODO: Send email notification to church treasurer (optional)
-
-        return res.status(200).json({ 
-          ResultCode: 0, 
-          ResultDesc: 'Payment processed successfully' 
-        })
-
-      } catch (dbError) {
-        console.error('Database operation failed:', dbError)
-        return res.status(200).json({ 
-          ResultCode: 0, 
-          ResultDesc: 'Payment received but processing incomplete' 
-        })
-      }
-
-    } else {
-      // Payment failed or cancelled
-      console.log(`Payment failed: ${ResultDesc} (Code: ${ResultCode})`)
-      
-      // Log failed payment attempt (optional)
-      try {
-        await supabase
-          .from('payment_logs')
-          .insert({
-            checkout_request_id: CheckoutRequestID,
-            merchant_request_id: MerchantRequestID,
-            result_code: ResultCode,
-            result_desc: ResultDesc,
-            status: 'failed',
-            created_at: new Date().toISOString()
-          })
-      } catch (logError) {
-        console.error('Failed to log payment attempt:', logError)
-      }
-
-      return res.status(200).json({ 
-        ResultCode: 0, 
-        ResultDesc: 'Callback processed' 
-      })
+    // Prepare payment record for existing payment_logs table
+    const paymentLogRecord = {
+      checkout_request_id: CheckoutRequestID,
+      merchant_request_id: MerchantRequestID,
+      result_code: ResultCode,
+      result_desc: ResultDesc,
+      status: ResultCode === 0 ? 'success' : 'failed',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
 
+    // If payment was successful, extract additional details
+    if (ResultCode === 0 && CallbackMetadata && CallbackMetadata.Item) {
+      CallbackMetadata.Item.forEach(item => {
+        switch (item.Name) {
+          case 'Amount':
+            paymentLogRecord.amount = item.Value
+            break
+          case 'MpesaReceiptNumber':
+            paymentLogRecord.transaction_id = item.Value
+            break
+          case 'TransactionDate':
+            // Convert M-PESA timestamp to readable format
+            paymentLogRecord.transaction_date = item.Value
+            break
+          case 'PhoneNumber':
+            paymentLogRecord.phone_number = item.Value
+            break
+        }
+      })
+
+      // Store full callback metadata as JSONB
+      paymentLogRecord.result_parameters = CallbackMetadata.Item
+    }
+
+    // Save to existing payment_logs table
+    const { data, error } = await supabase
+      .from('payment_logs')
+      .upsert(paymentLogRecord, { 
+        onConflict: 'checkout_request_id',
+        ignoreDuplicates: false 
+      })
+
+    if (error) {
+      console.error('Database error:', error)
+      throw error
+    }
+
+    console.log('Payment record saved to payment_logs:', data)
+
+    // If payment was successful, also save to giving_records table
+    if (ResultCode === 0 && paymentLogRecord.amount) {
+      try {
+        const givingRecord = {
+          amount: parseFloat(paymentLogRecord.amount),
+          giving_type: 'offering', // Default, could be enhanced to track actual type
+          payment_method: 'mpesa',
+          transaction_id: paymentLogRecord.transaction_id,
+          giving_date: new Date().toISOString().split('T')[0],
+          notes: `M-PESA payment from ${paymentLogRecord.phone_number}`,
+          is_verified: true
+        }
+
+        const { error: givingError } = await supabase
+          .from('giving_records')
+          .insert([givingRecord])
+
+        if (givingError) {
+          console.error('Error saving to giving_records:', givingError)
+          // Don't fail the callback for this error
+        } else {
+          console.log('Giving record saved successfully')
+        }
+      } catch (givingError) {
+        console.error('Error processing giving record:', givingError)
+      }
+    }
+
+    // Respond to Safaricom
+    res.status(200).json({
+      ResultCode: 0,
+      ResultDesc: 'Callback processed successfully'
+    })
+
   } catch (error) {
-    console.error('M-PESA callback processing error:', error)
+    console.error('Callback processing error:', error)
     
-    // Always return success to M-PESA to avoid retries
-    return res.status(200).json({ 
-      ResultCode: 0, 
-      ResultDesc: 'Callback received' 
+    // Still respond with success to avoid retries from Safaricom
+    res.status(200).json({
+      ResultCode: 0,
+      ResultDesc: 'Callback received'
     })
   }
 }

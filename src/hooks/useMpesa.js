@@ -89,25 +89,30 @@ export const useMpesa = () => {
         
         const status = await mpesaService.querySTKPushStatus(requestID)
         
+        console.log(`Payment status check (attempt ${attempts}):`, status)
+        
         if (status.ResponseCode === '0') {
-          // Payment successful
-          setPaymentStatus('completed')
+          // Payment successful - only process once
+          if (paymentStatus !== 'completed') {
+            setPaymentStatus('completed')
 
-          // Save payment record to database
-          try {
-            const paymentData = {
-              amount: status.Amount || 0,
-              givingType: 'offering', // Default, should be passed from context
-              phoneNumber: status.PhoneNumber || '',
-              transactionId: status.MpesaReceiptNumber || '',
-              checkoutRequestId: requestID
+            // Save payment record to database
+            try {
+              const paymentData = {
+                amount: status.Amount || 0,
+                givingType: 'offering', // Default, should be passed from context
+                phoneNumber: status.PhoneNumber || '',
+                transactionId: status.MpesaReceiptNumber || '',
+                checkoutRequestId: requestID,
+                status: 'success'
+              }
+
+              await mpesaService.savePaymentRecord(paymentData)
+              console.log('Payment record saved successfully')
+            } catch (saveError) {
+              console.error('Failed to save payment record:', saveError)
+              // Don't fail the payment flow for database save errors
             }
-
-            await mpesaService.savePaymentRecord(paymentData)
-            console.log('Payment record saved successfully')
-          } catch (saveError) {
-            console.error('Failed to save payment record:', saveError)
-            // Don't fail the payment flow for database save errors
           }
 
           return {
@@ -124,15 +129,20 @@ export const useMpesa = () => {
             message: 'Payment was cancelled'
           }
         } else if (status.ResponseCode === '1037') {
-          // Timeout
-          setPaymentStatus('timeout')
-          setError('Payment request timed out')
-          return {
-            success: false,
-            message: 'Payment request timed out. Please try again.'
+          // Still processing - continue polling
+          if (attempts < maxAttempts) {
+            setTimeout(poll, 2000) // Continue polling every 2 seconds
+          } else {
+            // Max attempts reached
+            setPaymentStatus('timeout')
+            setError('Payment request timed out')
+            return {
+              success: false,
+              message: 'Payment request timed out. Please try again.'
+            }
           }
         } else if (attempts < maxAttempts) {
-          // Continue polling
+          // Continue polling for other response codes
           setTimeout(poll, 2000) // Poll every 2 seconds
         } else {
           // Max attempts reached
