@@ -315,84 +315,86 @@ const BudgetManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleBudgetSubmit} className="admin-form">
-              <div className="admin-form-grid">
+            <div className="admin-modal-content">
+              <form onSubmit={handleBudgetSubmit} className="admin-form">
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Category *</label>
+                    <select
+                      value={budgetFormData.category}
+                      onChange={(e) => setBudgetFormData({...budgetFormData, category: e.target.value})}
+                      required
+                      className="admin-form-select"
+                    >
+                      <option value="">Select category</option>
+                      <option value="pastoral_care">Pastoral Care</option>
+                      <option value="worship_music">Worship & Music</option>
+                      <option value="youth_ministry">Youth Ministry</option>
+                      <option value="children_ministry">Children's Ministry</option>
+                      <option value="outreach_evangelism">Outreach & Evangelism</option>
+                      <option value="building_maintenance">Building & Maintenance</option>
+                      <option value="utilities">Utilities</option>
+                      <option value="office_supplies">Office Supplies</option>
+                      <option value="missions">Missions</option>
+                      <option value="special_events">Special Events</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Allocated Amount (KES) *</label>
+                    <input
+                      type="number"
+                      value={budgetFormData.allocated_amount}
+                      onChange={(e) => setBudgetFormData({...budgetFormData, allocated_amount: e.target.value})}
+                      required
+                      min="0"
+                      step="0.01"
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Year *</label>
+                    <input
+                      type="number"
+                      value={budgetFormData.year}
+                      onChange={(e) => setBudgetFormData({...budgetFormData, year: parseInt(e.target.value)})}
+                      required
+                      min="2020"
+                      max="2030"
+                      className="admin-form-input"
+                    />
+                  </div>
+                </div>
+
                 <div className="admin-form-group">
-                  <label>Category *</label>
-                  <select
-                    value={budgetFormData.category}
-                    onChange={(e) => setBudgetFormData({...budgetFormData, category: e.target.value})}
-                    required
-                    className="admin-form-select"
+                  <label>Description</label>
+                  <textarea
+                    value={budgetFormData.description}
+                    onChange={(e) => setBudgetFormData({...budgetFormData, description: e.target.value})}
+                    rows={3}
+                    className="admin-form-textarea"
+                  />
+                </div>
+
+                <div className="admin-form-actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowBudgetForm(false)
+                      setEditingBudget(null)
+                    }}
+                    className="admin-btn-secondary"
                   >
-                    <option value="">Select category</option>
-                    <option value="pastoral_care">Pastoral Care</option>
-                    <option value="worship_music">Worship & Music</option>
-                    <option value="youth_ministry">Youth Ministry</option>
-                    <option value="children_ministry">Children's Ministry</option>
-                    <option value="outreach_evangelism">Outreach & Evangelism</option>
-                    <option value="building_maintenance">Building & Maintenance</option>
-                    <option value="utilities">Utilities</option>
-                    <option value="office_supplies">Office Supplies</option>
-                    <option value="missions">Missions</option>
-                    <option value="special_events">Special Events</option>
-                    <option value="other">Other</option>
-                  </select>
+                    Cancel
+                  </button>
+                  <button type="submit" className="admin-btn-primary">
+                    {editingBudget ? 'Update Budget' : 'Create Budget'}
+                  </button>
                 </div>
-
-                <div className="admin-form-group">
-                  <label>Allocated Amount (KES) *</label>
-                  <input
-                    type="number"
-                    value={budgetFormData.allocated_amount}
-                    onChange={(e) => setBudgetFormData({...budgetFormData, allocated_amount: e.target.value})}
-                    required
-                    min="0"
-                    step="0.01"
-                    className="admin-form-input"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Year *</label>
-                  <input
-                    type="number"
-                    value={budgetFormData.year}
-                    onChange={(e) => setBudgetFormData({...budgetFormData, year: parseInt(e.target.value)})}
-                    required
-                    min="2020"
-                    max="2030"
-                    className="admin-form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-group">
-                <label>Description</label>
-                <textarea
-                  value={budgetFormData.description}
-                  onChange={(e) => setBudgetFormData({...budgetFormData, description: e.target.value})}
-                  rows={3}
-                  className="admin-form-textarea"
-                />
-              </div>
-
-              <div className="admin-form-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowBudgetForm(false)
-                    setEditingBudget(null)
-                  }}
-                  className="admin-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-btn-primary">
-                  {editingBudget ? 'Update Budget' : 'Create Budget'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}
@@ -416,88 +418,90 @@ const BudgetManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleExpenseSubmit} className="admin-form">
-              <div className="admin-form-grid">
+            <div className="admin-modal-content">
+              <form onSubmit={handleExpenseSubmit} className="admin-form">
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Budget Category *</label>
+                    <select
+                      value={expenseFormData.budget_id}
+                      onChange={(e) => setExpenseFormData({...expenseFormData, budget_id: e.target.value})}
+                      required
+                      className="admin-form-select"
+                    >
+                      <option value="">Select budget category</option>
+                      {budgets.map((budget) => (
+                        <option key={budget.id} value={budget.id}>
+                          {budget.category.replace('_', ' ')} - {formatCurrency(budget.allocated_amount)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Amount (KES) *</label>
+                    <input
+                      type="number"
+                      value={expenseFormData.amount}
+                      onChange={(e) => setExpenseFormData({...expenseFormData, amount: e.target.value})}
+                      required
+                      min="0"
+                      step="0.01"
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Expense Date *</label>
+                    <input
+                      type="date"
+                      value={expenseFormData.expense_date}
+                      onChange={(e) => setExpenseFormData({...expenseFormData, expense_date: e.target.value})}
+                      required
+                      className="admin-form-input"
+                    />
+                  </div>
+                </div>
+
                 <div className="admin-form-group">
-                  <label>Budget Category *</label>
-                  <select
-                    value={expenseFormData.budget_id}
-                    onChange={(e) => setExpenseFormData({...expenseFormData, budget_id: e.target.value})}
+                  <label>Description *</label>
+                  <textarea
+                    value={expenseFormData.description}
+                    onChange={(e) => setExpenseFormData({...expenseFormData, description: e.target.value})}
                     required
-                    className="admin-form-select"
+                    rows={3}
+                    className="admin-form-textarea"
+                  />
+                </div>
+
+                <div className="admin-form-group">
+                  <label>Receipt URL</label>
+                  <input
+                    type="url"
+                    value={expenseFormData.receipt_url}
+                    onChange={(e) => setExpenseFormData({...expenseFormData, receipt_url: e.target.value})}
+                    placeholder="Link to receipt or invoice"
+                    className="admin-form-input"
+                  />
+                </div>
+
+                <div className="admin-form-actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowExpenseForm(false)
+                      setEditingExpense(null)
+                    }}
+                    className="admin-btn-secondary"
                   >
-                    <option value="">Select budget category</option>
-                    {budgets.map((budget) => (
-                      <option key={budget.id} value={budget.id}>
-                        {budget.category.replace('_', ' ')} - {formatCurrency(budget.allocated_amount)}
-                      </option>
-                    ))}
-                  </select>
+                    Cancel
+                  </button>
+                  <button type="submit" className="admin-btn-primary">
+                    {editingExpense ? 'Update Expense' : 'Record Expense'}
+                  </button>
                 </div>
-
-                <div className="admin-form-group">
-                  <label>Amount (KES) *</label>
-                  <input
-                    type="number"
-                    value={expenseFormData.amount}
-                    onChange={(e) => setExpenseFormData({...expenseFormData, amount: e.target.value})}
-                    required
-                    min="0"
-                    step="0.01"
-                    className="admin-form-input"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Expense Date *</label>
-                  <input
-                    type="date"
-                    value={expenseFormData.expense_date}
-                    onChange={(e) => setExpenseFormData({...expenseFormData, expense_date: e.target.value})}
-                    required
-                    className="admin-form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-group">
-                <label>Description *</label>
-                <textarea
-                  value={expenseFormData.description}
-                  onChange={(e) => setExpenseFormData({...expenseFormData, description: e.target.value})}
-                  required
-                  rows={3}
-                  className="admin-form-textarea"
-                />
-              </div>
-
-              <div className="admin-form-group">
-                <label>Receipt URL</label>
-                <input
-                  type="url"
-                  value={expenseFormData.receipt_url}
-                  onChange={(e) => setExpenseFormData({...expenseFormData, receipt_url: e.target.value})}
-                  placeholder="Link to receipt or invoice"
-                  className="admin-form-input"
-                />
-              </div>
-
-              <div className="admin-form-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowExpenseForm(false)
-                    setEditingExpense(null)
-                  }}
-                  className="admin-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-btn-primary">
-                  {editingExpense ? 'Update Expense' : 'Record Expense'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

@@ -206,148 +206,150 @@ const EventsManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-form">
-              <div className="admin-form-grid">
+            <div className="admin-modal-content">
+              <form onSubmit={handleSubmit} className="admin-form">
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Title *</label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      required
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Event Type</label>
+                    <select
+                      value={formData.event_type}
+                      onChange={(e) => setFormData({...formData, event_type: e.target.value})}
+                      className="admin-form-select"
+                    >
+                      <option value="">Select type</option>
+                      <option value="worship_service">Worship Service</option>
+                      <option value="prayer_meeting">Prayer Meeting</option>
+                      <option value="bible_study">Bible Study</option>
+                      <option value="youth_meeting">Youth Meeting</option>
+                      <option value="fellowship">Fellowship</option>
+                      <option value="outreach">Outreach</option>
+                      <option value="conference">Conference</option>
+                      <option value="special_event">Special Event</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div className="admin-form-group">
-                  <label>Title *</label>
+                  <label>Description</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    rows={4}
+                    className="admin-form-textarea"
+                  />
+                </div>
+
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Start Date & Time *</label>
+                    <input
+                      type="datetime-local"
+                      value={formData.start_date}
+                      onChange={(e) => setFormData({...formData, start_date: e.target.value})}
+                      required
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>End Date & Time</label>
+                    <input
+                      type="datetime-local"
+                      value={formData.end_date}
+                      onChange={(e) => setFormData({...formData, end_date: e.target.value})}
+                      className="admin-form-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="admin-form-group">
+                  <label>Location</label>
                   <input
                     type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    required
+                    value={formData.location}
+                    onChange={(e) => setFormData({...formData, location: e.target.value})}
+                    placeholder="e.g., Main Sanctuary, Fellowship Hall"
                     className="admin-form-input"
                   />
                 </div>
 
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Max Attendees</label>
+                    <input
+                      type="number"
+                      value={formData.max_attendees}
+                      onChange={(e) => setFormData({...formData, max_attendees: e.target.value})}
+                      min="1"
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Cost (KSH)</label>
+                    <input
+                      type="number"
+                      value={formData.cost}
+                      onChange={(e) => setFormData({...formData, cost: e.target.value})}
+                      min="0"
+                      step="0.01"
+                      className="admin-form-input"
+                    />
+                  </div>
+                </div>
+
                 <div className="admin-form-group">
-                  <label>Event Type</label>
-                  <select
-                    value={formData.event_type}
-                    onChange={(e) => setFormData({...formData, event_type: e.target.value})}
-                    className="admin-form-select"
+                  <label className="admin-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.requires_registration}
+                      onChange={(e) => setFormData({...formData, requires_registration: e.target.checked})}
+                      className="admin-checkbox"
+                    />
+                    <span>Requires registration</span>
+                  </label>
+                </div>
+
+                <div className="admin-form-group">
+                  <label className="admin-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_published}
+                      onChange={(e) => setFormData({...formData, is_published: e.target.checked})}
+                      className="admin-checkbox"
+                    />
+                    <span>Publish immediately</span>
+                  </label>
+                </div>
+
+                <div className="admin-form-actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false)
+                      setEditingEvent(null)
+                    }}
+                    className="admin-btn-secondary"
                   >
-                    <option value="">Select type</option>
-                    <option value="worship_service">Worship Service</option>
-                    <option value="prayer_meeting">Prayer Meeting</option>
-                    <option value="bible_study">Bible Study</option>
-                    <option value="youth_meeting">Youth Meeting</option>
-                    <option value="fellowship">Fellowship</option>
-                    <option value="outreach">Outreach</option>
-                    <option value="conference">Conference</option>
-                    <option value="special_event">Special Event</option>
-                  </select>
+                    Cancel
+                  </button>
+                  <button type="submit" className="admin-btn-primary">
+                    {editingEvent ? 'Update Event' : 'Create Event'}
+                  </button>
                 </div>
-              </div>
-
-              <div className="admin-form-group">
-                <label>Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  rows={4}
-                  className="admin-form-textarea"
-                />
-              </div>
-
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label>Start Date & Time *</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.start_date}
-                    onChange={(e) => setFormData({...formData, start_date: e.target.value})}
-                    required
-                    className="admin-form-input"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>End Date & Time</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.end_date}
-                    onChange={(e) => setFormData({...formData, end_date: e.target.value})}
-                    className="admin-form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-group">
-                <label>Location</label>
-                <input
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  placeholder="e.g., Main Sanctuary, Fellowship Hall"
-                  className="admin-form-input"
-                />
-              </div>
-
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label>Max Attendees</label>
-                  <input
-                    type="number"
-                    value={formData.max_attendees}
-                    onChange={(e) => setFormData({...formData, max_attendees: e.target.value})}
-                    min="1"
-                    className="admin-form-input"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Cost (KSH)</label>
-                  <input
-                    type="number"
-                    value={formData.cost}
-                    onChange={(e) => setFormData({...formData, cost: e.target.value})}
-                    min="0"
-                    step="0.01"
-                    className="admin-form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-group">
-                <label className="admin-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.requires_registration}
-                    onChange={(e) => setFormData({...formData, requires_registration: e.target.checked})}
-                    className="admin-checkbox"
-                  />
-                  <span>Requires registration</span>
-                </label>
-              </div>
-
-              <div className="admin-form-group">
-                <label className="admin-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_published}
-                    onChange={(e) => setFormData({...formData, is_published: e.target.checked})}
-                    className="admin-checkbox"
-                  />
-                  <span>Publish immediately</span>
-                </label>
-              </div>
-
-              <div className="admin-form-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false)
-                    setEditingEvent(null)
-                  }}
-                  className="admin-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-btn-primary">
-                  {editingEvent ? 'Update Event' : 'Create Event'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

@@ -403,161 +403,163 @@ const AdminUsersManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-form">
-              <div className="admin-form-section">
-                <h3>Basic Information</h3>
-                <div className="admin-form-grid">
-                  <div className="admin-form-group">
-                    <label>Email Address *</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      required
-                      disabled={editingAdmin} // Can't change email for existing users
-                      className="admin-form-input"
-                      placeholder="e.g., finance@gmail.com or admin@example.com"
-                    />
-                  </div>
-
-                  <div className="admin-form-group">
-                    <label>Full Name *</label>
-                    <input
-                      type="text"
-                      value={formData.full_name}
-                      onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                      required
-                      className="admin-form-input"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="admin-form-section">
-                <h3>Role & Permissions</h3>
-                <div className="admin-form-group">
-                  <label>Admin Role *</label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => {
-                      const newRole = e.target.value
-                      setFormData({
-                        ...formData, 
-                        role: newRole,
-                        permissions: getDefaultPermissions(newRole)
-                      })
-                    }}
-                    required
-                    className="admin-form-select"
-                  >
-                    {adminRoles.map((role) => (
-                      <option key={role.value} value={role.value}>
-                        {role.label} - {role.description}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Permissions</label>
-                  <div className="admin-permissions-grid">
-                    {Object.entries(
-                      availablePermissions.reduce((acc, permission) => {
-                        if (!acc[permission.category]) acc[permission.category] = []
-                        acc[permission.category].push(permission)
-                        return acc
-                      }, {})
-                    ).map(([category, permissions]) => (
-                      <div key={category} className="admin-permission-category">
-                        <h4>{category}</h4>
-                        {permissions.map((permission) => (
-                          <label key={permission.id} className="admin-checkbox-label">
-                            <input
-                              type="checkbox"
-                              checked={formData.permissions.includes(permission.id)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setFormData({
-                                    ...formData,
-                                    permissions: [...formData.permissions, permission.id]
-                                  })
-                                } else {
-                                  setFormData({
-                                    ...formData,
-                                    permissions: formData.permissions.filter(p => p !== permission.id)
-                                  })
-                                }
-                              }}
-                              className="admin-checkbox"
-                            />
-                            <span>{permission.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {!editingAdmin && (
+            <div className="admin-modal-content">
+              <form onSubmit={handleSubmit} className="admin-form">
                 <div className="admin-form-section">
-                  <h3>Security</h3>
+                  <h3>Basic Information</h3>
                   <div className="admin-form-grid">
                     <div className="admin-form-group">
-                      <label>Password *</label>
+                      <label>Email Address *</label>
                       <input
-                        type="password"
-                        value={formData.password}
-                        onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        required={!editingAdmin}
-                        minLength="6"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        required
+                        disabled={editingAdmin} // Can't change email for existing users
                         className="admin-form-input"
+                        placeholder="e.g., finance@gmail.com or admin@example.com"
                       />
                     </div>
 
                     <div className="admin-form-group">
-                      <label>Confirm Password *</label>
+                      <label>Full Name *</label>
                       <input
-                        type="password"
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                        required={!editingAdmin}
-                        minLength="6"
+                        type="text"
+                        value={formData.full_name}
+                        onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                        required
                         className="admin-form-input"
                       />
                     </div>
                   </div>
                 </div>
-              )}
 
-              <div className="admin-form-group">
-                <label className="admin-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_active}
-                    onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
-                    className="admin-checkbox"
-                  />
-                  <span>Active user</span>
-                </label>
-              </div>
+                <div className="admin-form-section">
+                  <h3>Role & Permissions</h3>
+                  <div className="admin-form-group">
+                    <label>Admin Role *</label>
+                    <select
+                      value={formData.role}
+                      onChange={(e) => {
+                        const newRole = e.target.value
+                        setFormData({
+                          ...formData, 
+                          role: newRole,
+                          permissions: getDefaultPermissions(newRole)
+                        })
+                      }}
+                      required
+                      className="admin-form-select"
+                    >
+                      {adminRoles.map((role) => (
+                        <option key={role.value} value={role.value}>
+                          {role.label} - {role.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="admin-form-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false)
-                    setEditingAdmin(null)
-                  }}
-                  className="admin-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-btn-primary">
-                  {editingAdmin ? 'Update Admin User' : 'Create Admin User'}
-                </button>
-              </div>
-            </form>
+                  <div className="admin-form-group">
+                    <label>Permissions</label>
+                    <div className="admin-permissions-grid">
+                      {Object.entries(
+                        availablePermissions.reduce((acc, permission) => {
+                          if (!acc[permission.category]) acc[permission.category] = []
+                          acc[permission.category].push(permission)
+                          return acc
+                        }, {})
+                      ).map(([category, permissions]) => (
+                        <div key={category} className="admin-permission-category">
+                          <h4>{category}</h4>
+                          {permissions.map((permission) => (
+                            <label key={permission.id} className="admin-checkbox-label">
+                              <input
+                                type="checkbox"
+                                checked={formData.permissions.includes(permission.id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setFormData({
+                                      ...formData,
+                                      permissions: [...formData.permissions, permission.id]
+                                    })
+                                  } else {
+                                    setFormData({
+                                      ...formData,
+                                      permissions: formData.permissions.filter(p => p !== permission.id)
+                                    })
+                                  }
+                                }}
+                                className="admin-checkbox"
+                              />
+                              <span>{permission.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {!editingAdmin && (
+                  <div className="admin-form-section">
+                    <h3>Security</h3>
+                    <div className="admin-form-grid">
+                      <div className="admin-form-group">
+                        <label>Password *</label>
+                        <input
+                          type="password"
+                          value={formData.password}
+                          onChange={(e) => setFormData({...formData, password: e.target.value})}
+                          required={!editingAdmin}
+                          minLength="6"
+                          className="admin-form-input"
+                        />
+                      </div>
+
+                      <div className="admin-form-group">
+                        <label>Confirm Password *</label>
+                        <input
+                          type="password"
+                          value={formData.confirmPassword}
+                          onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                          required={!editingAdmin}
+                          minLength="6"
+                          className="admin-form-input"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="admin-form-group">
+                  <label className="admin-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_active}
+                      onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
+                      className="admin-checkbox"
+                    />
+                    <span>Active user</span>
+                  </label>
+                </div>
+
+                <div className="admin-form-actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false)
+                      setEditingAdmin(null)
+                    }}
+                    className="admin-btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="admin-btn-primary">
+                    {editingAdmin ? 'Update Admin User' : 'Create Admin User'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

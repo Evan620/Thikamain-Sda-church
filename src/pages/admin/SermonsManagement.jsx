@@ -205,133 +205,135 @@ const SermonsManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-form">
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label>Title *</label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    required
-                    className="admin-form-input"
-                  />
+            <div className="admin-modal-content">
+              <form onSubmit={handleSubmit} className="admin-form">
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Title *</label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      required
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Speaker *</label>
+                    <input
+                      type="text"
+                      value={formData.speaker}
+                      onChange={(e) => setFormData({...formData, speaker: e.target.value})}
+                      required
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Sermon Date *</label>
+                    <input
+                      type="date"
+                      value={formData.sermon_date}
+                      onChange={(e) => setFormData({...formData, sermon_date: e.target.value})}
+                      required
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Series</label>
+                    <input
+                      type="text"
+                      value={formData.series}
+                      onChange={(e) => setFormData({...formData, series: e.target.value})}
+                      className="admin-form-input"
+                    />
+                  </div>
                 </div>
 
                 <div className="admin-form-group">
-                  <label>Speaker *</label>
-                  <input
-                    type="text"
-                    value={formData.speaker}
-                    onChange={(e) => setFormData({...formData, speaker: e.target.value})}
-                    required
-                    className="admin-form-input"
+                  <label>Description</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    rows={4}
+                    className="admin-form-textarea"
                   />
                 </div>
 
-                <div className="admin-form-group">
-                  <label>Sermon Date *</label>
-                  <input
-                    type="date"
-                    value={formData.sermon_date}
-                    onChange={(e) => setFormData({...formData, sermon_date: e.target.value})}
-                    required
-                    className="admin-form-input"
-                  />
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Audio URL</label>
+                    <input
+                      type="url"
+                      value={formData.audio_url}
+                      onChange={(e) => setFormData({...formData, audio_url: e.target.value})}
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Video URL</label>
+                    <input
+                      type="url"
+                      value={formData.video_url}
+                      onChange={(e) => setFormData({...formData, video_url: e.target.value})}
+                      className="admin-form-input"
+                    />
+                  </div>
                 </div>
 
                 <div className="admin-form-group">
-                  <label>Series</label>
-                  <input
-                    type="text"
-                    value={formData.series}
-                    onChange={(e) => setFormData({...formData, series: e.target.value})}
-                    className="admin-form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-group">
-                <label>Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  rows={4}
-                  className="admin-form-textarea"
-                />
-              </div>
-
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label>Audio URL</label>
+                  <label>Notes URL</label>
                   <input
                     type="url"
-                    value={formData.audio_url}
-                    onChange={(e) => setFormData({...formData, audio_url: e.target.value})}
+                    value={formData.notes_url}
+                    onChange={(e) => setFormData({...formData, notes_url: e.target.value})}
                     className="admin-form-input"
                   />
                 </div>
 
                 <div className="admin-form-group">
-                  <label>Video URL</label>
+                  <label>Tags (comma-separated)</label>
                   <input
-                    type="url"
-                    value={formData.video_url}
-                    onChange={(e) => setFormData({...formData, video_url: e.target.value})}
+                    type="text"
+                    value={formData.tags}
+                    onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                    placeholder="e.g., faith, hope, love"
                     className="admin-form-input"
                   />
                 </div>
-              </div>
 
-              <div className="admin-form-group">
-                <label>Notes URL</label>
-                <input
-                  type="url"
-                  value={formData.notes_url}
-                  onChange={(e) => setFormData({...formData, notes_url: e.target.value})}
-                  className="admin-form-input"
-                />
-              </div>
+                <div className="admin-form-group">
+                  <label className="admin-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_published}
+                      onChange={(e) => setFormData({...formData, is_published: e.target.checked})}
+                      className="admin-checkbox"
+                    />
+                    <span>Publish immediately</span>
+                  </label>
+                </div>
 
-              <div className="admin-form-group">
-                <label>Tags (comma-separated)</label>
-                <input
-                  type="text"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({...formData, tags: e.target.value})}
-                  placeholder="e.g., faith, hope, love"
-                  className="admin-form-input"
-                />
-              </div>
-
-              <div className="admin-form-group">
-                <label className="admin-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_published}
-                    onChange={(e) => setFormData({...formData, is_published: e.target.checked})}
-                    className="admin-checkbox"
-                  />
-                  <span>Publish immediately</span>
-                </label>
-              </div>
-
-              <div className="admin-form-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false)
-                    setEditingSermon(null)
-                  }}
-                  className="admin-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-btn-primary">
-                  {editingSermon ? 'Update Sermon' : 'Create Sermon'}
-                </button>
-              </div>
-            </form>
+                <div className="admin-form-actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false)
+                      setEditingSermon(null)
+                    }}
+                    className="admin-btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="admin-btn-primary">
+                    {editingSermon ? 'Update Sermon' : 'Create Sermon'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

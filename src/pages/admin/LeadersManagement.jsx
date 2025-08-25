@@ -293,130 +293,132 @@ const LeadersManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-form">
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label>Full Name *</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required
-                    className="admin-form-input"
-                    placeholder="e.g., Pst. Charles Muritu"
-                  />
+            <div className="admin-modal-content">
+              <form onSubmit={handleSubmit} className="admin-form">
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Full Name *</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      required
+                      className="admin-form-input"
+                      placeholder="e.g., Pst. Charles Muritu"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Position/Title *</label>
+                    <input
+                      type="text"
+                      value={formData.position}
+                      onChange={(e) => setFormData({...formData, position: e.target.value})}
+                      required
+                      className="admin-form-input"
+                      placeholder="e.g., Senior Pastor"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Category *</label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      required
+                      className="admin-form-select"
+                    >
+                      {categories.map(cat => (
+                        <option key={cat.value} value={cat.value}>{cat.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Display Order</label>
+                    <input
+                      type="number"
+                      value={formData.display_order}
+                      onChange={(e) => setFormData({...formData, display_order: parseInt(e.target.value)})}
+                      className="admin-form-input"
+                      min="0"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="admin-form-input"
+                      placeholder="leader@thikamainsdachurch.org"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Phone</label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      className="admin-form-input"
+                      placeholder="+254 XXX XXX XXX"
+                    />
+                  </div>
+
+                  <div className="admin-form-group admin-form-group-full">
+                    <label>Biography</label>
+                    <textarea
+                      value={formData.bio}
+                      onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                      className="admin-form-textarea"
+                      rows="3"
+                      placeholder="Brief description of the leader's role and background..."
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Years of Service</label>
+                    <input
+                      type="number"
+                      value={formData.years_of_service}
+                      onChange={(e) => setFormData({...formData, years_of_service: e.target.value})}
+                      className="admin-form-input"
+                      min="0"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Specialties</label>
+                    <input
+                      type="text"
+                      value={formData.specialties}
+                      onChange={(e) => setFormData({...formData, specialties: e.target.value})}
+                      className="admin-form-input"
+                      placeholder="Pastoral Care, Leadership, Teaching (comma-separated)"
+                    />
+                  </div>
                 </div>
 
-                <div className="admin-form-group">
-                  <label>Position/Title *</label>
-                  <input
-                    type="text"
-                    value={formData.position}
-                    onChange={(e) => setFormData({...formData, position: e.target.value})}
-                    required
-                    className="admin-form-input"
-                    placeholder="e.g., Senior Pastor"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Category *</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    required
-                    className="admin-form-select"
+                <div className="admin-form-actions">
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="admin-btn-secondary"
                   >
-                    {categories.map(cat => (
-                      <option key={cat.value} value={cat.value}>{cat.label}</option>
-                    ))}
-                  </select>
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="admin-btn-primary"
+                  >
+                    {loading ? 'Saving...' : editingLeader ? 'Update Leader' : 'Add Leader'}
+                  </button>
                 </div>
-
-                <div className="admin-form-group">
-                  <label>Display Order</label>
-                  <input
-                    type="number"
-                    value={formData.display_order}
-                    onChange={(e) => setFormData({...formData, display_order: parseInt(e.target.value)})}
-                    className="admin-form-input"
-                    min="0"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="admin-form-input"
-                    placeholder="leader@thikamainsdachurch.org"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Phone</label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="admin-form-input"
-                    placeholder="+254 XXX XXX XXX"
-                  />
-                </div>
-
-                <div className="admin-form-group admin-form-group-full">
-                  <label>Biography</label>
-                  <textarea
-                    value={formData.bio}
-                    onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                    className="admin-form-textarea"
-                    rows="3"
-                    placeholder="Brief description of the leader's role and background..."
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Years of Service</label>
-                  <input
-                    type="number"
-                    value={formData.years_of_service}
-                    onChange={(e) => setFormData({...formData, years_of_service: e.target.value})}
-                    className="admin-form-input"
-                    min="0"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Specialties</label>
-                  <input
-                    type="text"
-                    value={formData.specialties}
-                    onChange={(e) => setFormData({...formData, specialties: e.target.value})}
-                    className="admin-form-input"
-                    placeholder="Pastoral Care, Leadership, Teaching (comma-separated)"
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-actions">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="admin-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="admin-btn-primary"
-                >
-                  {loading ? 'Saving...' : editingLeader ? 'Update Leader' : 'Add Leader'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

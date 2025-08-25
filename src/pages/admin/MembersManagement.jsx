@@ -249,7 +249,8 @@ const MembersManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-form">
+            <div className="admin-modal-content">
+              <form onSubmit={handleSubmit} className="admin-form">
               <div className="admin-form-section">
                 <h3>Basic Information</h3>
                 <div className="admin-form-grid">
@@ -454,6 +455,7 @@ const MembersManagement = () => {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

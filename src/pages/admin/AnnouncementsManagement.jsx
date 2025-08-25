@@ -203,111 +203,113 @@ const AnnouncementsManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-form">
-              <div className="admin-form-group">
-                <label>Title *</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  required
-                  className="admin-form-input"
-                />
-              </div>
-
-              <div className="admin-form-group">
-                <label>Content *</label>
-                <textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData({...formData, content: e.target.value})}
-                  required
-                  rows={6}
-                  className="admin-form-textarea"
-                />
-              </div>
-
-              <div className="admin-form-grid">
+            <div className="admin-modal-content">
+              <form onSubmit={handleSubmit} className="admin-form">
                 <div className="admin-form-group">
-                  <label>Priority</label>
-                  <select
-                    value={formData.priority}
-                    onChange={(e) => setFormData({...formData, priority: e.target.value})}
-                    className="admin-form-select"
-                  >
-                    <option value="low">Low</option>
-                    <option value="normal">Normal</option>
-                    <option value="high">High</option>
-                    <option value="urgent">Urgent</option>
-                  </select>
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Target Audience</label>
-                  <select
-                    value={formData.target_audience}
-                    onChange={(e) => setFormData({...formData, target_audience: e.target.value})}
-                    className="admin-form-select"
-                  >
-                    <option value="all">All</option>
-                    <option value="members">Members Only</option>
-                    <option value="visitors">Visitors</option>
-                    <option value="ministry_leaders">Ministry Leaders</option>
-                    <option value="elders">Elders</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label>Start Date *</label>
+                  <label>Title *</label>
                   <input
-                    type="date"
-                    value={formData.start_date}
-                    onChange={(e) => setFormData({...formData, start_date: e.target.value})}
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
                     required
                     className="admin-form-input"
                   />
                 </div>
 
                 <div className="admin-form-group">
-                  <label>End Date</label>
-                  <input
-                    type="date"
-                    value={formData.end_date}
-                    onChange={(e) => setFormData({...formData, end_date: e.target.value})}
-                    className="admin-form-input"
+                  <label>Content *</label>
+                  <textarea
+                    value={formData.content}
+                    onChange={(e) => setFormData({...formData, content: e.target.value})}
+                    required
+                    rows={6}
+                    className="admin-form-textarea"
                   />
                 </div>
-              </div>
 
-              <div className="admin-form-group">
-                <label className="admin-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_published}
-                    onChange={(e) => setFormData({...formData, is_published: e.target.checked})}
-                    className="admin-checkbox"
-                  />
-                  <span>Publish immediately</span>
-                </label>
-              </div>
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Priority</label>
+                    <select
+                      value={formData.priority}
+                      onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                      className="admin-form-select"
+                    >
+                      <option value="low">Low</option>
+                      <option value="normal">Normal</option>
+                      <option value="high">High</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
+                  </div>
 
-              <div className="admin-form-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false)
-                    setEditingAnnouncement(null)
-                  }}
-                  className="admin-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-btn-primary">
-                  {editingAnnouncement ? 'Update Announcement' : 'Create Announcement'}
-                </button>
-              </div>
-            </form>
+                  <div className="admin-form-group">
+                    <label>Target Audience</label>
+                    <select
+                      value={formData.target_audience}
+                      onChange={(e) => setFormData({...formData, target_audience: e.target.value})}
+                      className="admin-form-select"
+                    >
+                      <option value="all">All</option>
+                      <option value="members">Members Only</option>
+                      <option value="visitors">Visitors</option>
+                      <option value="ministry_leaders">Ministry Leaders</option>
+                      <option value="elders">Elders</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Start Date *</label>
+                    <input
+                      type="date"
+                      value={formData.start_date}
+                      onChange={(e) => setFormData({...formData, start_date: e.target.value})}
+                      required
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>End Date</label>
+                    <input
+                      type="date"
+                      value={formData.end_date}
+                      onChange={(e) => setFormData({...formData, end_date: e.target.value})}
+                      className="admin-form-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="admin-form-group">
+                  <label className="admin-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_published}
+                      onChange={(e) => setFormData({...formData, is_published: e.target.checked})}
+                      className="admin-checkbox"
+                    />
+                    <span>Publish immediately</span>
+                  </label>
+                </div>
+
+                <div className="admin-form-actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false)
+                      setEditingAnnouncement(null)
+                    }}
+                    className="admin-btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="admin-btn-primary">
+                    {editingAnnouncement ? 'Update Announcement' : 'Create Announcement'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

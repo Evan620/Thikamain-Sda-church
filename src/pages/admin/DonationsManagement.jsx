@@ -325,130 +325,132 @@ const DonationsManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-form">
-              <div className="admin-form-grid">
+            <div className="admin-modal-content">
+              <form onSubmit={handleSubmit} className="admin-form">
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Member (Optional)</label>
+                    <select
+                      value={formData.member_id}
+                      onChange={(e) => setFormData({...formData, member_id: e.target.value})}
+                      className="admin-form-select"
+                    >
+                      <option value="">Anonymous Donation</option>
+                      {members.map((member) => (
+                        <option key={member.id} value={member.id}>
+                          {member.first_name} {member.last_name} 
+                          {member.membership_number && ` (#${member.membership_number})`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Amount (KES) *</label>
+                    <input
+                      type="number"
+                      value={formData.amount}
+                      onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                      required
+                      min="0"
+                      step="0.01"
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Donation Type *</label>
+                    <select
+                      value={formData.giving_type}
+                      onChange={(e) => setFormData({...formData, giving_type: e.target.value})}
+                      required
+                      className="admin-form-select"
+                    >
+                      <option value="tithe">Tithe</option>
+                      <option value="offering">Offering</option>
+                      <option value="special_project">Special Project</option>
+                      <option value="building_fund">Building Fund</option>
+                      <option value="missions">Missions</option>
+                    </select>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Payment Method *</label>
+                    <select
+                      value={formData.payment_method}
+                      onChange={(e) => setFormData({...formData, payment_method: e.target.value})}
+                      required
+                      className="admin-form-select"
+                    >
+                      <option value="mpesa">M-Pesa</option>
+                      <option value="cash">Cash</option>
+                      <option value="bank_transfer">Bank Transfer</option>
+                      <option value="check">Check</option>
+                    </select>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Transaction ID</label>
+                    <input
+                      type="text"
+                      value={formData.transaction_id}
+                      onChange={(e) => setFormData({...formData, transaction_id: e.target.value})}
+                      placeholder="M-Pesa code, check number, etc."
+                      className="admin-form-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Date *</label>
+                    <input
+                      type="date"
+                      value={formData.giving_date}
+                      onChange={(e) => setFormData({...formData, giving_date: e.target.value})}
+                      required
+                      className="admin-form-input"
+                    />
+                  </div>
+                </div>
+
                 <div className="admin-form-group">
-                  <label>Member (Optional)</label>
-                  <select
-                    value={formData.member_id}
-                    onChange={(e) => setFormData({...formData, member_id: e.target.value})}
-                    className="admin-form-select"
+                  <label>Notes</label>
+                  <textarea
+                    value={formData.notes}
+                    onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                    rows={3}
+                    className="admin-form-textarea"
+                  />
+                </div>
+
+                <div className="admin-form-group">
+                  <label className="admin-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_verified}
+                      onChange={(e) => setFormData({...formData, is_verified: e.target.checked})}
+                      className="admin-checkbox"
+                    />
+                    <span>Mark as verified</span>
+                  </label>
+                </div>
+
+                <div className="admin-form-actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false)
+                      setEditingDonation(null)
+                    }}
+                    className="admin-btn-secondary"
                   >
-                    <option value="">Anonymous Donation</option>
-                    {members.map((member) => (
-                      <option key={member.id} value={member.id}>
-                        {member.first_name} {member.last_name} 
-                        {member.membership_number && ` (#${member.membership_number})`}
-                      </option>
-                    ))}
-                  </select>
+                    Cancel
+                  </button>
+                  <button type="submit" className="admin-btn-primary">
+                    {editingDonation ? 'Update Donation' : 'Record Donation'}
+                  </button>
                 </div>
-
-                <div className="admin-form-group">
-                  <label>Amount (KES) *</label>
-                  <input
-                    type="number"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    required
-                    min="0"
-                    step="0.01"
-                    className="admin-form-input"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Donation Type *</label>
-                  <select
-                    value={formData.giving_type}
-                    onChange={(e) => setFormData({...formData, giving_type: e.target.value})}
-                    required
-                    className="admin-form-select"
-                  >
-                    <option value="tithe">Tithe</option>
-                    <option value="offering">Offering</option>
-                    <option value="special_project">Special Project</option>
-                    <option value="building_fund">Building Fund</option>
-                    <option value="missions">Missions</option>
-                  </select>
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Payment Method *</label>
-                  <select
-                    value={formData.payment_method}
-                    onChange={(e) => setFormData({...formData, payment_method: e.target.value})}
-                    required
-                    className="admin-form-select"
-                  >
-                    <option value="mpesa">M-Pesa</option>
-                    <option value="cash">Cash</option>
-                    <option value="bank_transfer">Bank Transfer</option>
-                    <option value="check">Check</option>
-                  </select>
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Transaction ID</label>
-                  <input
-                    type="text"
-                    value={formData.transaction_id}
-                    onChange={(e) => setFormData({...formData, transaction_id: e.target.value})}
-                    placeholder="M-Pesa code, check number, etc."
-                    className="admin-form-input"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>Date *</label>
-                  <input
-                    type="date"
-                    value={formData.giving_date}
-                    onChange={(e) => setFormData({...formData, giving_date: e.target.value})}
-                    required
-                    className="admin-form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-group">
-                <label>Notes</label>
-                <textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  rows={3}
-                  className="admin-form-textarea"
-                />
-              </div>
-
-              <div className="admin-form-group">
-                <label className="admin-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_verified}
-                    onChange={(e) => setFormData({...formData, is_verified: e.target.checked})}
-                    className="admin-checkbox"
-                  />
-                  <span>Mark as verified</span>
-                </label>
-              </div>
-
-              <div className="admin-form-actions">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false)
-                    setEditingDonation(null)
-                  }}
-                  className="admin-btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-btn-primary">
-                  {editingDonation ? 'Update Donation' : 'Record Donation'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}
