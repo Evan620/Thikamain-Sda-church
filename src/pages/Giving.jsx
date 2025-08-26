@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import MpesaPaymentModal from '../components/MpesaPaymentModal'
+import PaymentModal from '../components/PaymentModal'
 
 const Giving = () => {
   // Form state
   const [amount, setAmount] = useState('')
   const [givingType, setGivingType] = useState('tithe')
-  const [showMpesaModal, setShowMpesaModal] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
 
   // Mobile detection
@@ -20,17 +20,17 @@ const Giving = () => {
       return
     }
 
-    // Open M-PESA payment modal
-    setShowMpesaModal(true)
+    // Open Equity Bank payment modal
+    setShowPaymentModal(true)
   }
 
   const handlePaymentSuccess = (paymentData) => {
     console.log('Payment successful:', paymentData)
     setPaymentSuccess(true)
-    setShowMpesaModal(false)
+    setShowPaymentModal(false)
 
     // Show success message
-    alert(`Thank you for your generous ${paymentData.givingType} of KES ${paymentData.amount}! Your payment has been processed successfully.`)
+    alert(`Thank you for your generous ${paymentData.givingType} of KES ${paymentData.amount}! Your payment has been processed successfully via Equity Bank.`)
 
     // Reset form
     setAmount('')
@@ -42,7 +42,7 @@ const Giving = () => {
 
   const handlePaymentError = (errorData) => {
     console.error('Payment error:', errorData)
-    setShowMpesaModal(false)
+    setShowPaymentModal(false)
 
     // Show error message
     alert(`Payment failed: ${errorData.error}. Please try again or contact support.`)
@@ -473,7 +473,7 @@ const Giving = () => {
               margin: '0 auto',
               lineHeight: '1.6'
             }}>
-              Support our ministry through secure M-PESA STK Push payment
+              Support our ministry through secure Equity Bank payment (works with all mobile money services)
             </p>
           </div>
 
@@ -726,8 +726,8 @@ const Giving = () => {
                     }
                   }}
                 >
-                  <span style={{ fontSize: '1.2rem' }}>📱</span>
-                  Pay with M-PESA STK Push
+                  <span style={{ fontSize: '1.2rem' }}>🏦</span>
+                  Pay via Equity Bank
                 </button>
 
                 <p style={{
@@ -1051,10 +1051,10 @@ const Giving = () => {
         </div>
       </section>
 
-      {/* M-PESA Payment Modal */}
-      <MpesaPaymentModal
-        isOpen={showMpesaModal}
-        onClose={() => setShowMpesaModal(false)}
+      {/* Equity Bank Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
         amount={parseFloat(amount) || 0}
         givingType={givingType}
         onPaymentSuccess={handlePaymentSuccess}

@@ -2270,6 +2270,8 @@ body {
   }
 }
 
+/*
+
 /* ========================================
    ADMIN SYSTEM STYLES
    ======================================== */
@@ -5344,6 +5346,31 @@ textarea.admin-form-textarea {
   font-weight: 700;
   margin: 0;
   line-height: 1.2;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  
+  /* Responsive font sizing for large numbers */
+  font-size: clamp(1.25rem, 4vw, 1.875rem);
+  
+  /* Ensure text fits container */
+  max-width: 100%;
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .financial-amount {
+    font-size: clamp(1rem, 5vw, 1.5rem);
+    line-height: 1.1;
+  }
+}
+
+/* For very large numbers, use smaller font */
+.financial-amount[data-large="true"] {
+  font-size: clamp(1rem, 3vw, 1.5rem);
 }
 
 .financial-period {

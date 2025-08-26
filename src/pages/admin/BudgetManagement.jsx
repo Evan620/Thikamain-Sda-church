@@ -22,11 +22,14 @@ const BudgetManagement = () => {
 
   const [expenseFormData, setExpenseFormData] = useState({
     budget_id: '',
+    category: '',
     amount: '',
     description: '',
     expense_date: new Date().toISOString().split('T')[0],
     receipt_url: '',
-    approved_by: user?.id
+    approved_by: user?.id,
+    is_approved: false,
+    created_by: user?.id
   })
 
   // Fetch budgets and expenses
@@ -112,10 +115,22 @@ const BudgetManagement = () => {
   const handleExpenseSubmit = async (e) => {
     e.preventDefault()
     try {
+      // Find the selected budget to get its category
+      const selectedBudget = budgets.find(budget => budget.id === expenseFormData.budget_id)
+      
       const expenseData = {
-        ...expenseFormData,
-        amount: parseFloat(expenseFormData.amount)
+        budget_id: expenseFormData.budget_id,
+        category: selectedBudget ? selectedBudget.category : 'other',
+        amount: parseFloat(expenseFormData.amount),
+        description: expenseFormData.description,
+        expense_date: expenseFormData.expense_date,
+        receipt_url: expenseFormData.receipt_url || null,
+        approved_by: user?.id,
+        is_approved: false,
+        created_by: user?.id
       }
+
+      console.log('Submitting expense data:', expenseData)
 
       if (editingExpense) {
         const { error } = await supabase
@@ -134,18 +149,21 @@ const BudgetManagement = () => {
 
       setExpenseFormData({
         budget_id: '',
+        category: '',
         amount: '',
         description: '',
         expense_date: new Date().toISOString().split('T')[0],
         receipt_url: '',
-        approved_by: user?.id
+        approved_by: user?.id,
+        is_approved: false,
+        created_by: user?.id
       })
       setShowExpenseForm(false)
       setEditingExpense(null)
       fetchData()
     } catch (error) {
       console.error('Error saving expense:', error)
-      alert('Error saving expense. Please try again.')
+      alert(`Error saving expense: ${error.message}. Please try again.`)
     }
   }
 
@@ -161,6 +179,11 @@ const BudgetManagement = () => {
       style: 'currency',
       currency: 'KES'
     }).format(amount)
+  }
+
+  // Format number without currency symbol
+  const formatNumber = (amount) => {
+    return new Intl.NumberFormat('en-KE').format(amount)
   }
 
   // Calculate totals
@@ -248,8 +271,8 @@ const BudgetManagement = () => {
             </svg>
           </div>
           <div className="financial-card-content">
-            <h3>Total Budget</h3>
-            <p className="financial-amount">{formatCurrency(totalAllocated)}</p>
+            <h3>Total Budget (Ksh)</h3>
+            <p className="financial-amount">{formatNumber(totalAllocated)}</p>
             <span className="financial-period">{selectedYear}</span>
           </div>
         </div>
@@ -261,8 +284,8 @@ const BudgetManagement = () => {
             </svg>
           </div>
           <div className="financial-card-content">
-            <h3>Total Spent</h3>
-            <p className="financial-amount">{formatCurrency(totalSpent)}</p>
+            <h3>Total Spent (Ksh)</h3>
+            <p className="financial-amount">{formatNumber(totalSpent)}</p>
             <span className="financial-period">{selectedYear}</span>
           </div>
         </div>
@@ -274,8 +297,8 @@ const BudgetManagement = () => {
             </svg>
           </div>
           <div className="financial-card-content">
-            <h3>{remainingBudget >= 0 ? 'Remaining' : 'Over Budget'}</h3>
-            <p className="financial-amount">{formatCurrency(Math.abs(remainingBudget))}</p>
+            <h3>{remainingBudget >= 0 ? 'Remaining (Ksh)' : 'Over Budget (Ksh)'}</h3>
+            <p className="financial-amount">{formatNumber(Math.abs(remainingBudget))}</p>
             <span className="financial-period">{selectedYear}</span>
           </div>
         </div>
