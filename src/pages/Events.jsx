@@ -24,7 +24,7 @@ const Events = () => {
     id: r.id,
     title: r.title,
     date: new Date(r.start_date).toLocaleDateString(),
-    time: r.end_date ? `${new Date(r.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(r.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'All Day',
+    time: r.end_date ? `${new Date(r.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} - ${new Date(r.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}` : 'All Day',
     location: r.location || 'Thika Main SDA Church',
     category: r.event_type || 'ministry',
     type: r.event_type || 'Event',

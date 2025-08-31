@@ -51,9 +51,12 @@ const formatEventTime = (startDate, endDate) => {
   const start = new Date(startDate)
   const end = endDate ? new Date(endDate) : null
   
-  // Check if it's an all-day event (starts at midnight and ends at 11:59 PM)
-  const isAllDay = start.getHours() === 0 && start.getMinutes() === 0 && 
-                   end && end.getHours() === 23 && end.getMinutes() === 59
+  // Check if it's an all-day event (starts at midnight and ends at 11:59 PM in UTC)
+  const startUTC = new Date(start.toISOString())
+  const endUTC = end ? new Date(end.toISOString()) : null
+  
+  const isAllDay = startUTC.getUTCHours() === 0 && startUTC.getUTCMinutes() === 0 && 
+                   endUTC && endUTC.getUTCHours() === 23 && endUTC.getUTCMinutes() === 59
   
   if (isAllDay) {
     return 'All Day'
@@ -62,14 +65,16 @@ const formatEventTime = (startDate, endDate) => {
   const startTime = start.toLocaleTimeString('en-US', { 
     hour: 'numeric', 
     minute: '2-digit',
-    hour12: true 
+    hour12: true,
+    timeZone: 'UTC'
   })
   
   if (end && !isAllDay) {
     const endTime = end.toLocaleTimeString('en-US', { 
       hour: 'numeric', 
       minute: '2-digit',
-      hour12: true 
+      hour12: true,
+      timeZone: 'UTC'
     })
     return `${startTime} - ${endTime}`
   }

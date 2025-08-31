@@ -87,36 +87,78 @@ const DynamicFeaturedAnnouncement = ({ isMobile, isTablet }) => {
   }
 
   // Format time for display
-  const formatAnnouncementTime = (timeString) => {
-    if (!timeString) return '11:00 AM'
+  const formatAnnouncementTime = (timeString, endTimeString) => {
+    if (!timeString) return '8:30 AM - 5:00 PM'
     
     try {
-      // Handle both time-only strings and full datetime strings
-      let timeToFormat = timeString
-      if (!timeString.includes('T')) {
-        // If it's just a time string, add a dummy date
-        timeToFormat = `2000-01-01T${timeString}`
+      // Handle time format (HH:MM or HH:MM:SS)
+      const formatTime = (time) => {
+        if (!time) return null
+        
+        // Parse time string (e.g., "08:30" or "08:30:00")
+        const [hours, minutes] = time.split(':').map(Number)
+        const date = new Date()
+        date.setHours(hours, minutes, 0, 0)
+        
+        return date.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        })
+      }
+
+      const startTime = formatTime(timeString)
+      const endTime = formatTime(endTimeString)
+      
+      if (startTime && endTime) {
+        return `${startTime} - ${endTime}`
+      } else if (startTime) {
+        return startTime
       }
       
-      const time = new Date(timeToFormat)
-      return time.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      })
+      return '8:30 AM - 5:00 PM'
     } catch (error) {
       console.error('Error formatting time:', error)
-      return timeString || '11:00 AM'
+      return '8:30 AM - 5:00 PM'
     }
+  }
+
+  // Format target audience for display
+  const formatTargetAudience = (audience) => {
+    if (!audience || audience === 'all') return 'All Welcome'
+    
+    const audienceMap = {
+      'members': 'Members Only',
+      'visitors': 'Visitors Welcome',
+      'ministry_leaders': 'Ministry Leaders',
+      'elders': 'Church Elders'
+    }
+    
+    return audienceMap[audience] || audience.replace('_', ' ')
+  }
+
+  // Get badge text based on target audience
+  const getBadgeText = (announcement) => {
+    if (!announcement) return 'This Week'
+    
+    const audience = announcement.target_audience
+    if (audience === 'all') return 'For Everyone'
+    if (audience === 'members') return 'For Members'
+    if (audience === 'visitors') return 'For Visitors'
+    if (audience === 'ministry_leaders') return 'Ministry Leaders'
+    if (audience === 'elders') return 'Church Leadership'
+    
+    return 'This Week'
   }
 
   // Default content when no announcement is available
   const defaultContent = {
-    title: 'Special Sabbath Service',
-    content: 'Join us for a special communion service this Sabbath. Experience the blessing of fellowship and spiritual renewal as we come together in worship.',
+    title: 'Join Us This Sabbath',
+    content: 'Experience the blessing of fellowship and spiritual renewal as we come together in worship. All are welcome to join our church family.',
     start_date: null,
     start_time: null,
-    badge: 'This Week'
+    end_time: null,
+    target_audience: 'all'
   }
 
   // Use announcement data or fallback to default
@@ -195,7 +237,7 @@ const DynamicFeaturedAnnouncement = ({ isMobile, isTablet }) => {
           display: 'inline-block',
           marginBottom: '1.5rem'
         }}>
-          {displayContent.badge || 'This Week'}
+          {getBadgeText(announcement)}
         </div>
 
         <h2 style={{
@@ -244,7 +286,19 @@ const DynamicFeaturedAnnouncement = ({ isMobile, isTablet }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span style={{ fontWeight: '600' }}>
-              {formatAnnouncementTime(displayContent.start_time)}
+              {formatAnnouncementTime(displayContent.start_time, displayContent.end_time)}
+            </span>
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <svg style={{ width: '1.25rem', height: '1.25rem', color: '#fbbf24' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span style={{ fontWeight: '600' }}>
+              {formatTargetAudience(displayContent.target_audience)}
             </span>
           </div>
         </div>

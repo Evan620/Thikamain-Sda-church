@@ -12,6 +12,7 @@ import Departments from './pages/Departments'
 import Contact from './pages/Contact'
 import Giving from './pages/Giving'
 import Submissions from './pages/Submissions'
+import Announcements from './pages/Announcements'
 
 // Admin System Imports
 import { AuthProvider } from './hooks/useAuth.jsx'
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/giving" element={<Giving />} />
                 <Route path="/submissions" element={<Submissions />} />
+                <Route path="/announcements" element={<Announcements />} />
               </Routes>
             </main>
             <Footer />

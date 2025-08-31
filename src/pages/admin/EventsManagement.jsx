@@ -392,7 +392,11 @@ const EventsManagement = () => {
                       <div className="admin-table-date">
                         {new Date(event.start_date).toLocaleDateString()}
                         <span className="admin-table-time">
-                          {new Date(event.start_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          {new Date(event.start_date).toLocaleTimeString([], {
+                            hour: '2-digit', 
+                            minute:'2-digit',
+                            timeZone: 'UTC'
+                          })}
                         </span>
                       </div>
                     </td>

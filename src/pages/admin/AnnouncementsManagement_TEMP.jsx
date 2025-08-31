@@ -13,9 +13,7 @@ const AnnouncementsManagement = () => {
     content: '',
     priority: 'normal',
     start_date: '',
-    start_time: '08:30',
     end_date: '',
-    end_time: '17:00',
     target_audience: 'all',
     is_published: false
   })
@@ -74,9 +72,7 @@ const AnnouncementsManagement = () => {
         content: '',
         priority: 'normal',
         start_date: '',
-        start_time: '08:30',
         end_date: '',
-        end_time: '17:00',
         target_audience: 'all',
         is_published: false
       })
@@ -97,9 +93,7 @@ const AnnouncementsManagement = () => {
       content: announcement.content || '',
       priority: announcement.priority || 'normal',
       start_date: announcement.start_date || '',
-      start_time: announcement.start_time || '08:30',
       end_date: announcement.end_date || '',
-      end_time: announcement.end_time || '17:00',
       target_audience: announcement.target_audience || 'all',
       is_published: announcement.is_published || false
     })
@@ -176,9 +170,7 @@ const AnnouncementsManagement = () => {
               content: '',
               priority: 'normal',
               start_date: '',
-              start_time: '08:30',
               end_date: '',
-              end_time: '17:00',
               target_audience: 'all',
               is_published: false
             })
@@ -279,33 +271,11 @@ const AnnouncementsManagement = () => {
                   </div>
 
                   <div className="admin-form-group">
-                    <label>Start Time</label>
-                    <input
-                      type="time"
-                      value={formData.start_time}
-                      onChange={(e) => setFormData({...formData, start_time: e.target.value})}
-                      className="admin-form-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="admin-form-grid">
-                  <div className="admin-form-group">
                     <label>End Date</label>
                     <input
                       type="date"
                       value={formData.end_date}
                       onChange={(e) => setFormData({...formData, end_date: e.target.value})}
-                      className="admin-form-input"
-                    />
-                  </div>
-
-                  <div className="admin-form-group">
-                    <label>End Time</label>
-                    <input
-                      type="time"
-                      value={formData.end_time}
-                      onChange={(e) => setFormData({...formData, end_time: e.target.value})}
                       className="admin-form-input"
                     />
                   </div>
@@ -362,7 +332,7 @@ const AnnouncementsManagement = () => {
                   <th>Title</th>
                   <th>Priority</th>
                   <th>Audience</th>
-                  <th>Date & Time</th>
+                  <th>Date Range</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -391,16 +361,10 @@ const AnnouncementsManagement = () => {
                     <td>
                       <div className="admin-table-date">
                         {new Date(announcement.start_date).toLocaleDateString()}
-                        {announcement.start_time && (
-                          <span className="admin-table-time">
-                            at {announcement.start_time}
-                          </span>
-                        )}
                         {announcement.end_date && (
-                          <div className="admin-table-time">
+                          <span className="admin-table-time">
                             to {new Date(announcement.end_date).toLocaleDateString()}
-                            {announcement.end_time && ` at ${announcement.end_time}`}
-                          </div>
+                          </span>
                         )}
                       </div>
                     </td>
