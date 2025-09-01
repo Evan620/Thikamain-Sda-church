@@ -93,8 +93,10 @@ const PermissionBasedDashboard = () => {
 
       // Fetch financial data if user has financial permissions
       if (hasAnyPermission(['manage_finances', 'view_financial_reports', 'manage_donations'])) {
-        const currentMonth = new Date().toISOString().slice(0, 7)
-        const currentYear = new Date().getFullYear()
+        const currentDate = new Date()
+        const currentYear = currentDate.getFullYear()
+        const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0')
+        const daysInMonth = new Date(currentYear, currentDate.getMonth() + 1, 0).getDate()
 
         promises.push(
           cacheService.cachedFetch(
@@ -109,8 +111,8 @@ const PermissionBasedDashboard = () => {
                   supabase
                     .from('giving_records')
                     .select('amount')
-                    .gte('giving_date', `${currentMonth}-01`)
-                    .lte('giving_date', `${currentMonth}-31`)
+                    .gte('giving_date', `${currentYear}-${currentMonth}-01`)
+                    .lte('giving_date', `${currentYear}-${currentMonth}-${daysInMonth}`)
                     .eq('is_verified', true)
                 ])
 

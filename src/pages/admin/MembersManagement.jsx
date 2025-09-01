@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase } from '../../services/supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
+import '../../styles/enhanced-search.css'
 
 const MembersManagement = () => {
   const { user } = useAuth()
   const [members, setMembers] = useState([])
+  const [filteredMembers, setFilteredMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingMember, setEditingMember] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchResults, setSearchResults] = useState(0)
   const [formData, setFormData] = useState({
     membership_number: '',
     first_name: '',
@@ -28,23 +31,19 @@ const MembersManagement = () => {
     is_active: true
   })
 
-  // Fetch members
+  // Fetch all members once
   const fetchMembers = async () => {
     try {
       setLoading(true)
-      let query = supabase
+      const { data, error } = await supabase
         .from('members')
         .select('*')
         .order('last_name', { ascending: true })
 
-      if (searchTerm) {
-        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,membership_number.ilike.%${searchTerm}%`)
-      }
-
-      const { data, error } = await query
-
       if (error) throw error
       setMembers(data || [])
+      setFilteredMembers(data || [])
+      setSearchResults(data?.length || 0)
     } catch (error) {
       console.error('Error fetching members:', error)
     } finally {
@@ -52,17 +51,86 @@ const MembersManagement = () => {
     }
   }
 
+  // Immediate search function for better UX
+  const performSearch = useCallback((searchValue) => {
+    if (!searchValue.trim()) {
+      setFilteredMembers(members)
+      setSearchResults(members.length)
+      return
+    }
+
+    const searchLower = searchValue.toLowerCase().trim()
+    const filtered = members.filter(member => {
+      const fullName = `${member.first_name} ${member.last_name}`.toLowerCase()
+      const membershipNumber = (member.membership_number || '').toLowerCase()
+      const email = (member.email || '').toLowerCase()
+      const phone = (member.phone || '').toLowerCase()
+      
+      return (
+        fullName.includes(searchLower) ||
+        member.first_name.toLowerCase().includes(searchLower) ||
+        member.last_name.toLowerCase().includes(searchLower) ||
+        membershipNumber.includes(searchLower) ||
+        email.includes(searchLower) ||
+        phone.includes(searchLower)
+      )
+    })
+
+    setFilteredMembers(filtered)
+    setSearchResults(filtered.length)
+  }, [members])
+
+  // Handle search input change (just update the input value)
+  const handleSearchChange = (e) => {
+    const value = e.target.value
+    setSearchTerm(value)
+    
+    // If user clears the search, show all members immediately
+    if (!value.trim()) {
+      performSearch(value)
+    }
+  }
+
+  // Handle Enter key press to trigger search
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      performSearch(searchTerm)
+    }
+  }
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm('')
+    setFilteredMembers(members)
+    setSearchResults(members.length)
+  }
+
   useEffect(() => {
     fetchMembers()
-  }, [searchTerm])
+  }, [])
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      // Clean up the data before sending to database
       const memberData = {
         ...formData,
-        emergency_contact: JSON.stringify(formData.emergency_contact)
+        // Convert empty strings to null for date fields
+        date_of_birth: formData.date_of_birth || null,
+        baptism_date: formData.baptism_date || null,
+        membership_date: formData.membership_date || null,
+        // Convert empty strings to null for optional fields
+        phone: formData.phone || null,
+        email: formData.email || null,
+        address: formData.address || null,
+        marital_status: formData.marital_status || null,
+        membership_number: formData.membership_number || null,
+        // Handle emergency contact
+        emergency_contact: formData.emergency_contact.name || formData.emergency_contact.phone || formData.emergency_contact.relationship 
+          ? formData.emergency_contact 
+          : null
       }
 
       if (editingMember) {
@@ -185,18 +253,59 @@ const MembersManagement = () => {
           <p>Manage church member directory and information</p>
         </div>
         <div className="admin-header-actions">
-          <div className="admin-search-box">
-            <svg className="admin-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search members..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="admin-search-input"
-            />
+          {/* Enhanced Search Box */}
+          <div className="enhanced-search-container">
+            <div className="enhanced-search-box">
+              <svg className="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search members by name, email, phone, or membership number..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyPress}
+                className="enhanced-search-input"
+              />
+              {searchTerm && (
+                <button
+                  onClick={clearSearch}
+                  className="search-clear-btn"
+                  title="Clear search"
+                >
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+              <button
+                onClick={() => performSearch(searchTerm)}
+                className="search-submit-btn"
+                title="Search"
+              >
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Search Results Info */}
+            <div className="search-results-info">
+              {searchTerm ? (
+                <span className="search-results-text">
+                  {`${searchResults} result${searchResults !== 1 ? 's' : ''} found`}
+                  {searchResults === 0 && (
+                    <span className="no-results"> - Try different keywords</span>
+                  )}
+                </span>
+              ) : (
+                <span className="total-members-text">
+                  Total: {members.length} member{members.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
           </div>
+
           <button
             onClick={() => {
               setShowForm(true)
@@ -462,13 +571,18 @@ const MembersManagement = () => {
 
       {/* Members List */}
       <div className="admin-content-list">
-        {members.length === 0 ? (
+        {filteredMembers.length === 0 ? (
           <div className="admin-empty-state">
             <svg className="admin-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             <h3>No members found</h3>
-            <p>{searchTerm ? 'Try adjusting your search terms' : 'Start by adding your first member'}</p>
+            <p>{searchTerm ? 'Try adjusting your search terms or clear the search to see all members' : 'Start by adding your first member'}</p>
+            {searchTerm && (
+              <button onClick={clearSearch} className="admin-btn-secondary" style={{marginTop: '1rem'}}>
+                Clear Search
+              </button>
+            )}
           </div>
         ) : (
           <div className="admin-table-container">
@@ -483,7 +597,7 @@ const MembersManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {members.map((member) => (
+                {filteredMembers.map((member) => (
                   <tr key={member.id}>
                     <td>
                       <div className="admin-member-info">
@@ -550,8 +664,22 @@ const MembersManagement = () => {
           </div>
         )}
       </div>
-    </div>
+
+          </div>
   )
+}
+
+// Debounce utility function
+function debounce(func, wait) {
+  let timeout
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
 }
 
 export default MembersManagement

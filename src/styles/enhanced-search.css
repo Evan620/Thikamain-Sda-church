@@ -1,0 +1,153 @@
+/* Enhanced Search Component Styles */
+
+.enhanced-search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 400px;
+}
+
+.enhanced-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.enhanced-search-box:focus-within {
+  border-color: #2d5a27;
+  box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.enhanced-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #1f2937 !important; /* Force black text */
+  background: transparent;
+  border-radius: 12px;
+}
+
+.enhanced-search-input::placeholder {
+  color: #9ca3af !important;
+  font-size: 14px;
+}
+
+.search-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.search-clear-btn:hover {
+  background: #e5e7eb;
+}
+
+.search-clear-btn svg {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+}
+
+.search-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.search-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #2d5a27;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.search-results-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #6b7280;
+  padding: 0 4px;
+}
+
+.search-results-text {
+  color: #2d5a27;
+  font-weight: 500;
+}
+
+.no-results {
+  color: #ef4444;
+  font-weight: normal;
+}
+
+.total-members-text {
+  color: #6b7280;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .enhanced-search-container {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .enhanced-search-input::placeholder {
+    font-size: 13px;
+  }
+
+  .admin-header-actions {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-search-input::placeholder {
+    content: "Search members...";
+  }
+  
+  .enhanced-search-container {
+    min-width: 100%;
+  }
+  
+  .search-results-info {
+    font-size: 12px;
+  }
+}

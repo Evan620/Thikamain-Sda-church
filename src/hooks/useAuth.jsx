@@ -77,7 +77,19 @@ export const AuthProvider = ({ children }) => {
           throw new Error('Supabase client not properly initialized')
         }
 
-        const { data: { session }, error } = response
+        // Handle both old and new response formats
+        let session, error
+        if (response.data && response.data.session !== undefined) {
+          session = response.data.session
+          error = response.error
+        } else if (response.session !== undefined) {
+          session = response.session
+          error = response.error
+        } else {
+          console.error('❌ Unexpected response format from getSession:', response)
+          session = null
+          error = null
+        }
 
         if (error) {
           console.error('Auth initialization error:', error)
