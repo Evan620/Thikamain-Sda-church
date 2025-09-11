@@ -8,7 +8,8 @@ const FinancialDashboard = () => {
     monthlyTrend: [],
     donationsByType: {},
     recentDonations: [],
-    topDonors: []
+    topDonors: [],
+    anonymousTotal: 0
   })
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState('month')
@@ -25,11 +26,10 @@ const FinancialDashboard = () => {
       const startDate = selectedPeriod === 'month' ? startOfMonth : startOfYear
       const last12MonthsStart = new Date(now.getFullYear(), now.getMonth() - 11, 1)
 
-      // Parallel fetch all required data
+      // Fetch period and recent donations in parallel
       const [
         periodDataResult,
-        recentDataResult,
-        yearlyDataResult
+        recentDataResult
       ] = await Promise.all([
         // Get period data (current month/year) with type breakdown
         supabase
@@ -46,19 +46,59 @@ const FinancialDashboard = () => {
             member:members(first_name, last_name)
           `)
           .order('created_at', { ascending: false })
-          .limit(10),
-
-        // Get last 12 months data for trend analysis
-        supabase
-          .from('giving_records')
-          .select('amount, giving_date')
-          .gte('giving_date', last12MonthsStart.toISOString().split('T')[0])
-          .eq('is_verified', true)
+          .limit(10)
       ])
 
       if (periodDataResult.error) throw periodDataResult.error
       if (recentDataResult.error) throw recentDataResult.error
-      if (yearlyDataResult.error) throw yearlyDataResult.error
+
+      // Build monthly trend using SQL aggregation (RPC) with fallback to client-side aggregation
+      const last12MonthsStartStr = last12MonthsStart.toISOString().split('T')[0]
+      const monthlyTrend = []
+      const monthlyTotals = {}
+
+      // Initialize all months with 0
+      for (let i = 11; i >= 0; i--) {
+        const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const monthKey = monthStart.toISOString().slice(0, 7) // YYYY-MM
+        monthlyTotals[monthKey] = {
+          month: monthStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          amount: 0
+        }
+      }
+
+      try {
+        // Attempt to use SQL aggregation via RPC
+        const { data: monthlyAgg, error: monthlyErr } = await supabase.rpc('get_monthly_giving', {
+          from_date: last12MonthsStartStr
+        })
+        if (monthlyErr) throw monthlyErr
+        // monthlyAgg expected rows: { month_key: 'YYYY-MM', total: number }
+        monthlyAgg?.forEach(row => {
+          const key = row.month_key
+          const total = Number(row.total) || 0
+          if (monthlyTotals[key] !== undefined) {
+            monthlyTotals[key].amount = total
+          }
+        })
+      } catch (e) {
+        // Fallback to client-side aggregation
+        const { data: yearlyDataFallback, error: yearlyError } = await supabase
+          .from('giving_records')
+          .select('amount, giving_date')
+          .gte('giving_date', last12MonthsStartStr)
+          .eq('is_verified', true)
+        if (!yearlyError) {
+          yearlyDataFallback.forEach(record => {
+            const monthKey = record.giving_date.slice(0, 7)
+            if (monthlyTotals[monthKey]) {
+              monthlyTotals[monthKey].amount += record.amount
+            }
+          })
+        }
+      }
+
+      Object.values(monthlyTotals).forEach(month => monthlyTrend.push(month))
 
       // Process period data
       const totalDonations = periodDataResult.data.reduce((sum, record) => sum + record.amount, 0)
@@ -67,32 +107,7 @@ const FinancialDashboard = () => {
         return acc
       }, {})
 
-      // Process monthly trend from yearly data
-      const monthlyTrend = []
-      const monthlyTotals = {}
-
-      // Initialize all months with 0
-      for (let i = 11; i >= 0; i--) {
-        const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const monthKey = monthStart.toISOString().slice(0, 7) // YYYY-MM format
-        monthlyTotals[monthKey] = {
-          month: monthStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-          amount: 0
-        }
-      }
-
-      // Aggregate data by month
-      yearlyDataResult.data.forEach(record => {
-        const monthKey = record.giving_date.slice(0, 7) // YYYY-MM format
-        if (monthlyTotals[monthKey]) {
-          monthlyTotals[monthKey].amount += record.amount
-        }
-      })
-
-      // Convert to array
-      Object.values(monthlyTotals).forEach(month => {
-        monthlyTrend.push(month)
-      })
+      // Monthly trend was built above using RPC with fallback
 
       // Process top donors from period data
       const donorTotals = {}
@@ -101,7 +116,8 @@ const FinancialDashboard = () => {
         // For now, we'll use a simplified approach
       })
 
-      // Fetch top donors separately (this is still needed for member names)
+      // Fetch top donors for the selected period (exclude anonymous here)
+      const periodStartStr = startDate.toISOString().split('T')[0]
       const { data: donorData } = await supabase
         .from('giving_records')
         .select(`
@@ -111,7 +127,15 @@ const FinancialDashboard = () => {
         `)
         .not('member_id', 'is', null)
         .eq('is_verified', true)
-        .gte('giving_date', startOfYear.toISOString().split('T')[0]) // Only current year for performance
+        .gte('giving_date', periodStartStr)
+
+      // Also compute Anonymous total for the same period
+      const { data: anonData } = await supabase
+        .from('giving_records')
+        .select('amount')
+        .is('member_id', null)
+        .eq('is_verified', true)
+        .gte('giving_date', periodStartStr)
 
       const donorTotalsMap = {}
       donorData?.forEach(record => {
@@ -130,12 +154,15 @@ const FinancialDashboard = () => {
         .sort((a, b) => b.total - a.total)
         .slice(0, 5)
 
+      const anonymousTotal = (anonData || []).reduce((sum, r) => sum + r.amount, 0)
+
       setFinancialData({
         totalDonations,
         monthlyTrend,
         donationsByType,
         recentDonations: recentDataResult.data || [],
-        topDonors
+        topDonors,
+        anonymousTotal
       })
     } catch (error) {
       console.error('Error fetching financial data:', error)
@@ -276,22 +303,35 @@ const FinancialDashboard = () => {
             <p>Highest contributors</p>
           </div>
           <div className="financial-donors-list">
-            {financialData.topDonors.length === 0 ? (
+            {financialData.topDonors.length === 0 && financialData.anonymousTotal === 0 ? (
               <p className="financial-empty-message">No donor data available</p>
             ) : (
-              financialData.topDonors.map((donor, index) => (
-                <div key={index} className="financial-donor-item">
-                  <div className="financial-donor-rank">#{index + 1}</div>
-                  <div className="financial-donor-info">
-                    <span className="financial-donor-name">
-                      {donor.member.first_name} {donor.member.last_name}
-                    </span>
-                    <span className="financial-donor-amount">
-                      {formatCurrency(donor.total)}
-                    </span>
+              <>
+                {financialData.topDonors.map((donor, index) => (
+                  <div key={index} className="financial-donor-item">
+                    <div className="financial-donor-rank">#{index + 1}</div>
+                    <div className="financial-donor-info">
+                      <span className="financial-donor-name">
+                        {donor.member.first_name} {donor.member.last_name}
+                      </span>
+                      <span className="financial-donor-amount">
+                        {formatCurrency(donor.total)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+                {financialData.anonymousTotal > 0 && (
+                  <div className="financial-donor-item">
+                    <div className="financial-donor-rank">—</div>
+                    <div className="financial-donor-info">
+                      <span className="financial-donor-name">Anonymous</span>
+                      <span className="financial-donor-amount">
+                        {formatCurrency(financialData.anonymousTotal)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

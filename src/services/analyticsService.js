@@ -141,16 +141,16 @@ export const getAttendanceAnalytics = async (dateRange = 'month') => {
     try {
       const dateFilter = getDateFilter(dateRange)
 
-      // Get attendance records with error handling
-      const attendanceResult = await supabase
-        .from('attendance')
-        .select('attendance_date, service_type, member_id')
+      // Read aggregate attendance counts (Sabbath School + Divine Service breakdown)
+      const result = await supabase
+        .from('attendance_aggregates')
+        .select('attendance_date, sabbath_school_count, divine_children_count, divine_youth_count, divine_adults_count')
         .gte('attendance_date', dateFilter.start.split('T')[0])
         .lte('attendance_date', dateFilter.end.split('T')[0])
+        .order('attendance_date', { ascending: true })
 
-      // Handle case where attendance table might not exist
-      if (attendanceResult.error) {
-        console.warn('Attendance table not found, returning default values')
+      if (result.error) {
+        console.warn('attendance_aggregates not available, returning default values')
         return {
           averageAttendance: 0,
           attendanceTrend: [],
@@ -159,39 +159,41 @@ export const getAttendanceAnalytics = async (dateRange = 'month') => {
         }
       }
 
-      const attendanceData = attendanceResult.data || []
+      const rows = result.data || []
 
-      // Calculate average attendance
-      const attendanceByDate = attendanceData.reduce((acc, record) => {
-        const date = record.attendance_date
-        if (!acc[date]) acc[date] = new Set()
-        acc[date].add(record.member_id)
-        return acc
-      }, {})
+      // Compute divine totals
+      const withTotals = rows.map(r => ({
+        date: r.attendance_date,
+        sabbath: Number(r.sabbath_school_count || 0),
+        children: Number(r.divine_children_count || 0),
+        youth: Number(r.divine_youth_count || 0),
+        adults: Number(r.divine_adults_count || 0),
+        divine: Number(r.divine_children_count || 0) + Number(r.divine_youth_count || 0) + Number(r.divine_adults_count || 0)
+      }))
 
-      const attendanceCounts = Object.values(attendanceByDate).map(set => set.size)
-      const averageAttendance = attendanceCounts.length > 0
-        ? Math.round(attendanceCounts.reduce((sum, count) => sum + count, 0) / attendanceCounts.length)
+      // Average attendance: use Divine Service total as the main weekly indicator
+      const averageAttendance = withTotals.length > 0
+        ? Math.round(withTotals.reduce((sum, r) => sum + r.divine, 0) / withTotals.length)
         : 0
 
-      // Get service comparison
-      const serviceComparison = getServiceComparison(attendanceData)
+      // Service comparison (averages)
+      const serviceComparison = getAggregateServiceComparison(withTotals)
 
-      // Get recent attendance trend
-      const attendanceTrend = getAttendanceTrend(attendanceByDate)
+      // Recent attendance trend: last 4 weeks by divine total
+      const lastFour = withTotals.slice(-4).map(r => ({ date: r.date, attendance: r.divine }))
 
-      // Get seasonal trends (quarterly) with fallback
-      const seasonalTrends = await getSeasonalTrends().catch(() => [])
+      // Seasonal trends (quarterly averages) based on current year
+      const seasonalTrends = await getSeasonalTrendsAggregates().catch(() => [])
 
       return {
         averageAttendance,
-        attendanceTrend,
+        attendanceTrend: lastFour,
         serviceComparison,
         seasonalTrends
       }
 
     } catch (error) {
-      console.error('Error fetching attendance analytics:', error)
+      console.error('Error fetching attendance analytics (aggregates):', error)
       return {
         averageAttendance: 0,
         attendanceTrend: [],
@@ -450,44 +452,35 @@ const getMembershipGrowthTrend = async () => {
 /**
  * Get service comparison data
  */
-const getServiceComparison = (attendanceData) => {
-  const serviceTypes = {
-    'sabbath_school': 'Sabbath School',
-    'divine_service': 'Divine Service',
-    'prayer_meeting': 'Prayer Meeting',
-    'youth_meeting': 'Youth Service'
-  }
+const getAggregateServiceComparison = (rows) => {
+  if (!Array.isArray(rows) || rows.length === 0) return []
 
-  const serviceCounts = attendanceData.reduce((acc, record) => {
-    const service = record.service_type
-    if (!acc[service]) acc[service] = new Set()
-    acc[service].add(`${record.attendance_date}-${record.member_id}`)
-    return acc
-  }, {})
+  const avg = (arr) => arr.length > 0 ? Math.round(arr.reduce((s, n) => s + n, 0) / arr.length) : 0
 
-  return Object.entries(serviceTypes).map(([key, name]) => ({
-    service: name,
-    average: serviceCounts[key] ? serviceCounts[key].size : 0
-  }))
+  const sabbathArr = rows.map(r => r.sabbath)
+  const divineArr = rows.map(r => r.divine)
+  const childrenArr = rows.map(r => r.children)
+  const youthArr = rows.map(r => r.youth)
+  const adultsArr = rows.map(r => r.adults)
+
+  return [
+    { service: 'Sabbath School', average: avg(sabbathArr) },
+    { service: 'Divine Service', average: avg(divineArr) },
+    { service: 'Children', average: avg(childrenArr) },
+    { service: 'Youth', average: avg(youthArr) },
+    { service: 'Adults', average: avg(adultsArr) }
+  ]
 }
 
 /**
  * Get attendance trend data
  */
-const getAttendanceTrend = (attendanceByDate) => {
-  return Object.entries(attendanceByDate)
-    .sort(([a], [b]) => new Date(a) - new Date(b))
-    .slice(-4) // Last 4 weeks
-    .map(([date, memberSet]) => ({
-      date,
-      attendance: memberSet.size
-    }))
-}
+// Not used in aggregate mode; trend is built directly in getAttendanceAnalytics
 
 /**
  * Get seasonal trends (quarterly data)
  */
-const getSeasonalTrends = async () => {
+const getSeasonalTrendsAggregates = async () => {
   try {
     const quarters = ['Q1', 'Q2', 'Q3', 'Q4']
     const currentYear = new Date().getFullYear()
@@ -501,24 +494,25 @@ const getSeasonalTrends = async () => {
       const endDate = new Date(currentYear, endMonth, 1)
 
       const { data, error } = await supabase
-        .from('attendance')
-        .select('member_id, attendance_date')
+        .from('attendance_aggregates')
+        .select('divine_children_count, divine_youth_count, divine_adults_count, attendance_date')
         .gte('attendance_date', startDate.toISOString().split('T')[0])
         .lt('attendance_date', endDate.toISOString().split('T')[0])
 
       if (error) throw error
 
-      const uniqueAttendees = new Set(data.map(record => `${record.attendance_date}-${record.member_id}`))
+      const totals = (data || []).map(r => Number(r.divine_children_count || 0) + Number(r.divine_youth_count || 0) + Number(r.divine_adults_count || 0))
+      const avg = totals.length > 0 ? Math.round(totals.reduce((s, n) => s + n, 0) / totals.length) : 0
 
       trends.push({
         season: quarters[i],
-        attendance: Math.round(uniqueAttendees.size / 13) // Average per week in quarter
+        attendance: avg
       })
     }
 
     return trends
   } catch (error) {
-    console.error('Error fetching seasonal trends:', error)
+    console.error('Error fetching seasonal trends (aggregates):', error)
     return []
   }
 }

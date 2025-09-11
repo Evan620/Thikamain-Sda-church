@@ -16,6 +16,8 @@ import SystemSettings from '../../pages/admin/SystemSettings'
 import CommunicationHub from '../../pages/admin/CommunicationHub'
 import ReportsAnalytics from '../../pages/admin/ReportsAnalytics'
 import LeadersManagement from '../../pages/admin/LeadersManagement'
+import AttendanceManagement from '../../pages/admin/AttendanceManagement'
+import AttendanceList from '../../pages/admin/AttendanceList'
 
 const FinancialManagement = () => (
   <div className="bg-white rounded-lg shadow p-6">
@@ -52,6 +54,32 @@ const AdminRoutes = () => {
         element={
           <AuthGuard requiredRole="ADMIN">
             <MembersManagement />
+          </AuthGuard>
+        }
+      />
+
+      {/* Attendance - List and Recording */}
+      <Route
+        path="/attendance"
+        element={
+          <AuthGuard requiredRole="ADMIN">
+            <AttendanceList />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/attendance/new"
+        element={
+          <AuthGuard requiredRole="ADMIN">
+            <AttendanceManagement />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/attendance/:date"
+        element={
+          <AuthGuard requiredRole="ADMIN">
+            <AttendanceManagement />
           </AuthGuard>
         }
       />
